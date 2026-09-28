@@ -1,0 +1,33 @@
+/* Kotak "Segera hadir" menempati tempat daftar kategori nanti */
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-12) var(--space-8);
+  border-radius: var(--radius-xl);
+  border: 1.5px dashed var(--color-border-strong);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.coming-soon__badge {
+  padding: 3px var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.coming-soon__text {
+  max-width: 34rem;
+  margin-block: var(--space-2) var(--space-4);
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 480px) {
+  .coming-soon {
+    padding: var(--space-10) var(--space-5);
+  }
+}

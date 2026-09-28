@@ -1,0 +1,77 @@
+/*
+ * Tiga kolom yang dibagi semua baris (subgrid): bintang | koin | angka.
+ * Kolom angka selebar angka terpanjang ikan ini, jadi kelima koin berada di satu garis lurus
+ * dan angkanya rata kanan dengan digit yang sejajar (tabular-nums).
+ */
+.market-value {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto max-content;
+  column-gap: var(--space-2);
+  row-gap: 2px;
+}
+
+.market-value__row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--duration-fast) ease;
+}
+
+.market-value__row:nth-child(odd) {
+  background: var(--color-surface-sunken);
+}
+
+.market-value__stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.market-value__stars svg {
+  width: 15px;
+  height: 15px;
+  color: var(--color-border-strong);
+  stroke-width: 1.75;
+}
+
+.market-value__stars svg.is-filled {
+  color: var(--color-gold);
+  fill: currentColor;
+}
+
+/* Isi emas supaya ikon Coins terbaca sebagai tumpukan koin, bukan ikon tautan */
+.market-value__coin {
+  width: 19px;
+  height: 19px;
+  color: var(--color-gold);
+  fill: var(--color-coin-fill);
+}
+
+.market-value__amount {
+  justify-self: end;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.market-value__row:last-child .market-value__amount {
+  color: var(--color-accent-ink);
+}
+
+/* Harga yang tidak ada atau belum pasti (mis. desimal di sumber): teks, bukan angka, jadi dibuat redup */
+.market-value__row .market-value__amount.is-missing {
+  font-size: var(--text-xs);
+  font-style: italic;
+  font-weight: 600;
+  color: var(--color-text-dimmed);
+}
+
+/* Ikon petir untuk energi resep */
+.market-value__energy {
+  width: 18px;
+  height: 18px;
+  color: var(--color-sage-ink);
+  fill: color-mix(in srgb, var(--color-sage-ink) 30%, transparent);
+}

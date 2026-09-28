@@ -1,0 +1,430 @@
+/*
+ * grid-auto-rows 1fr: semua baris setinggi kartu tertinggi, jadi ukuran kartu seragam.
+ * Lebar minimum kartu = label lokasi ikan terpanjang ("Onsen Mountain Lake", ±122px) + ikon, jarak,
+ * padding, dan border kartu (46px), supaya info satu-baris ikan tidak terpotong di lebar mana pun.
+ * Beberapa label lokasi serangga lebih panjang (mis. "East Pier of Fishing Village"); di kartu sempit
+ * label itu jadi elipsis dengan teks lengkap di atribut title, sedangkan "+N" selalu terlihat.
+ */
+.entry-grid {
+  --entry-card-min: 168px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--entry-card-min)), 1fr));
+  grid-auto-rows: 1fr;
+  gap: var(--space-5);
+}
+
+.page-header .entry-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  font-size: var(--text-sm);
+}
+
+.entry-progress__bar {
+  flex: 0 0 120px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sunken);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  overflow: hidden;
+}
+
+.entry-progress__bar > span {
+  display: block;
+  min-width: 6px;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+}
+
+/* ---------- Bar kontrol: pencarian | urutan | Filter | reset ---------- */
+.list-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.list-search {
+  position: relative;
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.list-search > svg {
+  position: absolute;
+  top: 50%;
+  left: var(--space-4);
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.list-search input {
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--space-4) 0 calc(var(--space-4) + 26px);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-sm);
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
+}
+
+/* Placeholder sengaja redup supaya tidak terbaca sebagai teks yang sudah diketik */
+.list-search input::placeholder {
+  color: var(--color-text-dimmed);
+}
+
+.list-search input:hover {
+  border-color: var(--color-border-strong);
+}
+
+.list-search input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+.list-sort {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.list-sort select {
+  height: 44px;
+  padding: 0 calc(var(--space-3) + 22px) 0 calc(var(--space-4) + 22px);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) ease;
+}
+
+.list-sort select:hover {
+  border-color: var(--color-border-strong);
+}
+
+.list-sort__icon,
+.list-sort__chevron {
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.list-sort__icon {
+  left: var(--space-4);
+}
+
+.list-sort__chevron {
+  right: var(--space-3);
+}
+
+.list-filter-toggle .count-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding-inline: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.list-filter-toggle__chevron {
+  transition: transform var(--duration) var(--ease-out);
+}
+
+.list-filter-toggle[aria-expanded='true'] {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: var(--color-accent-soft);
+}
+
+.list-filter-toggle[aria-expanded='true'] .list-filter-toggle__chevron {
+  transform: rotate(180deg);
+}
+
+.list-toolbar .list-reset {
+  width: 44px;
+  height: 44px;
+}
+
+.list-toolbar .list-reset:disabled {
+  color: var(--color-text-dimmed);
+  opacity: 0.5;
+  transform: none;
+}
+
+/* ---------- Filter Lanjutan ---------- */
+.filter-advanced {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.filter-advanced[hidden] {
+  display: none;
+}
+
+.filter-advanced__title {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.filter-advanced__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Tablet & desktop sempit: dropdown dibagi per 3 kolom (Fish: 3 + 3, bukan 5 + 1; Bugs: 3 + 2) */
+@media (min-width: 640px) and (max-width: 1199px) {
+  .filter-advanced__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Hasil ---------- */
+.list-results {
+  margin-top: var(--space-6);
+}
+
+.list-status {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.list-status__count {
+  font-size: var(--text-sm);
+}
+
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.active-filters__list {
+  display: contents;
+}
+
+.active-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 8px 4px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-sunken);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+
+.active-chip svg {
+  width: 14px;
+  height: 14px;
+}
+
+.active-chip:hover {
+  border-color: var(--color-border-strong);
+  background: color-mix(in srgb, var(--color-surface-sunken) 70%, var(--color-border));
+}
+
+.text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-accent-ink);
+  transition: background-color var(--duration-fast) ease;
+}
+
+.text-button:hover {
+  background: var(--color-accent-soft);
+}
+
+.text-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ---------- Section: Base Game, lalu event (terbaru → terlama) ---------- */
+.list-sections {
+  display: grid;
+  gap: var(--space-10);
+}
+
+/* Pil nama section, jumlah hasil, lalu garis pemisah sampai tepi kanan */
+.list-section__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.list-section__head::after {
+  content: '';
+  flex: 1 1 var(--space-6);
+  height: 1px;
+  background: var(--color-border);
+}
+
+.list-section__name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+}
+
+/* Section event: latar lembut + garis tepi dari token kategori event itu, sama dengan badge kategori di kartu */
+.list-section__name--event {
+  border-color: var(--cat-line);
+  background: var(--cat-bg);
+  color: var(--cat-ink);
+}
+
+.list-section__count {
+  flex: none;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tampilan kosong */
+.list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-12) var(--space-6);
+  border-radius: var(--radius-xl);
+  border: 1.5px dashed var(--color-border-strong);
+  text-align: center;
+}
+
+.list-empty__icon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 18px;
+  background: var(--color-surface-sunken);
+}
+
+.list-empty__icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.list-empty h3 {
+  font-size: var(--text-xl);
+}
+
+.list-empty p {
+  margin-bottom: var(--space-2);
+}
+
+/* ---------- Mobile: pencarian satu baris penuh, kontrol lain di bawahnya; dropdown menumpuk ---------- */
+@media (max-width: 639px) {
+  .list-search {
+    flex-basis: 100%;
+  }
+
+  .list-sort {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .list-sort select {
+    width: 100%;
+    min-width: 0;
+    padding: 0 30px 0 14px;
+    font-size: 0.8125rem;
+  }
+
+  .list-sort__chevron {
+    right: 10px;
+  }
+
+  /* Baris kedua dipadatkan supaya label urutan tidak terpotong */
+  .list-sort__icon,
+  .list-filter-toggle__chevron {
+    display: none;
+  }
+
+  .list-toolbar .list-filter-toggle {
+    gap: 6px;
+    padding-inline: 14px;
+  }
+
+  .filter-advanced {
+    gap: var(--space-2);
+  }
+
+  .filter-advanced__list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Layar sangat sempit: ikon tombol Filter disembunyikan (teksnya tetap) supaya label urutan muat */
+@media (max-width: 380px) {
+  .list-toolbar {
+    gap: var(--space-2);
+  }
+
+  .list-filter-toggle > svg:first-of-type {
+    display: none;
+  }
+}
+
+/* Mobile: jarak antar kartu dirapatkan supaya 2 kolom masih muat di 390px; lebih sempit → 1 kolom */
+@media (max-width: 420px) {
+  .entry-grid {
+    gap: var(--space-3);
+  }
+}

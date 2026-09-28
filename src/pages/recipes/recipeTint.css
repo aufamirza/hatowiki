@@ -1,0 +1,6 @@
+/* Warna halaman resep (header, panggung gambar): peach hangat seperti dapur. Kunci sama dengan kategori wildlife. */
+[data-wildlife='recipes'] {
+  --tint: var(--color-dawn-soft);
+  --tint-ink: var(--color-dawn-ink);
+  --stage-top: var(--stage-top-kitchen);
+}

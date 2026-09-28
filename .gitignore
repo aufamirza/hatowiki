@@ -1,0 +1,8 @@
+node_modules/
+dist/
+
+# Cache halaman & gambar dari heartodex (skrip sinkronisasi); ukurannya terus membesar.
+scripts/.cache/
+
+# Screenshot hasil QA; bisa dibuat ulang kapan saja.
+screenshots/

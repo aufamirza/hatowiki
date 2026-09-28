@@ -1,0 +1,254 @@
+/* ---------- Menu Wildlife (dropdown di toolbar desktop) ---------- */
+.nav-menu {
+  position: relative;
+}
+
+.nav-menu__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-menu__chevron {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--duration) var(--ease-out);
+}
+
+.nav-menu__button[aria-expanded='true'] {
+  color: var(--color-text);
+  background: var(--color-surface-sunken);
+}
+
+.nav-menu__button[aria-expanded='true'] .nav-menu__chevron {
+  transform: rotate(180deg);
+}
+
+.nav-menu__panel {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 120;
+  width: 18rem;
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  animation: nav-pop var(--duration) var(--ease-out);
+}
+
+@keyframes nav-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+.nav-menu__list {
+  display: grid;
+  gap: 2px;
+}
+
+/* Tautan kategori: ikon dalam tile berwarna kategori (wildlifeTints.css), nama, lalu label & jumlah entri */
+.nav-menu__link,
+.drawer__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: background-color var(--duration-fast) ease;
+}
+
+.nav-menu__link:hover,
+.nav-menu__link:focus-visible,
+.drawer__link:hover {
+  background: var(--color-surface-sunken);
+}
+
+.nav-menu__link.active,
+.drawer__link.active {
+  background: var(--color-accent-soft);
+}
+
+.nav-menu__icon,
+.drawer__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--tint, var(--color-surface-sunken));
+  color: var(--tint-ink, var(--color-text));
+}
+
+.nav-menu__icon svg,
+.drawer__icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.9;
+}
+
+.nav-menu__text,
+.drawer__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.nav-menu__name,
+.drawer__name {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.nav-menu__meta,
+.drawer__meta {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.nav-menu__all,
+.drawer__all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-accent-ink);
+  text-decoration: none;
+}
+
+.nav-menu__all svg,
+.drawer__all svg {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--duration) var(--ease-out);
+}
+
+.nav-menu__all:hover svg,
+.drawer__all:hover svg {
+  transform: translateX(3px);
+}
+
+/* ---------- Menu seluler ---------- */
+/* Selector ganda supaya menang atas .icon-button (display: grid) apa pun urutan CSS-nya */
+.site-header .menu-button {
+  display: none;
+}
+
+@media (max-width: 759px) {
+  .site-header .menu-button {
+    display: grid;
+  }
+}
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+}
+
+.drawer__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--map-dim);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: drawer-fade var(--duration) ease;
+}
+
+.drawer__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(20rem, 86vw);
+  padding: var(--space-3) var(--space-4) var(--space-6);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-bg);
+  border-left: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  animation: drawer-slide 280ms var(--ease-out);
+}
+
+/* Panel hanya menampung fokus saat bagian kosongnya diklik; tanpa garis fokus */
+.drawer__panel:focus {
+  outline: none;
+}
+
+@keyframes drawer-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes drawer-slide {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+.drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  margin-bottom: var(--space-3);
+}
+
+.drawer__title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 650;
+}
+
+.drawer__nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer__group {
+  margin: var(--space-4) var(--space-2) var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.drawer__list {
+  display: grid;
+  gap: 2px;
+}
+
+.drawer__link {
+  min-height: 56px;
+}
+
+.drawer__link--plain .drawer__name {
+  font-size: var(--text-base);
+}
+
+.drawer__all {
+  margin-top: var(--space-1);
+  border-top: 0;
+  padding-block: var(--space-2);
+}
+
+.drawer__divider {
+  margin-block: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}

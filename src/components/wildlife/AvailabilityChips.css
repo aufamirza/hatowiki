@@ -1,0 +1,82 @@
+.availability {
+  display: grid;
+  grid-template-columns: repeat(var(--availability-columns, 2), minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.availability__chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  transition:
+    background-color var(--duration) ease,
+    opacity var(--duration) ease;
+}
+
+.availability__emoji {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.availability__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.availability__label {
+  font-weight: 700;
+  font-size: var(--text-sm);
+}
+
+.availability__hint {
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.availability--stack .availability__chip {
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-block: var(--space-4);
+  text-align: center;
+}
+
+.availability--stack .availability__text {
+  align-items: center;
+}
+
+.availability__chip.is-on {
+  background: var(--color-sage-soft);
+  color: var(--color-sage-ink);
+}
+
+.availability__chip.is-on .availability__emoji {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.availability__chip.is-off {
+  border: 1px dashed var(--color-border-strong);
+  color: var(--color-text-dimmed);
+}
+
+.availability__chip.is-off .availability__emoji {
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+
+.availability__chip.is-off .availability__label {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}

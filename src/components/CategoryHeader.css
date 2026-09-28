@@ -1,0 +1,54 @@
+.category-header__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* Ukuran dan sudut tile sama dengan ikon kartu kategori di hub /wildlife */
+.category-header__tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 20px;
+  background: var(--tint, var(--color-accent-soft));
+  color: var(--tint-ink, var(--color-accent-ink));
+}
+
+.category-header__tile svg {
+  width: 30px;
+  height: 30px;
+  stroke-width: 1.75;
+}
+
+.category-header__heading {
+  min-width: 0;
+}
+
+/* Spesifisitas dinaikkan: CSS komponen dimuat sebelum base.css (.page-header h1) */
+.category-header .category-header__heading h1 {
+  margin-block: var(--space-1) 0;
+  line-height: 1;
+}
+
+.category-header__desc {
+  margin-top: var(--space-4);
+}
+
+@media (max-width: 480px) {
+  .category-header__top {
+    gap: var(--space-3);
+  }
+
+  .category-header__tile {
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 16px;
+  }
+
+  .category-header__tile svg {
+    width: 24px;
+    height: 24px;
+  }
+}

@@ -1,0 +1,31 @@
+.shadow-indicator {
+  display: block;
+  width: 96px;
+  height: 32px;
+  color: var(--color-sky-ink);
+}
+
+.shadow-indicator__fill {
+  fill: currentColor;
+  opacity: 0.85;
+}
+
+.shadow-indicator__ghost {
+  fill: none;
+  stroke: var(--color-text-faint);
+  stroke-width: 1.25;
+  stroke-dasharray: 3 3;
+}
+
+.shadow-indicator__glow {
+  fill: currentColor;
+  opacity: 0.18;
+}
+
+.shadow-indicator--gold {
+  color: var(--color-gold);
+}
+
+.shadow-indicator--blue {
+  color: var(--color-shadow-blue);
+}

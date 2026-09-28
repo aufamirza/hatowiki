@@ -1,0 +1,188 @@
+.entry-card {
+  --card-pad: var(--space-3);
+  --badge-inset: 5px;
+  /*
+   * Pita di atas gambar untuk badge kategori & level: kotak gambar lebih tinggi, ukuran gambar tetap.
+   * 28px cukup untuk badge kategori dua baris (nama panjang di kartu sempit) tanpa menyentuh gambar.
+   */
+  --badge-band: 28px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+  padding: var(--card-pad) var(--card-pad) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
+  text-decoration: none;
+  transition:
+    transform var(--duration) var(--ease-out),
+    box-shadow var(--duration) ease,
+    border-color var(--duration) ease;
+}
+
+.entry-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-border-strong);
+}
+
+.entry-card:focus-visible {
+  outline-offset: 4px;
+}
+
+/*
+ * Gambar selebar 86% kotak (padding 7% di tiap sisi). Padding atas ditambah pita badge, jadi badge
+ * berada di atas gambar dan tidak menutupi isinya; bagian atas gambar umumnya transparan.
+ */
+.entry-card__media {
+  display: grid;
+  place-items: center;
+  padding: calc(var(--badge-band) + 7%) 7% 7%;
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(ellipse 60% 22% at 50% 76%, var(--stage-shadow), transparent 70%),
+    linear-gradient(180deg, var(--stage-top), var(--stage-bottom));
+  overflow: hidden;
+}
+
+/* Kotak gambar selalu persegi; gambar yang tidak persegi (serangga) diletakkan utuh di tengahnya */
+.entry-card__image {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  transition: transform var(--duration) var(--ease-out);
+}
+
+/* Badge kategori & level di pojok kiri atas area gambar */
+.entry-card__badges {
+  position: absolute;
+  top: calc(var(--card-pad) + var(--badge-inset));
+  right: calc(var(--card-pad) + var(--badge-inset));
+  left: calc(var(--card-pad) + var(--badge-inset));
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  pointer-events: none;
+}
+
+/*
+ * Satu baris: kategori lalu level. Nama kategori yang panjang (mis. "Mermaid Fish Attractor" di kartu
+ * sempit) turun jadi dua baris di dalam badge-nya; badge level tidak pernah terpotong.
+ */
+.card-badge {
+  min-width: 0;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+/*
+ * Warna per kategori (Common & event): --cat-bg, --cat-ink, --cat-line diisi dari nama kategori (categoryTone.js).
+ * Latar lembut + garis tepi berwarna, supaya tidak terbaca sebagai badge level yang berupa blok warna penuh.
+ */
+.card-badge--category {
+  border-color: var(--cat-line, var(--color-border));
+  background: var(--cat-bg, var(--color-surface));
+  color: var(--cat-ink, var(--color-text));
+}
+
+/* Warna per level: --level-bg & --level-ink diisi dari nomor level (levelTone.js) */
+.card-badge--level {
+  flex: none;
+  border-color: color-mix(in srgb, var(--level-ink) 28%, transparent);
+  background: var(--level-bg);
+  color: var(--level-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.entry-card:hover .entry-card__image {
+  transform: scale(1.05) rotate(-2deg);
+}
+
+/* Nama selalu menyediakan ruang dua baris supaya isi semua kartu sejajar */
+.entry-card__name {
+  display: grid;
+  place-items: center;
+  min-height: 2.4em;
+  padding-inline: var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.entry-card__name-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+/*
+ * Lokasi, waktu, cuaca: tiga baris satu-baris dengan kolom ikon 14px yang sama, jadi ikon dan awal teks
+ * sejajar. Teks info sedikit lebih kecil dari nama ikan. Blok menempel di bawah kartu.
+ */
+.entry-card__facts {
+  display: grid;
+  gap: var(--space-1);
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.entry-card__facts li {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 6px;
+}
+
+/* Ukuran, warna, dan ketebalan garis sama untuk ketiga ikon */
+.entry-card__fact-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--color-text);
+  stroke-width: 2;
+}
+
+/* Pengaman: tetap satu baris, sisanya jadi elipsis (teks lengkap ada di atribut title) */
+.entry-card__fact-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Lokasi jamak: "lokasi pertama +N". Nama pertama yang terpotong jadi elipsis, "+N" tetap utuh. */
+.entry-card__fact-text--split {
+  display: flex;
+  gap: 4px;
+}
+
+.entry-card__fact-first {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.entry-card__fact-more {
+  flex: none;
+  font-weight: 700;
+  color: var(--color-accent-ink);
+}

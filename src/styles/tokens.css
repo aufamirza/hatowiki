@@ -1,0 +1,382 @@
+/*
+ * Design token Hatowiki.
+ * Light: krem hangat seperti kertas buku harian, satu aksen coral terakota.
+ * Dark: "malam di kabin" — cokelat hangat, bukan abu-abu kebiruan; permukaan makin terang
+ * saat makin "naik", aksen dibuat lebih muda supaya tetap lembut di latar gelap.
+ */
+:root {
+  /* Font */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* Skala teks */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: clamp(2rem, 1.5rem + 2vw, 2.625rem);
+  --text-4xl: clamp(2.5rem, 1.7rem + 3.4vw, 3.75rem);
+
+  /* Spacing (kelipatan 4px) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+
+  /* Radius */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+
+  /* Gerak */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 140ms;
+  --duration: 220ms;
+
+  --container: 1160px;
+
+  /* Warna — light */
+  color-scheme: light;
+  --color-bg: #faf5ec;
+  --color-bg-tint: #f5ede0;
+  --color-surface: #fffcf7;
+  --color-surface-sunken: #f4ecdf;
+  --color-border: #eadfcd;
+  --color-border-strong: #d8c7af;
+  /* Teks di light mode hitam pekat; hierarki dibedakan lewat ukuran dan ketebalan huruf. */
+  --color-text: #000000;
+  --color-text-muted: #000000;
+  /* Hanya untuk elemen yang sengaja diredupkan karena tidak berlaku (chip nonaktif, tombol disabled). */
+  --color-text-dimmed: #6f5f53;
+  /* Ikon dan garis dekoratif, bukan teks. */
+  --color-text-faint: #9c8b7a;
+
+  --color-accent: #c2553a;
+  --color-accent-hover: #a9472e;
+  --color-on-accent: #ffffff;
+  --color-accent-ink: #a9472e;
+  --color-accent-soft: #fbe4d9;
+
+  /* Pastel pendukung: untuk status dan nuansa, bukan aksen */
+  --color-sage-soft: #e2ecda;
+  --color-sage-ink: #3d5a37;
+  --color-sky-soft: #dceaf0;
+  --color-sky-ink: #35596a;
+  --color-butter-soft: #f8eccb;
+  --color-gold: #9c6a0e;
+  --color-coin-fill: #ecbf5a;
+  --color-shadow-blue: #3f7fb3;
+  /* Warna halaman Crops (daun muda) & Collectibles (tanah/kayu); kontras teks ≥ 6.2:1 */
+  --color-leaf-soft: #e8efd0;
+  --color-leaf-ink: #4b5a17;
+  --color-earth-soft: #efe3d3;
+  --color-earth-ink: #6b4a2b;
+
+  /* Badge periode waktu (Dawn, Day, Dusk, Night): kalem, kontras teks ≥ 5.6:1 */
+  --color-dawn-soft: #fde3d3;
+  --color-dawn-ink: #94421a;
+  --color-day-soft: #f7ecc6;
+  --color-day-ink: #6f4f0e;
+  --color-dusk-soft: #f6dfe6;
+  --color-dusk-ink: #8a3452;
+  --color-night-soft: #e1e5f5;
+  --color-night-ink: #3b4683;
+
+  /*
+   * Badge level (Lv. 1–14): warna naik hijau → teal → biru → ungu → merah muda → oranye → emas.
+   * Disusun di OKLCH dengan jarak warna antarlevel yang sama rata; kontras teks ≥ 6.2:1.
+   * --level-N = latar badge, --level-N-ink = teks & garis tepi. Warnanya dipilih dari nomor level
+   * di data (lihat components/wildlife/levelTone.js); level tanpa token memakai --level-fallback.
+   */
+  --level-1: #b5e3af;
+  --level-1-ink: #224b1e;
+  --level-2: #9ae6c6;
+  --level-2-ink: #024c36;
+  --level-3: #86e6e3;
+  --level-3-ink: #004a49;
+  --level-4: #8edefe;
+  --level-4-ink: #03475b;
+  --level-5: #abd5fe;
+  --level-5-ink: #0d426c;
+  --level-6: #c4cbfe;
+  --level-6-ink: #35396f;
+  --level-7: #d8c2fe;
+  --level-7-ink: #483268;
+  --level-8: #edb7fa;
+  --level-8-ink: #552d5e;
+  --level-9: #feb0e3;
+  --level-9-ink: #5f294f;
+  --level-10: #feb4cc;
+  --level-10-ink: #66263f;
+  --level-11: #feb7ae;
+  --level-11-ink: #6a2723;
+  --level-12: #ffb88d;
+  --level-12-ink: #652e00;
+  --level-13: #fdbb6d;
+  --level-13-ink: #5a3702;
+  --level-14: #e6c662;
+  --level-14-ink: #4e3e03;
+  /* Cadangan untuk level di atas 14: emas tua, setingkat di atas Lv. 14 */
+  --level-fallback: #e6ac45;
+  --level-fallback-ink: #482c01;
+
+  /*
+   * Badge kategori entri (Common & event) di kartu daftar dan halaman detail. Kunci token = nama kategori di data,
+   * huruf kecil dengan tanda hubung ('Sea Fishing' → --category-sea-fishing; lihat components/catalog/categoryTone.js).
+   * --category-<kunci> = latar lembut, --category-<kunci>-ink = teks sekaligus dasar warna garis tepi,
+   * --category-<kunci>-line (opsional) = garis tepi. Gayanya sengaja beda dari badge level yang berupa blok warna
+   * penuh: latar lembut + garis tepi berwarna. Kontras teks ≥ 7:1 di light dan ≥ 9:1 di dark; jarak warna latar ke
+   * semua token level ≥ 0,08 (OKLab). Kategori yang belum terdaftar memakai --category-fallback.
+   */
+  /* 🏠 Common: putih dengan garis tepi netral */
+  --category-common: #ffffff;
+  --category-common-ink: var(--color-text);
+  --category-common-line: var(--color-border-strong);
+  /* 🎣 laut lepas: biru toska */
+  --category-sea-fishing: #dcf9fc;
+  --category-sea-fishing-ink: #055b63;
+  /* 🐞 kepik: merah */
+  --category-bait-the-insects: #ffeeec;
+  --category-bait-the-insects-ink: #892a29;
+  /* 🦚 bulu merak: hijau zamrud */
+  --category-nest-of-hundreds: #e0faed;
+  --category-nest-of-hundreds-ink: #015f43;
+  /* 🧜‍♀️ putri duyung: ungu anggrek */
+  --category-mermaid-fish-attractor: #fbedff;
+  --category-mermaid-fish-attractor-ink: #6c3678;
+  /* 🦖 fosil & dinosaurus: hijau lumut purba */
+  --category-echo-of-ancients: #eff7d9;
+  --category-echo-of-ancients-ink: #4a5714;
+  /* 🐳 laut dalam: biru nila */
+  --category-call-of-whales: #edf2ff;
+  --category-call-of-whales-ink: #344a91;
+  /* 🎬 mimpi & film: ungu */
+  --category-dreamlight-cinematics: #f3f0ff;
+  --category-dreamlight-cinematics-ink: #573d8e;
+  /* 🧩 jalanan kota: abu batu kebiruan */
+  --category-modular-streets: #e9f4fe;
+  --category-modular-streets-ink: #38536a;
+  /* ⛄ salju & es: biru es */
+  --category-winter-frost-season: #e3f6fe;
+  --category-winter-frost-season-ink: #045871;
+  /* 🦴 anjing Maltese: krem biskuit */
+  --category-maltese: #feefe4;
+  --category-maltese-ink: #68482d;
+  /* 🌾 gandum musim panas: kuning gandum */
+  --category-midsummer-rhyme: #fef2cd;
+  --category-midsummer-rhyme-ink: #614e00;
+  /* 🪷 bunga teratai: merah muda teratai */
+  --category-qixi-fair: #ffedf4;
+  --category-qixi-fair-ink: #812a5a;
+  /* 🫧 karakter imut: merah muda permen */
+  --category-sanrio-characters: #ffedf1;
+  --category-sanrio-characters-ink: #862846;
+  /* 🤿 penyelam: biru samudra */
+  --category-dave-the-diver: #e6f5ff;
+  --category-dave-the-diver-ink: #03577a;
+  /* 🍂 daun musim gugur: oranye karat */
+  --category-autumn-moon-treasury: #feefe8;
+  --category-autumn-moon-treasury-ink: #7f3812;
+  /* 🍔 roti burger: kuning mustard */
+  --category-burger-bliss: #fef0df;
+  --category-burger-bliss-ink: #6e4600;
+  /* 🌈 pelangi: gradasi lembut, teks ungu */
+  --category-rainbow-verse: linear-gradient(90deg, #feebea, #ffeed2, #def9de, #e1f3ff, #f2edff);
+  --category-rainbow-verse-ink: #593888;
+  /* 🌠 hujan meteor: gradasi langit malam ke jejak meteor keemasan, teks biru malam */
+  --category-meteor-shower: linear-gradient(90deg, #e8ebff, #fff1d2);
+  --category-meteor-shower-ink: #353a7e;
+  /* cadangan untuk kategori yang belum terdaftar: abu netral kebiruan */
+  --category-fallback: #ecf1f5;
+  --category-fallback-ink: #48515b;
+
+  /* Panggung gambar wildlife, resep & peta. Atas: air (ikan); versi padang rumput untuk serangga, dapur hangat untuk resep. */
+  --stage-top: #e1eef1;
+  --stage-top-meadow: #e5eddb;
+  --stage-top-kitchen: #f6e5d3;
+  --stage-top-earth: #ece3d6;
+  --stage-bottom: #f6eee2;
+  --stage-ring: rgba(255, 255, 255, 0.55);
+  --stage-glow: rgba(255, 255, 255, 0.7);
+  --stage-shadow: rgba(38, 72, 84, 0.24);
+  --map-dim: rgba(58, 46, 39, 0.3);
+  --map-filter: none;
+
+  /*
+   * Pemandangan hero di beranda (ilustrasi SVG/CSS): langit pagi bergradasi, matahari, awan, bukit, dan laut.
+   * Teks di atas langit tetap --color-text (kontras ≥ 15:1 terhadap kedua ujung gradasi).
+   */
+  --hero-sky-top: #cde3ed;
+  --hero-sky-bottom: #fbf1e4;
+  --hero-sun: #fbd89c;
+  --hero-sun-glow: rgba(251, 216, 156, 0.55);
+  --hero-star: transparent;
+  --hero-cloud: rgba(255, 252, 247, 0.92);
+  --hero-hill-far: #d3e4c5;
+  --hero-hill-near: #bcd6a9;
+  --hero-tree: #9fc389;
+  --hero-sea-deep: #a9d0de;
+  --hero-sea: #c1dfe9;
+  --hero-foam: rgba(255, 255, 255, 0.8);
+
+  /* Elevasi — bayangan hangat kecokelatan */
+  --shadow-sm: 0 1px 2px rgba(92, 64, 40, 0.06), 0 1px 1px rgba(92, 64, 40, 0.04);
+  --shadow-md: 0 2px 4px rgba(92, 64, 40, 0.04), 0 10px 24px -10px rgba(92, 64, 40, 0.16);
+  --shadow-lg: 0 4px 8px rgba(92, 64, 40, 0.05), 0 22px 44px -18px rgba(92, 64, 40, 0.26);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg: #1b1714;
+  --color-bg-tint: #201b17;
+  --color-surface: #26211d;
+  --color-surface-sunken: #1f1a17;
+  --color-border: #3a322b;
+  --color-border-strong: #4e443a;
+  --color-text: #f2e8dc;
+  --color-text-muted: #bba998;
+  --color-text-dimmed: #bba998;
+  --color-text-faint: #8e7f71;
+
+  --color-accent: #f0957a;
+  --color-accent-hover: #f5ae97;
+  --color-on-accent: #1b1714;
+  --color-accent-ink: #f5ae97;
+  --color-accent-soft: #3a2822;
+
+  --color-sage-soft: #243024;
+  --color-sage-ink: #bcd9b0;
+  --color-sky-soft: #1f2c33;
+  --color-sky-ink: #a9cbda;
+  --color-butter-soft: #362d1a;
+  --color-gold: #e8b64c;
+  --color-coin-fill: #7d5a1c;
+  --color-shadow-blue: #7fb4de;
+  --color-leaf-soft: #2a2f1c;
+  --color-leaf-ink: #cbd9a3;
+  --color-earth-soft: #332a21;
+  --color-earth-ink: #dcc3a6;
+
+  --color-dawn-soft: #3d2b21;
+  --color-dawn-ink: #f3b98f;
+  --color-day-soft: #39301b;
+  --color-day-ink: #ebc574;
+  --color-dusk-soft: #3b2531;
+  --color-dusk-ink: #eeabc1;
+  --color-night-soft: #262b40;
+  --color-night-ink: #b6bff0;
+
+  /* Badge level: urutan hue sama dengan light, latar gelap & teks terang; kontras ≥ 6.1:1 */
+  --level-1: #274923;
+  --level-1-ink: #cae8c6;
+  --level-2: #004d37;
+  --level-2-ink: #bbebd5;
+  --level-3: #004c4b;
+  --level-3-ink: #b0ebe9;
+  --level-4: #014a60;
+  --level-4-ink: #b2e8fe;
+  --level-5: #154670;
+  --level-5-ink: #c5e2fe;
+  --level-6: #3a3e74;
+  --level-6-ink: #d6dcff;
+  --level-7: #4f386f;
+  --level-7-ink: #e4d6fe;
+  --level-8: #5d3466;
+  --level-8-ink: #f4cffc;
+  --level-9: #693057;
+  --level-9-ink: #fecdec;
+  --level-10: #712d47;
+  --level-10-ink: #fecfdd;
+  --level-11: #772f2a;
+  --level-11-ink: #fed2cd;
+  --level-12: #743701;
+  --level-12-ink: #ffd4ba;
+  --level-13: #694103;
+  --level-13-ink: #ffd6a8;
+  --level-14: #5c4a02;
+  --level-14-ink: #f2dd9d;
+  --level-fallback: #714e04;
+  --level-fallback-ink: #fee5b3;
+
+  /* Badge kategori: latar gelap bernuansa + teks terang. Common netral, sedikit di atas permukaan (tidak menyilaukan). */
+  --category-common: #2f2924;
+  --category-sea-fishing: #192e30;
+  --category-sea-fishing-ink: #a6e0e7;
+  --category-bait-the-insects: #3a2321;
+  --category-bait-the-insects-ink: #fec4be;
+  --category-nest-of-hundreds: #1c2f27;
+  --category-nest-of-hundreds-ink: #b0e1ca;
+  --category-mermaid-fish-attractor: #322435;
+  --category-mermaid-fish-attractor-ink: #eac6f2;
+  --category-echo-of-ancients: #282d18;
+  --category-echo-of-ancients-ink: #cfdab3;
+  --category-call-of-whales: #22293c;
+  --category-call-of-whales-ink: #c3d4fe;
+  --category-dreamlight-cinematics: #2b273a;
+  --category-dreamlight-cinematics-ink: #d7ccfe;
+  --category-modular-streets: #242b32;
+  --category-modular-streets-ink: #c5d7e7;
+  --category-winter-frost-season: #182d36;
+  --category-winter-frost-season-ink: #aaddf2;
+  --category-maltese: #322820;
+  --category-maltese-ink: #e7cfbd;
+  --category-midsummer-rhyme: #32290d;
+  --category-midsummer-rhyme-ink: #e2d4a8;
+  --category-qixi-fair: #38232d;
+  --category-qixi-fair-ink: #fdc0db;
+  --category-sanrio-characters: #382428;
+  --category-sanrio-characters-ink: #ffc1ce;
+  --category-dave-the-diver: #142d3b;
+  --category-dave-the-diver-ink: #a6ddfd;
+  --category-autumn-moon-treasury: #3b2319;
+  --category-autumn-moon-treasury-ink: #fac7b1;
+  --category-burger-bliss: #39260b;
+  --category-burger-bliss-ink: #f0cea5;
+  --category-rainbow-verse: linear-gradient(90deg, #3d2323, #362913, #1e311f, #162e3c, #2e273c);
+  --category-rainbow-verse-ink: #dbcafe;
+  --category-meteor-shower: linear-gradient(90deg, #23263f, #3a2e14);
+  --category-meteor-shower-ink: #dfe1ff;
+  --category-fallback: #272a2e;
+  --category-fallback-ink: #cad2db;
+
+  --stage-top: #1c2b32;
+  --stage-top-meadow: #212b20;
+  --stage-top-kitchen: #2e241c;
+  --stage-top-earth: #2b241e;
+  --stage-bottom: #231e1a;
+  --stage-ring: rgba(169, 203, 218, 0.07);
+  --stage-glow: rgba(169, 203, 218, 0.1);
+  --stage-shadow: rgba(0, 0, 0, 0.5);
+  --map-dim: rgba(12, 9, 7, 0.55);
+  --map-filter: brightness(0.86) saturate(0.9);
+
+  /* Hero: malam berbintang dengan bulan; bukit & laut gelap kehijauan/kebiruan, horizon cokelat hangat */
+  --hero-sky-top: #131a23;
+  --hero-sky-bottom: #2a211b;
+  --hero-sun: #efe2c6;
+  --hero-sun-glow: rgba(239, 226, 198, 0.16);
+  --hero-star: rgba(255, 244, 222, 0.85);
+  --hero-cloud: rgba(64, 58, 66, 0.55);
+  --hero-hill-far: #243128;
+  --hero-hill-near: #1d2821;
+  --hero-tree: #1a241c;
+  --hero-sea-deep: #172730;
+  --hero-sea: #1c2f39;
+  --hero-foam: rgba(169, 203, 218, 0.28);
+
+  /* Di gelap, kedalaman datang dari highlight tipis di tepi atas, bukan bayangan besar */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: inset 0 1px 0 rgba(255, 240, 220, 0.04), 0 12px 28px -12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: inset 0 1px 0 rgba(255, 240, 220, 0.05), 0 24px 48px -20px rgba(0, 0, 0, 0.72);
+}

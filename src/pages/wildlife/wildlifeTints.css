@@ -1,0 +1,30 @@
+/* Warna pastel per kategori wildlife, dipakai hub, header kategori, dan halaman daftar/detail. */
+[data-wildlife] {
+  --tint: var(--color-surface-sunken);
+  --tint-ink: var(--color-text);
+}
+
+[data-wildlife='fish'] {
+  --tint: var(--color-sky-soft);
+  --tint-ink: var(--color-sky-ink);
+}
+
+[data-wildlife='bugs'] {
+  --tint: var(--color-sage-soft);
+  --tint-ink: var(--color-sage-ink);
+}
+
+[data-wildlife='birds'] {
+  --tint: var(--color-butter-soft);
+  --tint-ink: var(--color-gold);
+}
+
+[data-wildlife='animals'] {
+  --tint: var(--color-accent-soft);
+  --tint-ink: var(--color-accent-ink);
+}
+
+/* Panggung gambar serangga: padang rumput, bukan air */
+[data-wildlife='bugs'] {
+  --stage-top: var(--stage-top-meadow);
+}

@@ -1,0 +1,257 @@
+.server-time {
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
+}
+
+/*
+ * Satu template kolom untuk semua baris (baris memakai subgrid dari daftar):
+ *   nama + UTC | ruang | jam | ruang | periode
+ * Kolom nama selebar nama terpanjang ("TW HK MO"), kolom periode selebar badge terlebar.
+ * Kedua kolom ruang sama-sama 1fr, jadi jarak nama→jam dan jam→periode seimbang dan
+ * badge periode selalu menempel di ujung kanan baris.
+ */
+.server-time__list {
+  --server-gap-min: var(--space-5);
+  display: grid;
+  flex: 1;
+  grid-template-columns:
+    max-content minmax(var(--server-gap-min), 1fr)
+    max-content minmax(var(--server-gap-min), 1fr)
+    max-content;
+  grid-auto-rows: 1fr;
+  row-gap: var(--space-2);
+}
+
+.server-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+  min-height: 3.5rem;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-sunken);
+  transition: background-color var(--duration-fast) ease;
+}
+
+.server-row:hover {
+  background: color-mix(in srgb, var(--color-surface-sunken) 70%, var(--color-border));
+}
+
+.server-row__name {
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.server-row__server {
+  font-weight: 700;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.server-row__offset {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* Font body: angka tabularnya benar-benar sama lebar (Fraunces tidak punya angka tabular). */
+.server-row__clock {
+  grid-column: 3;
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* Badge periode (versi daftar & kartu; .period-badge untuk tempat lain, mis. Muncul Sekarang di beranda).
+   Di daftar selebar kolomnya, jadi kelima badge sama lebar dan ikonnya sejajar. */
+.server-row__period,
+.server-card__period,
+.period-badge {
+  --period-bg: var(--color-surface);
+  --period-ink: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--period-bg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--period-ink) 22%, transparent);
+  color: var(--period-ink);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.server-row__period {
+  grid-column: 5;
+}
+
+.server-row__period svg,
+.server-card__period svg,
+.period-badge svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+.server-time [data-period='Dawn'],
+.period-badge[data-period='Dawn'] {
+  --period-bg: var(--color-dawn-soft);
+  --period-ink: var(--color-dawn-ink);
+}
+
+.server-time [data-period='Day'],
+.period-badge[data-period='Day'] {
+  --period-bg: var(--color-day-soft);
+  --period-ink: var(--color-day-ink);
+}
+
+.server-time [data-period='Dusk'],
+.period-badge[data-period='Dusk'] {
+  --period-bg: var(--color-dusk-soft);
+  --period-ink: var(--color-dusk-ink);
+}
+
+.server-time [data-period='Night'],
+.period-badge[data-period='Night'] {
+  --period-bg: var(--color-night-soft);
+  --period-ink: var(--color-night-ink);
+}
+
+/* Wadah sempit (ponsel, kotak detail di desktop): ukuran dan jarak dikecilkan, susunan kolom tetap. */
+@container (max-width: 330px) {
+  .server-time__list {
+    --server-gap-min: var(--space-3);
+  }
+
+  .server-row {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .server-row__server {
+    font-size: 0.8125rem;
+  }
+
+  .server-row__offset {
+    font-size: 0.6875rem;
+  }
+
+  .server-row__clock {
+    font-size: 1.125rem;
+  }
+
+  .server-row__period {
+    gap: 5px;
+    padding: 3px 8px;
+  }
+
+  .server-row__period svg {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+/* ---------- Varian kartu (beranda): lima kotak terpisah dengan jam besar ---------- */
+.server-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.server-card {
+  --period-bg: var(--color-surface-sunken);
+  --period-ink: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  /* Nuansa warna periode di bagian atas kotak, memudar ke warna permukaan */
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--period-bg) 75%, var(--color-surface)), var(--color-surface) 70%);
+  box-shadow: var(--shadow-md);
+}
+
+.server-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  align-self: stretch;
+  line-height: 1.25;
+}
+
+.server-card__name {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.server-card__offset {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* Font body: angka tabularnya benar-benar sama lebar (Fraunces tidak punya angka tabular). */
+.server-card__clock {
+  font-family: var(--font-body);
+  font-size: 2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* Sempit (ponsel): 2 kolom; kotak kelima selebar baris dengan susunan mendatar supaya tidak ada ruang kosong. */
+@container (max-width: 559px) {
+  .server-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .server-card:last-child:nth-child(odd) .server-card__head {
+    flex-direction: column;
+    align-self: auto;
+    gap: 0;
+  }
+}
+
+/* Sedang (tablet): 3 + 2, baris kedua di tengah. */
+@container (min-width: 560px) and (max-width: 899px) {
+  .server-cards {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .server-card {
+    grid-column: span 2;
+  }
+
+  .server-card:nth-child(4):nth-last-child(2) {
+    grid-column: 2 / span 2;
+  }
+}
+
+/* Lebar (desktop): 5 kolom. */
+@container (min-width: 900px) {
+  .server-cards {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .server-card__clock {
+    font-size: 2.375rem;
+  }
+}

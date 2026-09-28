@@ -1,0 +1,13 @@
+/* Warna halaman Crops (daun muda, panggung padang rumput) dan Collectibles (tanah & kayu). Kunci sama dengan
+   kategori wildlife (data-wildlife), dipakai header, panggung gambar, menu toolbar, dan kartu beranda. */
+[data-wildlife='crops'] {
+  --tint: var(--color-leaf-soft);
+  --tint-ink: var(--color-leaf-ink);
+  --stage-top: var(--stage-top-meadow);
+}
+
+[data-wildlife='collectibles'] {
+  --tint: var(--color-earth-soft);
+  --tint-ink: var(--color-earth-ink);
+  --stage-top: var(--stage-top-earth);
+}

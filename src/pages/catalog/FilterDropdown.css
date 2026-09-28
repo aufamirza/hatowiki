@@ -1,0 +1,136 @@
+.filter-dropdown {
+  position: relative;
+}
+
+.filter-dropdown__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 var(--space-3) 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+
+.filter-dropdown__button:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-sunken);
+}
+
+.filter-dropdown__label {
+  font-weight: 600;
+}
+
+.filter-dropdown__status {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.filter-dropdown__button.is-active {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: var(--color-accent-soft);
+}
+
+.filter-dropdown__button.is-active .filter-dropdown__status {
+  font-weight: 700;
+  color: var(--color-accent-ink);
+}
+
+.filter-dropdown__chevron {
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  transition: transform var(--duration) var(--ease-out);
+}
+
+.filter-dropdown__button[aria-expanded='true'] .filter-dropdown__chevron {
+  transform: rotate(180deg);
+}
+
+.filter-dropdown__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  min-width: max(100%, 15rem);
+  max-width: min(22rem, calc(100vw - 2 * var(--space-5)));
+  max-height: 18rem;
+  overflow-y: auto;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.filter-dropdown__panel.is-align-end {
+  left: auto;
+  right: 0;
+}
+
+.filter-dropdown__panel fieldset {
+  min-width: 0;
+  border: 0;
+}
+
+/* Seluruh baris adalah <label> yang membungkus checkbox: area klik penuh, minimal 44px untuk jari */
+.filter-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  user-select: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) ease;
+}
+
+.filter-check:hover,
+.filter-check:has(input:focus-visible) {
+  background: var(--color-surface-sunken);
+}
+
+.filter-check input {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.filter-check__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.filter-check__count {
+  min-width: 1.25rem;
+  margin-left: auto;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sunken);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.filter-check:hover .filter-check__count {
+  background: var(--color-surface);
+}
+
+.filter-check.is-empty {
+  opacity: 0.55;
+}

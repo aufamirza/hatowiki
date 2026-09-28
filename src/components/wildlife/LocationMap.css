@@ -1,0 +1,88 @@
+.location-map {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.location-map__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.08;
+  border-radius: var(--radius-md);
+  background: var(--color-sky-soft);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.location-map__base {
+  filter: var(--map-filter);
+}
+
+.location-map__dim {
+  fill: var(--map-dim);
+}
+
+.location-map__zone {
+  fill: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  stroke: var(--color-accent);
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.location-map--empty {
+  place-items: center;
+  align-content: center;
+  aspect-ratio: 1.08;
+  padding: var(--space-6);
+  border-radius: var(--radius-md);
+  border: 1.5px dashed var(--color-border-strong);
+  background: var(--color-surface-sunken);
+  color: var(--color-text-muted);
+  text-align: center;
+  font-size: var(--text-sm);
+}
+
+.location-map--empty svg {
+  width: 36px;
+  height: 36px;
+  color: var(--color-text-faint);
+}
+
+/* Pin titik tempat makan (hewan). Ukuran dalam unit peta; garis tepi tidak ikut membesar. */
+.location-map__pin-halo {
+  fill: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  stroke: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}
+
+.location-map__pin-shadow {
+  fill: rgba(0, 0, 0, 0.35);
+}
+
+.location-map__pin-body {
+  fill: var(--color-accent);
+  stroke: #fff;
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.location-map__pin-dot {
+  fill: #fff;
+}
+
+.location-map__caption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.location-map__caption svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--color-accent);
+}
