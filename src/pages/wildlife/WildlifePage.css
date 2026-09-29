@@ -13,19 +13,14 @@
   border-radius: var(--radius-xl);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   color: var(--color-text);
   text-decoration: none;
-  transition:
-    transform var(--duration) var(--ease-out),
-    box-shadow var(--duration) ease,
-    border-color var(--duration) ease;
+  transition: border-color var(--duration) ease;
 }
 
 .wildlife-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--color-border-strong);
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
 }
 
 .wildlife-card__icon {

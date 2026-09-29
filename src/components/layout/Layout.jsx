@@ -1,8 +1,11 @@
-import { Link, Outlet, ScrollRestoration } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
+import { Link, Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
 import { ExternalLink, Heart } from 'lucide-react'
+import { useReplayAnimation } from '../../hooks/useReplayAnimation'
 import GlobalSearch from '../search/GlobalSearch'
 import MobileMenu from './MobileMenu'
 import NavMenu from './NavMenu'
+import StoreLinks from './StoreLinks'
 import ThemeToggle from './ThemeToggle'
 import { WIKI_CATALOGS, WILDLIFE_CATALOGS } from './catalogs'
 // Warna per kategori (data-wildlife) dipakai juga di toolbar: menu Wildlife, drawer, dan hasil pencarian.
@@ -23,8 +26,9 @@ function Brand() {
   )
 }
 
-// Toolbar global (sticky): logo, menu Wildlife & Wiki (desktop), pencarian, tombol tema, dan tombol menu
-// seluler. Di bawah 760px menu pindah ke drawer dan pencarian ke balik tombol ikon.
+// Toolbar global: bar melayang berbentuk pil (sticky, semi transparan + blur) berisi logo, menu Wildlife & Wiki
+// (desktop), pencarian, tombol tema, dan tombol menu seluler. Di bawah 760px menu pindah ke drawer dan pencarian ke
+// balik tombol ikon. Di beranda, pencarian toolbar disembunyikan selama hero (yang punya kolom cari sendiri) terlihat.
 const WILDLIFE_ALL = { to: '/wildlife', label: 'Semua kategori wildlife' }
 function SiteHeader() {
   return (
@@ -53,6 +57,8 @@ function SiteFooter() {
           <div className="site-footer__about">
             <Brand />
             <p>Wiki dan panduan untuk penjelajah Heartopia dalam bahasa Indonesia.</p>
+            <h2 className="site-footer__title site-footer__title--stores">Unduh Heartopia</h2>
+            <StoreLinks />
           </div>
           <div>
             <h2 className="site-footer__title">Jelajahi</h2>
@@ -87,14 +93,34 @@ function SiteFooter() {
   )
 }
 
+const SITE_URL = 'https://www.hatowiki.site'
+// Area dengan tint latar sendiri (token --page-bg-<area> di tokens.css), dari segmen pertama URL.
+const TINTED_AREAS = ['wildlife', 'recipes', 'crops', 'collectibles', 'ingredients']
+
 function Layout() {
+  const { pathname } = useLocation()
+  const mainRef = useRef(null)
+  const area = pathname.split('/')[1]
+  const isHome = pathname === '/'
+
+  // Pindah halaman: konten memudar masuk (CSS, lihat .page-enter di base.css).
+  useReplayAnimation(mainRef, pathname, 'page-enter')
+
+  // Canonical & og:url mengikuti halaman yang sedang dibuka (index.html hanya berisi versi beranda).
+  useEffect(() => {
+    const url = SITE_URL + pathname
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', url)
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', url)
+  }, [pathname])
+
   return (
-    <div className="site">
+    <div className="site" data-area={TINTED_AREAS.includes(area) ? area : undefined}>
       <a href="#konten" className="skip-link">
         Lewati ke konten
       </a>
       <SiteHeader />
-      <main id="konten" className="site-main" tabIndex={-1}>
+      {/* Beranda: hero dimulai dari tepi atas, di belakang toolbar melayang. */}
+      <main id="konten" ref={mainRef} className={`site-main${isHome ? ' site-main--flush' : ''}`} tabIndex={-1}>
         <Outlet />
       </main>
       <SiteFooter />

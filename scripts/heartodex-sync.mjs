@@ -196,7 +196,7 @@ const KINDS = {
     storeImageSize: true,
     fieldOrder: [
       'slug', 'name', 'category', 'section', 'description', 'descriptionOriginal', 'descriptionSourceLang', 'buyPrice', 'sellPrice',
-      'origin', 'uncertain', 'image', 'imageSize', 'source',
+      'origin', 'obtainedFrom', 'uncertain', 'image', 'imageSize', 'source',
     ],
   },
 }
@@ -2037,7 +2037,9 @@ async function syncGoods(args, kind) {
         notes.push('bahan punya Growth Time/Sell Value/Energy Boost/deret per bintang (tidak disimpan)')
       }
       if (detail.zone || detail.pins.length || detail.locationLabel) notes.push('halaman bahan punya peta/lokasi (tidak disimpan)')
-      fields = { buyPrice, sellPrice, origin }
+      // Tempat membeli tidak ada di halaman bahan Heartodex (kecuali kalimat About gula); diisi manual dari sumber lain.
+      todos.obtainedFrom = 'tempat membeli/mendapatkan belum diisi (cari di About, Fandom, atau situs panduan; tulis sumbernya)'
+      fields = { buyPrice, sellPrice, origin, obtainedFrom: null }
     } else {
       const sellValue = integerStat(detail.sellValue, 'nilai jual (Sell Value)', 'sellValue', todos, uncertain)
       // Energy Boost hanya ada untuk benda yang bisa dimakan; tidak ada di sumber → null tanpa TODO.

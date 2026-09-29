@@ -56,3 +56,26 @@ maksud asli; nama benda dan istilah game tetap bahasa Inggris.
 | Dreamlight Cinematics | Dreamlight Cinematics | Springday Brown Sugar (`springday-brown-sugar`) | Raw sugar simmered with traditional craftsmanship, boasting a golden, translucent appearance and a well-balanced sweetness. | Gula mentah yang dimasak perlahan dengan cara tradisional, berwarna keemasan dan bening, dengan rasa manis yang seimbang. | beli 50, jual —, asal — |
 | Dreamlight Cinematics | Dreamlight Cinematics | Salsa Sauce (`salsa-sauce`) | A classic, all-purpose condiment—salsa goes with everything. | Saus klasik serbaguna—salsa cocok dipadukan dengan apa saja. | beli 50, jual —, asal — |
 | Winter frost season | Winter frost season | Frosted (`frosted`) | Icing sugar, sparkling like frost, was gently sprinkled for a touch of sweetness. | Gula halus yang berkilau seperti embun beku, ditaburkan perlahan untuk sentuhan rasa manis. | beli 50, jual —, asal — |
+
+## Tempat membeli (`obtainedFrom`, ditambahkan 2026-09-29)
+
+Heartodex hanya menyebut tempat membeli untuk 7 gula (About: "It can be purchased at Doris's store."). Bahan lain diisi
+dari situs panduan; sumbernya juga ditulis sebagai komentar di baris `obtainedFrom` tiap entri. Tampil di detail sebagai
+"Didapat dari" (toko + syarat waktu) dan di kartu daftar (toko saja; teks lengkap di atribut title).
+
+| Bahan | Didapat dari | Sumber |
+| --- | --- | --- |
+| Cooking Oil, Meat, Red Bean, Coffee Beans, Rice Flour, Egg, Milk, Butter, Matcha Powder, Cheese, Tea Leaves | Toko Massimo | https://gamerant.com/heartopia-all-shops-locations-sell-items/ (daftar isi toko Massimo); cocok dengan heartopialog.com |
+| Pasteurized Egg | Toko Massimo | https://www.gamezebo.com/walkthroughs/how-to-make-onsen-egg-in-heartopia/; cocok dengan heartopialog.com |
+| Blue, Indigo, Violet Sugar | Toko Doris, saat hujan atau pelangi | Heartodex (About) + https://www.heartopialog.com/2026/02/heartopia-ingredients-guide-massimo-doris-foraging.html (syarat cuaca; TheGamer menyebut hal yang sama) |
+| Red, Orange, Yellow, Green Sugar | Toko Doris, hanya saat pelangi | idem |
+| Osmanthus Jam | Toko event Autumn Moon Treasury | https://build-heartopia.com/events/mid-autumn ("Event Store: Ingredients", 100 Gold) |
+| Fruitwood Charcoal, Concentrated Date Paste | Toko Massimo, selama event Echo of Ancients | https://allthings.how/heartopia-echo-of-ancients-festival-how-to-unlock-every-collection-and-recipe/ |
+| Spirulina Powder | Toko Massimo, selama event Call of Whales | https://heartopia.life/guides/call-of-whales-cooking/ |
+| Bamboo Leaf | Toko penukaran event Midsummer Rhyme | https://www.heartopialog.com/2026/02/heartopia-ingredients-guide-massimo-doris-foraging.html ("Exchange Store - Midsummer Rhyme"; satu sumber saja) |
+| Brick Meat Patty, Brick Ice, Condensed Milk | Toko Massimo, selama event Modular Streets | https://www.screenhype.co.uk/heartopia-modular-streets-event-guide-all-collectables-values/ |
+| Springday Brown Sugar, Salsa Sauce | Toko Massimo, selama event Dreamlight Cinematics | https://gamerant.com/heartopia-all-every-dreamlight-cinematics-cooking-recipe-how-cook/ |
+| Frosted | Toko Massimo, selama event Winter frost season | https://www.heartopia-tips.com/blog/heartopia-frost-season-recipes (juga TheGamer, Aurora Banquet) |
+| Ace Chicken, Ace Beef | — (null + TODO) | Tidak ditemukan di sumber yang jelas: halaman event Burger Bliss di Heartodex dan build-heartopia.com tidak menyebut tempat membelinya |
+
+Wiki Fandom (heartopia.fandom.com/wiki/Cooking) tidak bisa dibuka saat diperiksa (HTTP 402).

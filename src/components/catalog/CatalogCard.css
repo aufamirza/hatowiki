@@ -18,16 +18,12 @@
   box-shadow: var(--shadow-sm);
   color: var(--color-text);
   text-decoration: none;
-  transition:
-    transform var(--duration) var(--ease-out),
-    box-shadow var(--duration) ease,
-    border-color var(--duration) ease;
+  transition: border-color var(--duration) ease;
 }
 
+/* Hover: kartu tidak terangkat; garis tepi berwarna aksen dan gambarnya yang bergerak (lihat di bawah) */
 .entry-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--color-border-strong);
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
 }
 
 .entry-card:focus-visible {
@@ -108,8 +104,73 @@
   white-space: nowrap;
 }
 
-.entry-card:hover .entry-card__image {
-  transform: scale(1.05) rotate(-2deg);
+/*
+ * Gerak gambar saat hover, sesuai jenis entri (data-wildlife di halaman daftar): ikan bergoyang seperti berenang,
+ * serangga bergetar seperti mengepak, burung melompat kecil; resep, tanaman, benda, dan hewan cukup sedikit membesar.
+ * Hanya transform, hanya di perangkat dengan hover, dan tidak ada sama sekali saat prefers-reduced-motion.
+ */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .entry-card:hover .entry-card__image {
+    transform: scale(1.06);
+  }
+
+  [data-wildlife='fish'] .entry-card:hover .entry-card__image {
+    animation: card-swim 1.6s ease-in-out infinite;
+  }
+
+  [data-wildlife='bugs'] .entry-card:hover .entry-card__image {
+    animation: card-flutter 0.36s ease-in-out infinite;
+  }
+
+  [data-wildlife='birds'] .entry-card:hover .entry-card__image {
+    animation: card-hop 1.1s var(--ease-out) infinite;
+  }
+}
+
+@keyframes card-swim {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+
+  25% {
+    transform: translateX(3%) rotate(3deg);
+  }
+
+  75% {
+    transform: translateX(-3%) rotate(-3deg);
+  }
+}
+
+@keyframes card-flutter {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+
+  50% {
+    transform: rotate(2deg) translateY(-1%);
+  }
+}
+
+@keyframes card-hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+
+  20% {
+    transform: translateY(-7%);
+  }
+
+  40% {
+    transform: translateY(0);
+  }
+
+  48% {
+    transform: translateY(-2.5%);
+  }
 }
 
 /* Nama selalu menyediakan ruang dua baris supaya isi semua kartu sejajar */

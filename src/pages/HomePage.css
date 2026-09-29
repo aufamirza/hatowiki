@@ -3,9 +3,11 @@
   /* Tinggi pemandangan bukit & laut di bawah hero; konten diberi ruang supaya tidak tertimpa. */
   --hero-land-height: clamp(150px, 17vw, 260px);
   position: relative;
+  /* Di atas section berikutnya: daftar hasil pencarian hero boleh menjulur keluar hero */
+  z-index: 2;
   isolation: isolate;
-  overflow: hidden;
-  padding-block: var(--space-16) calc(var(--hero-land-height) * 0.72);
+  /* Hero dimulai dari tepi atas halaman, di belakang toolbar melayang (--header-space dari Layout.css) */
+  padding-block: calc(var(--header-space, 0px) + var(--space-12)) calc(var(--hero-land-height) * 0.72);
   background-color: var(--hero-sky-bottom);
   background-image: linear-gradient(to bottom, var(--hero-sky-top), var(--hero-sky-bottom) 78%);
   text-align: center;
@@ -36,33 +38,47 @@
   color: var(--color-sage-ink);
 }
 
-.hero__content h1 {
-  max-width: 16ch;
-  margin-block: var(--space-5) var(--space-4);
-  font-size: var(--text-4xl);
-  font-weight: 650;
-  line-height: 1.05;
+/*
+ * Judul "Hatowiki": Fraunces tebal ukuran poster (sumbu optical size ikut membesar otomatis), rapat, dengan garis
+ * ombak tangan berwarna aksen di bawahnya — mengikuti laut di pemandangan. Tanpa gradasi atau bayangan.
+ */
+.hero__title {
+  margin-block: var(--space-4) var(--space-5);
+  font-size: clamp(4rem, 1.2rem + 9.5vw, 8.5rem);
+  font-weight: 700;
+  font-variation-settings: 'SOFT' 100;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+}
+
+.hero__title::after {
+  content: '';
+  display: block;
+  width: 1.7em;
+  height: 0.15em;
+  margin: 0.1em auto 0;
+  background: var(--color-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 16'%3E%3Cpath d='M4 8c10-7 18-7 28 0s18 7 28 0 18-7 28 0 18 7 28 0' fill='none' stroke='%23000' stroke-width='4.5' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 16'%3E%3Cpath d='M4 8c10-7 18-7 28 0s18 7 28 0 18-7 28 0 18 7 28 0' fill='none' stroke='%23000' stroke-width='4.5' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
 }
 
 .hero__lead {
-  max-width: 36rem;
+  max-width: 34rem;
   font-size: var(--text-lg);
   color: var(--color-text-muted);
 }
 
-.hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-3);
+.hero__content .global-search--hero {
   margin-top: var(--space-8);
 }
 
 /* ---------- Pemandangan (dekoratif) ---------- */
+/* Dimulai di bawah toolbar supaya matahari, awan, dan hiasan tidak tertutup pil toolbar; langitnya tetap latar .hero */
 .hero-scene {
   position: absolute;
-  inset: 0;
+  inset: var(--header-space, 0px) 0 0;
   z-index: -1;
+  overflow: hidden;
   pointer-events: none;
   user-select: none;
 }
@@ -356,7 +372,7 @@
 
 @media (max-width: 720px) {
   .hero {
-    padding-top: var(--space-12);
+    padding-top: calc(var(--header-space, 0px) + var(--space-8));
   }
 }
 
@@ -606,7 +622,6 @@
 }
 
 .now-tile:hover {
-  transform: translateY(-3px);
   border-color: var(--color-border);
   background: var(--color-surface-sunken);
 }
@@ -677,14 +692,9 @@
   height: 12px;
 }
 
-.now-empty,
-.now-footnote {
+.now-empty {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-}
-
-.now-footnote {
-  margin-top: var(--space-4);
 }
 
 @media (max-width: 999px) {
@@ -762,19 +772,14 @@
   border-radius: var(--radius-xl);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   color: var(--color-text);
   text-decoration: none;
-  transition:
-    transform var(--duration) var(--ease-out),
-    box-shadow var(--duration) ease,
-    border-color var(--duration) ease;
+  transition: border-color var(--duration) ease;
 }
 
 .category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--color-border-strong);
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
 }
 
 .category-card__head {

@@ -1,8 +1,10 @@
 /*
  * Design token Hatowiki.
- * Light: krem hangat seperti kertas buku harian, satu aksen coral terakota.
- * Dark: "malam di kabin" — cokelat hangat, bukan abu-abu kebiruan; permukaan makin terang
- * saat makin "naik", aksen dibuat lebih muda supaya tetap lembut di latar gelap.
+ * Light: putih bersih yang sedikit kebiruan seperti langit pagi di hero, satu aksen lavender/violet untuk tombol,
+ * tautan, dan elemen aktif.
+ * Dark: biru tua keunguan seperti langit malam di hero; permukaan makin terang saat makin "naik", aksen dibuat lebih
+ * muda supaya tetap lembut di latar gelap.
+ * Warna badge level & kategori dan tint per katalog tetap; kontras teks semuanya ≥ 4,5:1 (AA).
  */
 :root {
   /* Font */
@@ -48,25 +50,26 @@
 
   /* Warna — light */
   color-scheme: light;
-  --color-bg: #faf5ec;
-  --color-bg-tint: #f5ede0;
-  --color-surface: #fffcf7;
-  --color-surface-sunken: #f4ecdf;
-  --color-border: #eadfcd;
-  --color-border-strong: #d8c7af;
+  --color-bg: #f5f7fc;
+  --color-bg-tint: #eceff9;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #eef0f9;
+  --color-border: #dfe3f1;
+  --color-border-strong: #c3c8e0;
   /* Teks di light mode hitam pekat; hierarki dibedakan lewat ukuran dan ketebalan huruf. */
   --color-text: #000000;
   --color-text-muted: #000000;
   /* Hanya untuk elemen yang sengaja diredupkan karena tidak berlaku (chip nonaktif, tombol disabled). */
-  --color-text-dimmed: #6f5f53;
+  --color-text-dimmed: #5a5f7d;
   /* Ikon dan garis dekoratif, bukan teks. */
-  --color-text-faint: #9c8b7a;
+  --color-text-faint: #9197b6;
 
-  --color-accent: #c2553a;
-  --color-accent-hover: #a9472e;
+  /* Aksen lavender/violet: tombol (teks putih 5,3:1), tautan (6,8:1 di latar), elemen aktif */
+  --color-accent: #6a58d3;
+  --color-accent-hover: #5845c2;
   --color-on-accent: #ffffff;
-  --color-accent-ink: #a9472e;
-  --color-accent-soft: #fbe4d9;
+  --color-accent-ink: #5640be;
+  --color-accent-soft: #ece9fd;
 
   /* Pastel pendukung: untuk status dan nuansa, bukan aksen */
   --color-sage-soft: #e2ecda;
@@ -74,6 +77,9 @@
   --color-sky-soft: #dceaf0;
   --color-sky-ink: #35596a;
   --color-butter-soft: #f8eccb;
+  /* Warna kategori Animals (dulu memakai aksen coral) */
+  --color-coral-soft: #fbe4d9;
+  --color-coral-ink: #a9472e;
   --color-gold: #9c6a0e;
   --color-coin-fill: #ecbf5a;
   --color-shadow-blue: #3f7fb3;
@@ -206,23 +212,24 @@
   --stage-top-meadow: #e5eddb;
   --stage-top-kitchen: #f6e5d3;
   --stage-top-earth: #ece3d6;
-  --stage-bottom: #f6eee2;
+  --stage-bottom: #eef1f9;
   --stage-ring: rgba(255, 255, 255, 0.55);
   --stage-glow: rgba(255, 255, 255, 0.7);
   --stage-shadow: rgba(38, 72, 84, 0.24);
-  --map-dim: rgba(58, 46, 39, 0.3);
+  --map-dim: rgba(30, 32, 70, 0.3);
   --map-filter: none;
 
   /*
    * Pemandangan hero di beranda (ilustrasi SVG/CSS): langit pagi bergradasi, matahari, awan, bukit, dan laut.
-   * Teks di atas langit tetap --color-text (kontras ≥ 15:1 terhadap kedua ujung gradasi).
+   * Teks di atas langit tetap --color-text (kontras ≥ 15:1 terhadap kedua ujung gradasi). Ujung bawah langit
+   * mendekati --color-bg supaya hero menyambung ke halaman.
    */
-  --hero-sky-top: #cde3ed;
-  --hero-sky-bottom: #fbf1e4;
+  --hero-sky-top: #c8ddf1;
+  --hero-sky-bottom: #f2f2fc;
   --hero-sun: #fbd89c;
   --hero-sun-glow: rgba(251, 216, 156, 0.55);
   --hero-star: transparent;
-  --hero-cloud: rgba(255, 252, 247, 0.92);
+  --hero-cloud: rgba(255, 255, 255, 0.92);
   --hero-hill-far: #d3e4c5;
   --hero-hill-near: #bcd6a9;
   --hero-tree: #9fc389;
@@ -230,36 +237,55 @@
   --hero-sea: #c1dfe9;
   --hero-foam: rgba(255, 255, 255, 0.8);
 
-  /* Elevasi — bayangan hangat kecokelatan */
-  --shadow-sm: 0 1px 2px rgba(92, 64, 40, 0.06), 0 1px 1px rgba(92, 64, 40, 0.04);
-  --shadow-md: 0 2px 4px rgba(92, 64, 40, 0.04), 0 10px 24px -10px rgba(92, 64, 40, 0.16);
-  --shadow-lg: 0 4px 8px rgba(92, 64, 40, 0.05), 0 22px 44px -18px rgba(92, 64, 40, 0.26);
+  /* Elevasi — bayangan tipis kebiruan; yang tebal hanya untuk panel melayang (menu, dropdown) */
+  --shadow-sm: 0 1px 2px rgba(35, 40, 90, 0.06);
+  --shadow-md: 0 1px 2px rgba(35, 40, 90, 0.04), 0 8px 20px -12px rgba(35, 40, 90, 0.18);
+  --shadow-lg: 0 2px 6px rgba(35, 40, 90, 0.05), 0 18px 40px -18px rgba(35, 40, 90, 0.3);
+
+  /* Toolbar melayang (pil): latar semi transparan + blur. --toolbar-bg-solid dipakai browser tanpa backdrop-filter. */
+  --toolbar-bg: color-mix(in srgb, var(--color-surface) 74%, transparent);
+  --toolbar-bg-solid: var(--color-surface);
+  --toolbar-border: color-mix(in srgb, var(--color-border-strong) 55%, transparent);
+  --toolbar-shadow: 0 1px 2px rgba(35, 40, 90, 0.05), 0 10px 28px -14px rgba(35, 40, 90, 0.28);
+
+  /*
+   * Latar halaman: tekstur doodle kecil (daun, ikan, bintang) dengan opasitas sangat rendah, plus tint yang sedikit
+   * berbeda per area (dipasang lewat data-area di Layout, lihat Layout.css). Selisihnya sengaja nyaris tidak terasa.
+   */
+  --page-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' fill='none' stroke='%234b4f9c' stroke-opacity='.07' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M28 52c6-12 20-16 30-12-2 12-14 20-28 18zm2 6 18-14'/%3E%3Cpath d='M150 40c8-8 20-8 28 0-8 8-20 8-28 0zm28 0 8-6v12z'/%3E%3Cpath d='M92 132l3 8 8 3-8 3-3 8-3-8-8-3 8-3z'/%3E%3Cpath d='M190 150c10-4 20 2 22 12-10 4-20-2-22-12zm4 4 14 6'/%3E%3Cpath d='M36 190c6-6 15-6 21 0-6 6-15 6-21 0zm21 0 6-4v8z'/%3E%3Ccircle cx='200' cy='96' r='2.5'/%3E%3Ccircle cx='128' cy='212' r='2'/%3E%3Cpath d='M20 118l2 5 5 2-5 2-2 5-2-5-5-2 5-2z'/%3E%3C/svg%3E");
+  --page-bg-wildlife: #f1f6fd;
+  --page-bg-recipes: #fbf6f5;
+  --page-bg-crops: #f2f8f4;
+  --page-bg-collectibles: #f7f6f2;
+  --page-bg-ingredients: #faf5f9;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-bg: #1b1714;
-  --color-bg-tint: #201b17;
-  --color-surface: #26211d;
-  --color-surface-sunken: #1f1a17;
-  --color-border: #3a322b;
-  --color-border-strong: #4e443a;
-  --color-text: #f2e8dc;
-  --color-text-muted: #bba998;
-  --color-text-dimmed: #bba998;
-  --color-text-faint: #8e7f71;
+  --color-bg: #13142a;
+  --color-bg-tint: #171933;
+  --color-surface: #1d1f3d;
+  --color-surface-sunken: #181a35;
+  --color-border: #2d3060;
+  --color-border-strong: #41457e;
+  --color-text: #eef0fb;
+  --color-text-muted: #b7bbdb;
+  --color-text-dimmed: #b7bbdb;
+  --color-text-faint: #7d82ad;
 
-  --color-accent: #f0957a;
-  --color-accent-hover: #f5ae97;
-  --color-on-accent: #1b1714;
-  --color-accent-ink: #f5ae97;
-  --color-accent-soft: #3a2822;
+  --color-accent: #b3a5ff;
+  --color-accent-hover: #c8beff;
+  --color-on-accent: #16152f;
+  --color-accent-ink: #c3b8ff;
+  --color-accent-soft: #2d2a5c;
 
   --color-sage-soft: #243024;
   --color-sage-ink: #bcd9b0;
   --color-sky-soft: #1f2c33;
   --color-sky-ink: #a9cbda;
   --color-butter-soft: #362d1a;
+  --color-coral-soft: #3a2629;
+  --color-coral-ink: #f5ae97;
   --color-gold: #e8b64c;
   --color-coin-fill: #7d5a1c;
   --color-shadow-blue: #7fb4de;
@@ -310,7 +336,7 @@
   --level-fallback-ink: #fee5b3;
 
   /* Badge kategori: latar gelap bernuansa + teks terang. Common netral, sedikit di atas permukaan (tidak menyilaukan). */
-  --category-common: #2f2924;
+  --category-common: #262947;
   --category-sea-fishing: #192e30;
   --category-sea-fishing-ink: #a6e0e7;
   --category-bait-the-insects: #3a2321;
@@ -347,36 +373,48 @@
   --category-rainbow-verse-ink: #dbcafe;
   --category-meteor-shower: linear-gradient(90deg, #23263f, #3a2e14);
   --category-meteor-shower-ink: #dfe1ff;
-  --category-fallback: #272a2e;
+  --category-fallback: #25283f;
   --category-fallback-ink: #cad2db;
 
-  --stage-top: #1c2b32;
-  --stage-top-meadow: #212b20;
-  --stage-top-kitchen: #2e241c;
-  --stage-top-earth: #2b241e;
-  --stage-bottom: #231e1a;
+  --stage-top: #1a2a3a;
+  --stage-top-meadow: #1f2b26;
+  --stage-top-kitchen: #2c2230;
+  --stage-top-earth: #29242c;
+  --stage-bottom: #1b1d38;
   --stage-ring: rgba(169, 203, 218, 0.07);
   --stage-glow: rgba(169, 203, 218, 0.1);
   --stage-shadow: rgba(0, 0, 0, 0.5);
-  --map-dim: rgba(12, 9, 7, 0.55);
+  --map-dim: rgba(8, 9, 26, 0.55);
   --map-filter: brightness(0.86) saturate(0.9);
 
-  /* Hero: malam berbintang dengan bulan; bukit & laut gelap kehijauan/kebiruan, horizon cokelat hangat */
-  --hero-sky-top: #131a23;
-  --hero-sky-bottom: #2a211b;
+  /* Hero: malam berbintang dengan bulan; bukit & laut gelap kebiruan, horizon ungu tua */
+  --hero-sky-top: #0e1027;
+  --hero-sky-bottom: #29254f;
   --hero-sun: #efe2c6;
   --hero-sun-glow: rgba(239, 226, 198, 0.16);
-  --hero-star: rgba(255, 244, 222, 0.85);
-  --hero-cloud: rgba(64, 58, 66, 0.55);
-  --hero-hill-far: #243128;
-  --hero-hill-near: #1d2821;
-  --hero-tree: #1a241c;
-  --hero-sea-deep: #172730;
-  --hero-sea: #1c2f39;
+  --hero-star: rgba(248, 244, 255, 0.85);
+  --hero-cloud: rgba(74, 72, 122, 0.5);
+  --hero-hill-far: #1f2d3a;
+  --hero-hill-near: #192532;
+  --hero-tree: #16202d;
+  --hero-sea-deep: #16223b;
+  --hero-sea: #1b2b47;
   --hero-foam: rgba(169, 203, 218, 0.28);
 
   /* Di gelap, kedalaman datang dari highlight tipis di tepi atas, bukan bayangan besar */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: inset 0 1px 0 rgba(255, 240, 220, 0.04), 0 12px 28px -12px rgba(0, 0, 0, 0.6);
-  --shadow-lg: inset 0 1px 0 rgba(255, 240, 220, 0.05), 0 24px 48px -20px rgba(0, 0, 0, 0.72);
+  --shadow-md: inset 0 1px 0 rgba(225, 228, 255, 0.04), 0 12px 28px -12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: inset 0 1px 0 rgba(225, 228, 255, 0.05), 0 24px 48px -20px rgba(0, 0, 0, 0.72);
+
+  --toolbar-bg: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  --toolbar-bg-solid: var(--color-surface);
+  --toolbar-border: color-mix(in srgb, var(--color-border-strong) 70%, transparent);
+  --toolbar-shadow: inset 0 1px 0 rgba(225, 228, 255, 0.05), 0 12px 30px -14px rgba(0, 0, 0, 0.7);
+
+  --page-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' fill='none' stroke='%23d4d6ff' stroke-opacity='.05' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M28 52c6-12 20-16 30-12-2 12-14 20-28 18zm2 6 18-14'/%3E%3Cpath d='M150 40c8-8 20-8 28 0-8 8-20 8-28 0zm28 0 8-6v12z'/%3E%3Cpath d='M92 132l3 8 8 3-8 3-3 8-3-8-8-3 8-3z'/%3E%3Cpath d='M190 150c10-4 20 2 22 12-10 4-20-2-22-12zm4 4 14 6'/%3E%3Cpath d='M36 190c6-6 15-6 21 0-6 6-15 6-21 0zm21 0 6-4v8z'/%3E%3Ccircle cx='200' cy='96' r='2.5'/%3E%3Ccircle cx='128' cy='212' r='2'/%3E%3Cpath d='M20 118l2 5 5 2-5 2-2 5-2-5-5-2 5-2z'/%3E%3C/svg%3E");
+  --page-bg-wildlife: #111a2f;
+  --page-bg-recipes: #1a1529;
+  --page-bg-crops: #121b28;
+  --page-bg-collectibles: #17172b;
+  --page-bg-ingredients: #19152f;
 }

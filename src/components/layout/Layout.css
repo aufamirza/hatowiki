@@ -1,20 +1,55 @@
 .site {
+  /* Toolbar melayang: jarak pil dari tepi atas & tingginya. Konten dimulai di bawah pil (--header-space). */
+  --header-gap: var(--space-3);
+  --header-height: 60px;
+  --header-space: calc(var(--header-gap) + var(--header-height));
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  /* Latar: tekstur doodle yang sangat tipis di atas warna latar; tint per area di bawah */
+  background-color: var(--color-bg);
+  background-image: var(--page-texture);
+  transition: background-color 400ms ease;
+}
+
+/* Tint latar per area (nyaris tidak terasa): Wildlife biru langit, Resep hangat, Crops hijau, dst. */
+.site[data-area='wildlife'] {
+  --color-bg: var(--page-bg-wildlife);
+}
+
+.site[data-area='recipes'] {
+  --color-bg: var(--page-bg-recipes);
+}
+
+.site[data-area='crops'] {
+  --color-bg: var(--page-bg-crops);
+}
+
+.site[data-area='collectibles'] {
+  --color-bg: var(--page-bg-collectibles);
+}
+
+.site[data-area='ingredients'] {
+  --color-bg: var(--page-bg-ingredients);
 }
 
 .site-main {
   flex: 1;
+  padding-top: var(--header-space);
+}
+
+/* Beranda: hero dimulai dari tepi atas, di belakang toolbar (hero memberi ruang sendiri) */
+.site-main--flush {
+  padding-top: 0;
 }
 
 .site-main:focus {
   outline: none;
 }
 
-/* Target anchor (mis. /#muncul-sekarang) tidak tertutup header yang sticky */
+/* Target anchor (mis. /#muncul-sekarang) tidak tertutup toolbar */
 .site-main [id] {
-  scroll-margin-top: 88px;
+  scroll-margin-top: calc(var(--header-space) + var(--space-5));
 }
 
 /* Drawer menu seluler terbuka: halaman di belakangnya tidak ikut tergulir */
@@ -42,22 +77,40 @@
   transform: none;
 }
 
-/* Header */
+/*
+ * Header: bar melayang berbentuk pil, sedikit menjauh dari tepi atas. Header sendiri transparan dan tidak menangkap
+ * klik; margin bawah negatif membuat konten mengalir di bawahnya (main memberi ruang lewat --header-space).
+ */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: color-mix(in srgb, var(--color-bg) 86%, transparent);
-  backdrop-filter: saturate(1.4) blur(12px);
-  -webkit-backdrop-filter: saturate(1.4) blur(12px);
-  border-bottom: 1px solid var(--color-border);
+  padding-top: var(--header-gap);
+  margin-bottom: calc(-1 * var(--header-space));
+  pointer-events: none;
 }
 
 .site-header__inner {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  min-height: 68px;
+  min-height: var(--header-height);
+  padding-inline: var(--space-3) var(--space-2);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--toolbar-border);
+  /* Fallback: latar solid untuk browser tanpa backdrop-filter */
+  background: var(--toolbar-bg-solid);
+  box-shadow: var(--toolbar-shadow);
+  pointer-events: auto;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .site-header__inner {
+    background: var(--toolbar-bg);
+    -webkit-backdrop-filter: saturate(1.6) blur(16px);
+    backdrop-filter: saturate(1.6) blur(16px);
+  }
 }
 
 .brand {
@@ -165,6 +218,33 @@
   transform: rotate(-12deg);
 }
 
+/* Tombol ikon di dalam pil toolbar: tanpa kotak sendiri, latar muncul saat hover */
+.site-header .icon-button {
+  border-color: transparent;
+  background: transparent;
+}
+
+.site-header .icon-button:hover {
+  border-color: transparent;
+  background: var(--color-surface-sunken);
+}
+
+/* Beranda: pencarian toolbar disembunyikan selama hero (yang punya kolom cari sendiri) masih terlihat. Atribut
+   data-hero-search dipasang HomeHero di <html>. */
+.site-header .global-search {
+  transition:
+    opacity var(--duration) ease,
+    visibility 0s;
+}
+
+:root[data-hero-search] .site-header .global-search {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--duration) ease,
+    visibility 0s linear var(--duration);
+}
+
 /* Footer */
 .site-footer {
   margin-top: var(--space-16);
@@ -211,6 +291,61 @@
   color: var(--color-accent-ink);
 }
 
+/* Tombol unduh: ikon merek (Simple Icons) + nama toko, satu warna mengikuti teks */
+.site-footer__title--stores {
+  margin-top: var(--space-6);
+}
+
+.store-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.store-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 6px var(--space-4) 6px var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+  transition:
+    border-color var(--duration-fast) ease,
+    background-color var(--duration-fast) ease;
+}
+
+.store-link:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.store-link__icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.store-link__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.store-link__platform {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.store-link__name {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
 .site-footer__credit a {
   display: inline-flex;
   align-items: center;
@@ -233,11 +368,19 @@
   line-height: 1.7;
 }
 
-/* Toolbar seluler: logo | cari, tema, menu. Menu pindah ke drawer, pencarian ke balik tombol ikon. */
+/* Toolbar seluler: logo | cari, tema, menu. Menu pindah ke drawer, pencarian ke balik tombol ikon. Pil lebih rapat ke
+   tepi layar dan lebih pendek supaya tidak menutupi banyak konten. */
 @media (max-width: 759px) {
-  .site-header__inner {
-    gap: var(--space-3);
-    min-height: 60px;
+  .site {
+    --header-gap: var(--space-2);
+    --header-height: 52px;
+  }
+
+  /* Selector ganda supaya menang atas lebar .container (base.css dimuat setelah file ini) */
+  .site-header .site-header__inner {
+    gap: var(--space-2);
+    width: calc(100% - 2 * var(--space-2));
+    padding-inline: var(--space-2) 4px;
   }
 
   .site-nav {
@@ -246,10 +389,7 @@
 
   .site-header__tools {
     flex: none;
-  }
-
-  .site-main [id] {
-    scroll-margin-top: 80px;
+    gap: 2px;
   }
 }
 

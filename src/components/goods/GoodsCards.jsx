@@ -1,4 +1,4 @@
-import { Coins, Hourglass, MapPin } from 'lucide-react'
+import { Coins, Hourglass, MapPin, Store } from 'lucide-react'
 import { COLLECTIBLE_KIND, CROP_KIND, INGREDIENT_KIND, formatGrowthTime } from '../../pages/goods/goodsKinds'
 import CatalogCard from '../catalog/CatalogCard'
 import { formatCoins } from '../recipes/starValues'
@@ -63,9 +63,22 @@ export function CollectibleCard({ item, linkState }) {
   )
 }
 
-/** Kartu bahan masak di halaman daftar: gambar, badge kategori (tanpa level), dan harga beli. */
+/**
+ * Kartu bahan masak di halaman daftar: gambar, badge kategori (tanpa level), harga beli, dan tempat membelinya (hanya
+ * toko/NPC; syarat waktunya ada di atribut title dan halaman detail).
+ */
 export function IngredientCard({ item, linkState }) {
-  const facts = [{ key: 'buy', label: 'Harga beli', Icon: Coins, ...amount(item, 'buyPrice') }]
+  const obtained = item.obtainedFrom
+  const facts = [
+    { key: 'buy', label: 'Harga beli', Icon: Coins, ...amount(item, 'buyPrice') },
+    {
+      key: 'obtained',
+      label: 'Didapat dari',
+      Icon: Store,
+      short: obtained?.place ?? '—',
+      full: obtained ? [obtained.place, obtained.when].filter(Boolean).join(', ') : '—',
+    },
+  ]
   return (
     <CatalogCard
       to={INGREDIENT_KIND.href(item)}

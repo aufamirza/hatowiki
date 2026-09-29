@@ -20,8 +20,8 @@
 }
 
 [data-wildlife='animals'] {
-  --tint: var(--color-accent-soft);
-  --tint-ink: var(--color-accent-ink);
+  --tint: var(--color-coral-soft);
+  --tint-ink: var(--color-coral-ink);
 }
 
 /* Panggung gambar serangga: padang rumput, bukan air */

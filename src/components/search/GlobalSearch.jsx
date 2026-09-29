@@ -26,8 +26,10 @@ function Highlight({ text, query }) {
  * hasil aktif ditandai lewat aria-activedescendant. Panah atas/bawah pindah hasil, Enter membuka hasil aktif
  * (bawaannya hasil pertama), Escape menutup daftar, lalu mengosongkan kolom, lalu (di ponsel) menutup panel.
  * Di ponsel kolomnya tersembunyi di balik tombol ikon dan tampil sebagai baris di bawah toolbar.
+ * `variant="hero"`: kolom besar di hero beranda, selalu tampil (tanpa tombol ikon), dengan pencarian yang sama.
  */
-function GlobalSearch() {
+function GlobalSearch({ variant = 'toolbar' }) {
+  const isHero = variant === 'hero'
   const [query, setQuery] = useState('')
   const [listOpen, setListOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
@@ -129,18 +131,24 @@ function GlobalSearch() {
   }
 
   return (
-    <div className={`global-search${panelOpen ? ' is-open' : ''}`} ref={rootRef} onBlur={handleBlur}>
-      <button
-        ref={toggleRef}
-        type="button"
-        className="icon-button global-search__toggle"
-        aria-label={panelOpen ? 'Tutup pencarian' : 'Buka pencarian'}
-        aria-expanded={panelOpen}
-        aria-controls={panelId}
-        onClick={() => (panelOpen ? closePanel() : setPanelOpen(true))}
-      >
-        {panelOpen ? <X aria-hidden="true" /> : <Search aria-hidden="true" />}
-      </button>
+    <div
+      className={`global-search${isHero ? ' global-search--hero' : ''}${panelOpen ? ' is-open' : ''}`}
+      ref={rootRef}
+      onBlur={handleBlur}
+    >
+      {!isHero && (
+        <button
+          ref={toggleRef}
+          type="button"
+          className="icon-button global-search__toggle"
+          aria-label={panelOpen ? 'Tutup pencarian' : 'Buka pencarian'}
+          aria-expanded={panelOpen}
+          aria-controls={panelId}
+          onClick={() => (panelOpen ? closePanel() : setPanelOpen(true))}
+        >
+          {panelOpen ? <X aria-hidden="true" /> : <Search aria-hidden="true" />}
+        </button>
+      )}
 
       <div className="global-search__panel" id={panelId}>
         <div className="global-search__field">
@@ -161,7 +169,7 @@ function GlobalSearch() {
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             onFocus={() => hasQuery && setListOpen(true)}
-            placeholder="Cari ikan, serangga, resep…"
+            placeholder={isHero ? 'Cari nama ikan, serangga, burung, resep, atau bahan…' : 'Cari ikan, serangga, resep…'}
             autoComplete="off"
             autoCapitalize="off"
             spellCheck="false"

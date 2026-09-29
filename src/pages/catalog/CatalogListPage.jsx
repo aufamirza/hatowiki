@@ -5,6 +5,7 @@ import Breadcrumbs from '../../components/Breadcrumbs'
 import CategoryHeader from '../../components/CategoryHeader'
 import { categoryToneStyle } from '../../components/catalog/categoryTone'
 import { usePageTitle } from '../../hooks/usePageTitle'
+import { useReplayAnimation } from '../../hooks/useReplayAnimation'
 import FilterDropdown from './FilterDropdown'
 import {
   SORT_OPTIONS,
@@ -52,6 +53,9 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
   const sortId = useId()
   const advancedId = useId()
   const sectionId = useId()
+  // Hasil yang berubah karena pencarian, filter, atau urutan memudar masuk (lihat .results-enter di base.css).
+  const resultsRef = useRef(null)
+  useReplayAnimation(resultsRef, location.search, 'results-enter')
 
   // Nilai terakhir yang dikirim kolom pencarian ke URL, supaya perubahan itu tidak disalin balik
   // ke kolom (bisa menimpa huruf yang baru saja diketik).
@@ -245,7 +249,7 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
         </div>
 
         {results.length > 0 ? (
-          <div className="list-sections">
+          <div className="list-sections" ref={resultsRef}>
             {sections.map((section, index) => (
               <section key={section.name} className="list-section" aria-labelledby={`${sectionId}-${index}`}>
                 {/* Judul section: emoji, nama, dan jumlah hasil. Event memakai warna kategorinya (token --category-*). */}
@@ -268,7 +272,7 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
             ))}
           </div>
         ) : (
-          <div className="list-empty">
+          <div className="list-empty" ref={resultsRef}>
             <span className="list-empty__icon" aria-hidden="true">
               <SearchX />
             </span>

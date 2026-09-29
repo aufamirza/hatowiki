@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 /**
  * Uji beranda dan toolbar global di Chrome headless (lewat Chrome DevTools Protocol), untuk lebar 1280, 820, dan 390:
- * - Toolbar: sticky di beberapa halaman; menu Wildlife (dropdown, klik & keyboard) dan menu Wiki (Resep, Crops,
- *   Collectibles, Ingredients) di desktop; di ponsel menu pindah ke drawer (dialog modal: fokus terkunci, Escape, klik latar, tautan
- *   menutup drawer, scroll terkunci).
+ * - Toolbar: pil melayang (sticky, semi transparan + blur, fallback solid, konten tidak tertutup); menu Wildlife & Wiki
+ *   (Resep, Crops, Collectibles, Ingredients) di desktop terbuka saat hover dengan jeda (kursor lewat tidak membuka),
+ *   klik, keyboard (Enter, Space, Escape, panah), dan ketuk di layar sentuh; di ponsel menu pindah ke drawer (dialog
+ *   modal: fokus terkunci, Escape, klik latar, tautan menutup drawer, scroll terkunci).
+ * - Tema: pengunjung pertama selalu light walau sistem dark; pilihan dari tombol diingat.
  * - Pencarian global: hasil dari semua kategori (gambar, nama, label kategori, tautan) dicocokkan dengan data,
  *   keyboard (panah, Enter, Escape), klik mouse, tanpa hasil, dan dropdown tidak melebar ke samping.
- * - Beranda: klaim & tombol mati sudah hilang; hero dengan pemandangan & hiasan dari aset lokal (tidak menutupi
+ * - Beranda: klaim & tombol mati sudah hilang; hero dengan judul besar, tagline satu kalimat, dan kolom cari global
+ *   (pencarian toolbar tersembunyi selama hero terlihat), pemandangan & hiasan dari aset lokal (tidak menutupi
  *   teks, dijeda di luar layar, mati saat prefers-reduced-motion); Waktu Server 5 kotak (jam, UTC, periode, tata
  *   letak per lebar) sementara detail wildlife tetap versi daftar; Muncul Sekarang (server bawaan SEA, ganti server,
  *   isi & urutan dari data, hanya entri section Base Game, "Lihat semua" ke daftar berfilter waktu); kartu kategori
@@ -14,7 +17,12 @@
  * - Gambar entri: kotak persegi (object-fit: contain) di Muncul Sekarang, contoh gambar kartu kategori, hiasan hero,
  *   dan thumbnail pencarian; gambar tinggi (Black Stork 400×846) tidak mengubah ukuran kotak; tile Muncul Sekarang
  *   sebaris sama tinggi, nama maks. 2 baris (teks lengkap di title), badge level di pojok gambar.
- * - Kontras teks AA (light & dark), teks hitam pekat di light, halaman tidak melebar, console bersih.
+ * - Footer: tombol unduh App Store, Google Play, Steam (listing resmi, tab baru, noopener); meta Open Graph & Twitter
+ *   Card dengan gambar preview 1200×630, canonical per halaman.
+ * - Animasi: transisi halaman & hasil filter, gerak gambar kartu per jenis saat hover (hanya opacity/transform, mati
+ *   saat prefers-reduced-motion).
+ * - Kontras teks AA (light & dark, termasuk toolbar di atas hero & footer), teks hitam pekat di light, halaman tidak
+ *   melebar, console bersih.
  *
  * Pemakaian (dev server harus sudah jalan):
  *   npm run dev
@@ -224,6 +232,55 @@ async function runSuite(width) {
     check(`Toolbar sticky di ${route}: tetap di atas saat digulir, ada logo & tombol tema`, sticky.position === 'sticky' && sticky.cssTop === '0px' && sticky.top === 0 && sticky.scrolled > 300 && sticky.brand === '/' && sticky.theme, `scrollY ${sticky.scrolled}, top ${sticky.top}`)
   }
 
+  // Toolbar melayang: pil (sudut membulat penuh) sedikit di bawah tepi atas, semi transparan + blur, fallback latar solid
+  // di luar @supports; di beranda hero dimulai di belakang pil, di halaman lain konten dimulai di bawah pil.
+  for (const route of ['/', '/wildlife/fish']) {
+    await go(route)
+    const pill = await evaluate(`(() => {
+      const inner = document.querySelector('.site-header__inner')
+      const r = inner.getBoundingClientRect()
+      const cs = getComputedStyle(inner)
+      const rules = [...document.styleSheets].flatMap((sheet) => { try { return [...sheet.cssRules] } catch { return [] } })
+      const supports = rules.filter((rule) => rule instanceof CSSSupportsRule && /backdrop-filter/.test(rule.conditionText))
+      const solid = rules.some((rule) => rule.selectorText === '.site-header__inner' && /toolbar-bg-solid/.test(rule.style.background))
+      const first = document.querySelector('.site-main > *')?.getBoundingClientRect()
+      return {
+        top: r.top, bottom: r.bottom, height: r.height, radius: parseFloat(cs.borderTopLeftRadius),
+        alpha: (cs.backgroundColor.match(/[\\d.]+/g) || []).map(Number)[3] ?? 1,
+        blur: /blur\\(/.test(cs.backdropFilter || cs.webkitBackdropFilter || ''),
+        fallback: solid && supports.some((rule) => [...rule.cssRules].some((inside) => inside.selectorText === '.site-header__inner')),
+        contentTop: first ? first.top : null,
+        passThrough: getComputedStyle(document.querySelector('.site-header')).pointerEvents === 'none' && cs.pointerEvents === 'auto',
+      }
+    })()`)
+    const contentOk = route === '/' ? pill.contentTop === 0 : pill.contentTop >= pill.bottom - 0.5
+    check(
+      `Toolbar pil di ${route}: ${desktop ? 12 : 8}px dari tepi atas, sudut membulat penuh, semi transparan + blur (fallback solid), ${route === '/' ? 'hero di belakang pil' : 'konten di bawah pil'}`,
+      Math.abs(pill.top - (desktop ? 12 : 8)) <= 1 && pill.height <= (desktop ? 60.5 : 52.5) && pill.radius >= pill.height / 2 - 1 && pill.alpha < 1 && pill.blur && pill.fallback && pill.passThrough && contentOk,
+      JSON.stringify(pill),
+    )
+  }
+
+  // ================= 1b. Tema: default light, pilihan diingat =================
+  await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] })
+  await go('/')
+  await evaluate(`localStorage.removeItem('hdx-theme')`)
+  await go('/')
+  const firstVisit = await evaluate(`({ theme: document.documentElement.dataset.theme, stored: localStorage.getItem('hdx-theme') })`)
+  await toggleTheme()
+  await go('/wildlife/fish')
+  const remembered = await evaluate(`document.documentElement.dataset.theme`)
+  await toggleTheme()
+  await go('/')
+  const backToLight = await evaluate(`({ theme: document.documentElement.dataset.theme, stored: localStorage.getItem('hdx-theme') })`)
+  await evaluate(`localStorage.removeItem('hdx-theme')`)
+  await send('Emulation.setEmulatedMedia', { features: [LIGHT] })
+  check(
+    'Tema: pengunjung pertama selalu light walau sistem dark; pilihan dari tombol diingat setelah muat ulang',
+    firstVisit.theme === 'light' && firstVisit.stored === null && remembered === 'dark' && backToLight.theme === 'light' && backToLight.stored === 'light',
+    JSON.stringify({ firstVisit, remembered, backToLight }),
+  )
+
   // ================= 2. Menu Wildlife & Wiki (desktop) atau drawer (ponsel) =================
   await go('/')
   const navState = await evaluate(`({
@@ -310,6 +367,82 @@ async function runSuite(width) {
     page = await pageInfo()
     const resepActive = await evaluate(`[...document.querySelectorAll('.nav-menu__button')].find((b) => b.textContent.trim() === 'Wiki').classList.contains('active')`)
     check('Menu Wiki: Resep membuka /recipes dan tombol Wiki ditandai aktif', page.path === '/recipes' && resepActive, page.path)
+
+    // ----- Hover dengan mouse: jeda buka & tutup; klik, keyboard, dan ketuk tetap jalan -----
+    const buttonPoint = (label) => evaluate(`(() => { const b = [...document.querySelectorAll('.nav-menu__button')].find((x) => x.textContent.trim() === ${JSON.stringify(label)}); const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } })()`)
+    const menuState = () => evaluate(`[...document.querySelectorAll('.nav-menu__button')].map((b) => b.textContent.trim() + ':' + b.getAttribute('aria-expanded')).join()`)
+    const moveTo = ({ x, y }) => send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y })
+    const away = { x: Math.round(width / 2), y: 640 }
+    const CLOSED = 'Wildlife:false,Wiki:false'
+    await go('/wildlife')
+    await moveTo(away); await sleep(400)
+    const wildlifePoint = await buttonPoint('Wildlife')
+    const wikiPoint = await buttonPoint('Wiki')
+    // Kursor hanya lewat (keluar sebelum jeda habis) → menu tidak terbuka.
+    await moveTo(wikiPoint); await sleep(40); await moveTo(away); await sleep(400)
+    const passBy = await menuState()
+    // Kursor diam di tombol → belum terbuka seketika, terbuka setelah jeda singkat.
+    await moveTo(wildlifePoint); await sleep(30)
+    const early = await menuState()
+    await sleep(320)
+    const hovered = await menuState()
+    check('Menu hover (mouse): kursor yang hanya lewat tidak membuka menu; kursor diam membuka menu setelah jeda singkat',
+      passBy === CLOSED && early === CLOSED && hovered === 'Wildlife:true,Wiki:false', `${passBy} | ${early} | ${hovered}`)
+    // Turun ke tautan di panel (melewati celah tombol–panel) → tetap terbuka.
+    const linkPoint = await evaluate(`(() => { const a = document.querySelector('.nav-menu__panel .nav-menu__link'); const r = a.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } })()`)
+    await moveTo({ x: wildlifePoint.x, y: Math.round((wildlifePoint.y + linkPoint.y) / 2) }); await sleep(60)
+    await moveTo(linkPoint); await sleep(450)
+    const onPanel = await menuState()
+    // Pindah ke tombol Wiki → Wiki terbuka, Wildlife langsung tertutup (satu panel saja).
+    await moveTo(wikiPoint); await sleep(320)
+    const switched = { state: await menuState(), panels: await evaluate(`document.querySelectorAll('.nav-menu__panel').length`) }
+    // Kursor keluar → masih terbuka sesaat, lalu tertutup setelah jeda.
+    await moveTo(away); await sleep(60)
+    const stillOpen = await menuState()
+    await sleep(450)
+    const closedAfter = await menuState()
+    check('Menu hover: tetap terbuka saat kursor turun ke panel; pindah ke Wiki menutup Wildlife; tertutup setelah jeda saat kursor keluar',
+      onPanel === 'Wildlife:true,Wiki:false' && switched.state === 'Wildlife:false,Wiki:true' && switched.panels === 1 && stillOpen === 'Wildlife:false,Wiki:true' && closedAfter === CLOSED,
+      `${onPanel} | ${switched.state} (${switched.panels} panel) | ${stillOpen} | ${closedAfter}`)
+    // Hover lalu klik: klik tidak menutup menu yang baru dibuka hover, menu tetap terbuka walau kursor keluar; klik lagi menutup.
+    await moveTo(wildlifePoint); await sleep(320)
+    await mouseClick(wildlifePoint)
+    const afterClick = await menuState()
+    await moveTo(away); await sleep(500)
+    const pinned = await menuState()
+    await mouseClick(wildlifePoint)
+    const afterSecond = await menuState()
+    check('Menu hover + klik: klik tidak menutup menu yang dibuka hover dan menu tetap terbuka saat kursor keluar; klik berikutnya menutup',
+      afterClick === 'Wildlife:true,Wiki:false' && pinned === 'Wildlife:true,Wiki:false' && afterSecond === CLOSED, `${afterClick} | ${pinned} | ${afterSecond}`)
+    // Keyboard: Space & Enter di tombol membuka/menutup, Escape menutup.
+    await evaluate(`[...document.querySelectorAll('.nav-menu__button')].find((b) => b.textContent.trim() === 'Wildlife').focus()`)
+    await press(' ', 'Space', 32, ' ')
+    const spaceOpen = await menuState()
+    await KEY.escape()
+    const escClosed = await menuState()
+    await KEY.enter()
+    const enterOpen = await menuState()
+    await KEY.enter()
+    const enterClosed = await menuState()
+    check('Menu keyboard: Space & Enter di tombol membuka-menutup, Escape menutup',
+      spaceOpen === 'Wildlife:true,Wiki:false' && escClosed === CLOSED && enterOpen === 'Wildlife:true,Wiki:false' && enterClosed === CLOSED, `${spaceOpen} | ${escClosed} | ${enterOpen} | ${enterClosed}`)
+    // Layar sentuh: ketuk membuka (tanpa hover) dan menu tidak tertutup sendiri; ketuk lagi menutup.
+    await moveTo(away); await sleep(400)
+    await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 1 })
+    const tap = async ({ x, y }) => {
+      await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] })
+      await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+      await sleep(450)
+    }
+    await tap(wildlifePoint)
+    const tapOpen = await menuState()
+    await sleep(500)
+    const tapStill = await menuState()
+    await tap(wildlifePoint)
+    const tapClosed = await menuState()
+    await send('Emulation.setTouchEmulationEnabled', { enabled: false })
+    check('Menu sentuh: ketuk membuka dan menu tidak tertutup sendiri; ketuk lagi menutup',
+      tapOpen === 'Wildlife:true,Wiki:false' && tapStill === tapOpen && tapClosed === CLOSED, `${tapOpen} | ${tapStill} | ${tapClosed}`)
   } else {
     check('Ponsel: menu desktop & kolom cari tersembunyi, tombol menu & tombol cari tampil', navState.nav === 'none' && navState.menuButton === 'grid' && navState.searchToggle === 'grid' && navState.searchInput === 0, JSON.stringify(navState))
     const toolbarFits = await evaluate(`(() => { const r = [...document.querySelectorAll('.site-header__inner > *, .site-header__tools > *')].map((e) => e.getBoundingClientRect()); return r.every((b) => b.right <= innerWidth && b.left >= 0) && document.querySelector('.site-header').getBoundingClientRect().height <= 64 })()`)
@@ -375,9 +508,11 @@ async function runSuite(width) {
     check('Drawer: tertutup sendiri saat layar melebar ke desktop', !drawer.open && !drawer.locked)
   }
 
-  // ================= 3. Pencarian global =================
+  // ================= 3. Pencarian global (toolbar) =================
+  // Di beranda pencarian toolbar tersembunyi selama hero terlihat (lihat 3b), jadi diuji di halaman Wildlife.
   await go('/')
   await evaluate(`localStorage.removeItem('hdx-server')`)
+  await go('/wildlife')
   const openSearch = async () => {
     if (!desktop) {
       const expanded = await evaluate(`document.querySelector('.global-search__toggle').getAttribute('aria-expanded')`)
@@ -504,6 +639,47 @@ async function runSuite(width) {
   search = await readSearch()
   check('Tab keluar dari kolom menutup daftar hasil', search.expanded === 'false' && !search.focused)
 
+  // ================= 3b. Kolom cari besar di hero =================
+  await go('/')
+  const heroSearch = await evaluate(`(() => {
+    const box = document.querySelector('.hero .global-search--hero')
+    const input = box?.querySelector('input')
+    const r = input?.getBoundingClientRect()
+    return {
+      exists: !!input, role: input?.getAttribute('role'), label: !!(input && document.querySelector('label[for="' + input.id + '"]')),
+      width: Math.round(r?.width ?? 0), height: Math.round(r?.height ?? 0), toggle: !!box?.querySelector('.global-search__toggle'),
+      heroButtons: document.querySelectorAll('.hero .btn, .hero__actions').length,
+    }
+  })()`)
+  check('Hero: tombol diganti satu kolom pencarian besar (combobox berlabel, tanpa tombol ikon)',
+    heroSearch.exists && heroSearch.role === 'combobox' && heroSearch.label && heroSearch.height >= 52 && heroSearch.width >= (desktop ? 480 : 280) && !heroSearch.toggle && heroSearch.heroButtons === 0, JSON.stringify(heroSearch))
+  const toolbarSearchAt = (y) => evaluate(`(async () => { scrollTo(0, ${y}); await new Promise((r) => setTimeout(r, 500)); const cs = getComputedStyle(document.querySelector('.site-header .global-search')); return cs.visibility + '/' + cs.opacity })()`)
+  const heroBottom = await evaluate(`Math.round(document.querySelector('.hero').getBoundingClientRect().bottom + scrollY)`)
+  const atTop = await toolbarSearchAt(0)
+  const pastHero = await toolbarSearchAt(heroBottom + 40)
+  const backTop = await toolbarSearchAt(0)
+  await go('/wildlife/fish')
+  const otherPage = await evaluate(`(() => { const cs = getComputedStyle(document.querySelector('.site-header .global-search')); return cs.visibility + '/' + cs.opacity })()`)
+  check('Beranda: pencarian toolbar tersembunyi selama hero terlihat, muncul setelah hero dilewati; halaman lain selalu tampil',
+    atTop === 'hidden/0' && pastHero === 'visible/1' && backTop === 'hidden/0' && otherPage === 'visible/1', `${atTop} → ${pastHero} → ${backTop}; /wildlife/fish ${otherPage}`)
+  await go('/')
+  await evaluate(`document.querySelector('.global-search--hero input').focus()`)
+  await type('bass')
+  const heroResults = await evaluate(`(() => {
+    const input = document.querySelector('.global-search--hero input')
+    const list = document.getElementById(input.getAttribute('aria-controls') ?? '')
+    const options = [...(list?.querySelectorAll('[role="option"]') ?? [])]
+    options.at(-1)?.scrollIntoView({ block: 'nearest' })
+    const last = options.at(-1)?.getBoundingClientRect()
+    const hit = last && document.elementFromPoint(last.left + last.width / 2, last.top + last.height / 2)
+    return { count: options.length, first: options[0]?.dataset.href, name: options[0]?.querySelector('.search-option__name').textContent, lastVisible: !!hit && options.at(-1).contains(hit), expanded: input.getAttribute('aria-expanded') }
+  })()`)
+  const expectedBass = await expectedSearch('bass')
+  await KEY.enter(); await sleep(1300)
+  page = await pageInfo()
+  check('Hero: kolom cari memakai pencarian global (hasil "bass" dari data, daftar tidak terpotong hero), Enter membuka hasil pertama',
+    heroResults.expanded === 'true' && heroResults.count === Math.min(8, expectedBass.total) && heroResults.lastVisible && page.path === heroResults.first && page.title === heroResults.name, `${heroResults.count} hasil → ${page.path}`)
+
   // ================= 4. Beranda: isi & klaim yang dihapus =================
   await go('/')
   const content = await evaluate(`(() => {
@@ -514,10 +690,24 @@ async function runSuite(width) {
       buttons: home.querySelectorAll('button').length,
       deadLinks: [...home.querySelectorAll('a')].filter((a) => !a.getAttribute('href') || a.getAttribute('href').startsWith('#')).length,
       sections: [...home.querySelectorAll(':scope > section')].map((s) => s.querySelector('h1, h2')?.textContent.trim()),
+      footnote: !!home.querySelector('.now-footnote') || /Urutan: yang waktu munculnya/.test(document.getElementById('muncul-sekarang').textContent),
     }
   })()`)
   check('Beranda: klaim tanpa bukti & fitur palsu hilang, tanpa tombol mati atau tautan kosong', content.banned.length === 0 && content.buttons === 0 && content.deadLinks === 0, content.banned.join(', ') || `${content.buttons} tombol, ${content.deadLinks} tautan kosong`)
-  check('Beranda: urutan section Hero, Waktu Server, Jelajahi Kategori, lalu Muncul Sekarang (kategori di atas)', content.sections.join(' | ') === 'Wiki Komunitas Heartopia | Waktu Server | Jelajahi Kategori | Muncul Sekarang', content.sections.join(' | '))
+  check('Beranda: urutan section Hero, Waktu Server, Semua Kategori, lalu Muncul Sekarang (kategori di atas)', content.sections.join(' | ') === 'Hatowiki | Waktu Server | Semua Kategori | Muncul Sekarang', content.sections.join(' | '))
+  check('Muncul Sekarang: tanpa teks keterangan urutan di bawah section', !content.footnote)
+  const heroText = await evaluate(`(async () => {
+    ${LOAD_DATA}
+    const count = (slug) => CATALOGS.find((c) => c.slug === slug).entries.length
+    const h1 = document.querySelector('.hero h1')
+    return {
+      title: h1.textContent.trim(), size: parseFloat(getComputedStyle(h1).fontSize), family: getComputedStyle(h1).fontFamily,
+      lead: document.querySelector('.hero__lead').textContent.replace(/\\u00a0/g, ' ').trim(),
+      expected: 'Jadwal, lokasi, dan harga ' + count('fish') + ' ikan, ' + count('bugs') + ' serangga, ' + count('birds') + ' burung, dan ' + count('recipes') + ' resep Heartopia, dalam bahasa Indonesia.',
+    }
+  })()`)
+  check('Hero: judul "Hatowiki" besar (Fraunces), tagline satu kalimat spesifik dengan jumlah entri dari data',
+    heroText.title === 'Hatowiki' && heroText.size >= (desktop ? 96 : 60) && /Fraunces/.test(heroText.family) && heroText.lead === heroText.expected, `${heroText.size}px; "${heroText.lead}"`)
 
   // ================= 5. Hero =================
   // Cache dimatikan supaya gambar yang sudah dimuat bagian lain (mis. Muncul Sekarang) tidak terbaca sebagai unduhan hero.
@@ -531,7 +721,7 @@ async function runSuite(width) {
       const r = c.getBoundingClientRect()
       return { src: img.getAttribute('src'), alt: img.getAttribute('alt'), shown: getComputedStyle(c).display !== 'none', square: Math.abs(r.width - r.height) <= 1 && getComputedStyle(img).objectFit === 'contain', loaded: img.complete && img.naturalWidth > 0, lazy: img.loading === 'lazy', size: !!img.getAttribute('width') && !!img.getAttribute('height'), rect: [r.left, r.top, r.right, r.bottom], anim: getComputedStyle(c).animationName }
     })
-    const textRects = [...heroEl.querySelectorAll('.hero__badge, h1, .hero__lead, .hero__actions .btn')].map((e) => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom] })
+    const textRects = [...heroEl.querySelectorAll('.hero__badge, h1, .hero__lead, .global-search--hero input')].map((e) => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom] })
     const overlaps = creatures.filter((c) => c.shown).filter((c) => textRects.some((t) => c.rect[0] < t[2] && c.rect[2] > t[0] && c.rect[1] < t[3] && c.rect[3] > t[1])).map((c) => c.src)
     const sun = heroEl.querySelector('.hero-scene__sun').getBoundingClientRect()
     const sunOverText = textRects.some((t) => sun.left < t[2] && sun.right > t[0] && sun.top < t[3] && sun.bottom > t[1])
@@ -550,7 +740,7 @@ async function runSuite(width) {
   const shownCreatures = hero.creatures.filter((c) => c.shown)
   check('Hero: hiasan yang tampil sudah termuat dan beranimasi', shownCreatures.length >= 3 && shownCreatures.every((c) => c.loaded && c.anim !== 'none'), `${shownCreatures.length} tampil`)
   check('Hero: tiap hiasan berupa kotak persegi, gambar utuh (object-fit: contain)', shownCreatures.every((c) => c.square))
-  check('Hero: hiasan & matahari/bulan tidak menutupi teks atau tombol', hero.overlaps.length === 0 && !hero.sunOverText, hero.overlaps.join(', ') || (hero.sunOverText ? 'matahari' : ''))
+  check('Hero: hiasan & matahari/bulan tidak menutupi teks atau kolom cari', hero.overlaps.length === 0 && !hero.sunOverText, hero.overlaps.join(', ') || (hero.sunOverText ? 'matahari' : ''))
   if (width < 1000) {
     const hiddenLoaded = hero.creatures.filter((c) => !c.shown && c.loaded).map((c) => c.src)
     check('Hero: hiasan yang disembunyikan di layar kecil tidak diunduh (lazy)', hero.creatures.some((c) => !c.shown) && hiddenLoaded.length === 0, hiddenLoaded.join(', '))
@@ -805,6 +995,15 @@ async function runSuite(width) {
       const out = {}
       out.home = worstContrast(document.querySelector('.home'))
       out.header = worstContrast(document.querySelector('.site-header'))
+      out.footer = worstContrast(document.querySelector('.site-footer'))
+      // Toolbar di atas hero: latar pil (semi transparan) dikomposit di atas warna langit hero (tanpa efek blur).
+      scrollTo(0, 0); await wait(300)
+      const inner = document.querySelector('.site-header__inner')
+      const pill = parse(getComputedStyle(inner).backgroundColor)
+      const hero = getComputedStyle(document.querySelector('.hero'))
+      const sky = [parse(hero.backgroundColor), ...(hero.backgroundImage.match(COLOR_RE) || []).map(parse)].map((c) => over(c, [255, 255, 255, 1]))
+      const texts = [...inner.querySelectorAll('.brand__name, .nav-menu__button')].filter((el) => el.getBoundingClientRect().width > 0)
+      out.overHero = Math.min(...texts.flatMap((el) => { const color = parse(getComputedStyle(el).color); return sky.map((c) => { const bg = over(pill, c); return ratio(over(color, bg), bg) }) }))
       return out
     })()`)
     const parts = []
@@ -820,14 +1019,15 @@ async function runSuite(width) {
       parts.push(['drawer', await evaluate(`(() => { ${CONTRAST_PROBE} return worstContrast(document.querySelector('.drawer__panel')) })()`)])
       await KEY.escape()
     }
-    await openSearch()
+    await evaluate(`document.querySelector('.global-search--hero input').focus()`)
     await type('an')
     parts.push(['hasil pencarian', await evaluate(`(() => { ${CONTRAST_PROBE} return worstContrast(document.querySelector('.global-search__dropdown')) })()`)])
-    await KEY.escape(); await KEY.escape(); if (!desktop) await KEY.escape()
-    const all = [['beranda', report.home], ['toolbar', report.header], ...parts]
+    await KEY.escape(); await KEY.escape()
+    const all = [['beranda', report.home], ['toolbar', report.header], ['footer', report.footer], ...parts]
     const failing = all.filter(([, r]) => r.worst && r.worst.ratio < r.worst.need)
+    check(`Kontras toolbar di atas hero (${theme}): teks pil ≥ 4,5:1 terhadap langit hero`, report.overHero >= 4.5, `${report.overHero.toFixed(2)}:1`)
     check(
-      `Kontras teks AA (${theme}): beranda, toolbar, ${desktop ? 'menu Wildlife & Wiki' : 'drawer'}, hasil pencarian`,
+      `Kontras teks AA (${theme}): beranda, toolbar, footer, ${desktop ? 'menu Wildlife & Wiki' : 'drawer'}, hasil pencarian`,
       failing.length === 0 && all.every(([, r]) => r.count > 0),
       all.map(([name, r]) => `${name} ${r.count} teks, terendah ${r.worst?.ratio.toFixed(2)}:1${r.worst && r.worst.ratio < r.worst.need ? ` ("${r.worst.text}" ${r.worst.cls})` : ''}`).join('; '),
     )
@@ -835,6 +1035,94 @@ async function runSuite(width) {
     check(`Beranda (${theme}): tidak melebar ke samping`, overflow <= 0, `${overflow}px`)
   }
   await evaluate(`localStorage.removeItem('hdx-theme')`)
+
+  // ================= 11. Footer: tombol unduh; meta Open Graph, Twitter Card & canonical =================
+  await go('/')
+  const stores = await evaluate(`[...document.querySelectorAll('.site-footer .store-link')].map((a) => ({ name: a.querySelector('.store-link__name').textContent, href: a.getAttribute('href'), target: a.target, rel: a.rel, icon: !!a.querySelector('svg path'), iconHidden: a.querySelector('svg')?.getAttribute('aria-hidden') === 'true', newTab: a.textContent.includes('(membuka tab baru)'), visible: a.getBoundingClientRect().width > 0 }))`)
+  const STORE_LINKS = 'App Store>https://apps.apple.com/app/heartopia/id6746151928,Google Play>https://play.google.com/store/apps/details?id=com.xd.xdtglobal.gp,Steam>https://store.steampowered.com/app/4025700/Heartopia/'
+  check('Footer: tombol unduh App Store, Google Play, Steam ke listing resmi, ikon merek + teks, tab baru dengan rel="noopener"',
+    stores.map((store) => `${store.name}>${store.href}`).join() === STORE_LINKS && stores.every((store) => store.target === '_blank' && /\bnoopener\b/.test(store.rel) && store.icon && store.iconHidden && store.newTab && store.visible),
+    stores.map((store) => store.name).join(', '))
+  const meta = await evaluate(`(async () => {
+    const m = (selector) => document.querySelector(selector)?.getAttribute('content') ?? null
+    const image = m('meta[property="og:image"]')
+    const res = await fetch(new URL(image).pathname)
+    const blob = await res.blob()
+    const bitmap = await createImageBitmap(blob)
+    return {
+      canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href'), ogUrl: m('meta[property="og:url"]'), ogType: m('meta[property="og:type"]'),
+      ogTitle: m('meta[property="og:title"]'), ogDesc: m('meta[property="og:description"]'), ogImage: image, ogSize: m('meta[property="og:image:width"]') + 'x' + m('meta[property="og:image:height"]'),
+      ogAlt: m('meta[property="og:image:alt"]'), twCard: m('meta[name="twitter:card"]'), twImage: m('meta[name="twitter:image"]'), twTitle: m('meta[name="twitter:title"]'),
+      twDesc: m('meta[name="twitter:description"]'), desc: m('meta[name="description"]'),
+      file: { status: res.status, type: blob.type, bytes: blob.size, size: bitmap.width + 'x' + bitmap.height },
+    }
+  })()`)
+  const IMAGE_URL = 'https://www.hatowiki.site/og-image.jpg'
+  const topics = ['ikan', 'serangga', 'burung', 'hewan', 'resep', 'tanaman', 'collectibles', 'bahan masak']
+  check('Meta: og:image & twitter:image URL absolut ke gambar 1200×630 JPEG di bawah 300 KB, Twitter Card summary_large_image, judul & alt terisi',
+    meta.ogImage === IMAGE_URL && meta.twImage === IMAGE_URL && meta.ogSize === '1200x630' && meta.file.status === 200 && meta.file.type === 'image/jpeg' && meta.file.size === '1200x630' && meta.file.bytes < 300 * 1024 &&
+      meta.twCard === 'summary_large_image' && meta.ogType === 'website' && !!meta.ogTitle && !!meta.twTitle && !!meta.ogAlt,
+    JSON.stringify(meta.file))
+  check('Meta: deskripsi situs, og:description & twitter:description menyebut semua kategori (ikan … bahan masak)',
+    [meta.desc, meta.ogDesc, meta.twDesc].every((text) => topics.every((topic) => text?.toLowerCase().includes(topic))), meta.desc)
+  await evaluate(`document.querySelector('.site-footer a[href="/wildlife/fish"]').click()`); await sleep(1000)
+  const canonicalFish = await evaluate(`({ canonical: document.querySelector('link[rel="canonical"]').getAttribute('href'), ogUrl: document.querySelector('meta[property="og:url"]').getAttribute('content') })`)
+  check('Canonical & og:url: https://www.hatowiki.site/ di beranda, mengikuti halaman setelah pindah (/wildlife/fish)',
+    meta.canonical === 'https://www.hatowiki.site/' && meta.ogUrl === meta.canonical && canonicalFish.canonical === 'https://www.hatowiki.site/wildlife/fish' && canonicalFish.ogUrl === canonicalFish.canonical,
+    `${meta.canonical} → ${canonicalFish.canonical}`)
+
+  // ================= 12. Animasi secukupnya =================
+  const frames = await evaluate(`(() => {
+    const rules = [...document.styleSheets].flatMap((sheet) => { try { return [...sheet.cssRules] } catch { return [] } })
+    const flat = rules.flatMap((rule) => (rule.cssRules ? [rule, ...rule.cssRules] : [rule]))
+    return Object.fromEntries(flat.filter((rule) => rule instanceof CSSKeyframesRule).map((rule) => [rule.name, [...new Set([...rule.cssRules].flatMap((key) => [...key.style]))]]))
+  })()`)
+  const MOTION = ['page-enter', 'fade-in', 'card-swim', 'card-flutter', 'card-hop']
+  check('Animasi baru (transisi halaman & hasil filter, gerak kartu) hanya memakai opacity & transform',
+    MOTION.every((name) => frames[name]?.length && frames[name].every((prop) => prop === 'opacity' || prop === 'transform')), MOTION.map((name) => `${name}: ${frames[name]?.join('+')}`).join('; '))
+  // Kelas animasi yang dipasang saat pindah halaman / hasil filter berubah (dicatat MutationObserver).
+  const watchClass = (scope, cls, action) => evaluate(`(async () => {
+    const seen = []
+    const observer = new MutationObserver((list) => list.forEach((m) => { if (m.target.classList?.contains('${cls}')) seen.push(getComputedStyle(m.target).animationName) }))
+    observer.observe(document.querySelector('${scope}'), { attributes: true, attributeFilter: ['class'], subtree: true })
+    ${action}
+    await new Promise((r) => setTimeout(r, 800))
+    observer.disconnect()
+    return seen
+  })()`)
+  const TYPE_BASS = `const input = document.querySelector('.list-search input'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, 'bass'); input.dispatchEvent(new Event('input', { bubbles: true }))`
+  await go('/wildlife')
+  const pageAnim = await watchClass('.site', 'page-enter', `document.querySelector('.site-main a[href="/wildlife/fish"]').click()`)
+  const resultAnim = await watchClass('.list-results', 'results-enter', TYPE_BASS)
+  await send('Emulation.setEmulatedMedia', { features: [LIGHT, { name: 'prefers-reduced-motion', value: 'reduce' }] })
+  await go('/wildlife')
+  const pageReduced = await watchClass('.site', 'page-enter', `document.querySelector('.site-main a[href="/wildlife/fish"]').click()`)
+  const resultReduced = await watchClass('.list-results', 'results-enter', TYPE_BASS)
+  await send('Emulation.setEmulatedMedia', { features: [LIGHT] })
+  check('Transisi: pindah halaman memudar masuk (page-enter), hasil filter yang berubah memudar (fade-in); mati saat prefers-reduced-motion',
+    pageAnim.includes('page-enter') && resultAnim.includes('fade-in') && pageReduced.length > 0 && pageReduced.every((name) => name === 'none') && resultReduced.length > 0 && resultReduced.every((name) => name === 'none'),
+    JSON.stringify({ pageAnim, resultAnim, pageReduced, resultReduced }))
+  if (desktop) {
+    const hoverCard = async (route) => {
+      await go(route)
+      const point = await centerOf(`document.querySelector('.entry-card')`)
+      await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: point.x, y: point.y }); await sleep(400)
+      const state = await evaluate(`(() => { const card = document.querySelector('.entry-card'); const img = card.querySelector('.entry-card__image'); const cs = getComputedStyle(img); return { anim: cs.animationName, transform: cs.transform, card: getComputedStyle(card).transform } })()`)
+      await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: Math.round(width / 2), y: 2 }); await sleep(200)
+      return state
+    }
+    const hovers = {}
+    for (const [kind, route] of [['fish', '/wildlife/fish'], ['bugs', '/wildlife/bugs'], ['birds', '/wildlife/birds'], ['recipes', '/recipes'], ['crops', '/crops']]) hovers[kind] = await hoverCard(route)
+    const scaled = (t) => /^matrix\(1\.06, 0, 0, 1\.06, 0, 0\)$/.test(t)
+    check('Hover kartu: ikan berenang, serangga mengepak, burung melompat; resep & tanaman sedikit membesar; kartu tidak terangkat',
+      hovers.fish.anim === 'card-swim' && hovers.bugs.anim === 'card-flutter' && hovers.birds.anim === 'card-hop' && hovers.recipes.anim === 'none' && scaled(hovers.recipes.transform) && hovers.crops.anim === 'none' && scaled(hovers.crops.transform) &&
+        Object.values(hovers).every((h) => h.card === 'none'),
+      Object.entries(hovers).map(([kind, h]) => `${kind}: ${h.anim} ${h.transform}`).join('; '))
+    await send('Emulation.setEmulatedMedia', { features: [LIGHT, { name: 'prefers-reduced-motion', value: 'reduce' }] })
+    const reducedHover = await hoverCard('/wildlife/fish')
+    await send('Emulation.setEmulatedMedia', { features: [LIGHT] })
+    check('Hover kartu saat prefers-reduced-motion: gambar diam', reducedHover.anim === 'none' && reducedHover.transform === 'none', JSON.stringify(reducedHover))
+  }
 
   const problems = tab.logs.filter((line) => !/\[vite\] connect|React DevTools/.test(line))
   check('Console bersih selama uji', problems.length === 0, problems.join(' | '))

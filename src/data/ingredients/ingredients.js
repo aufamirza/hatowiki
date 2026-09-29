@@ -2,7 +2,8 @@ import { findIngredientProblems } from './validateIngredients'
 
 /**
  * Data bahan masak Heartopia (kategori Ingredients). Semua nilai wajib bersumber dari Heartodex
- * (https://www.heartodex.com/en/ingredients/<slug>; section dari halaman daftar https://www.heartodex.com/en/ingredients).
+ * (https://www.heartodex.com/en/ingredients/<slug>; section dari halaman daftar https://www.heartodex.com/en/ingredients),
+ * kecuali `obtainedFrom` yang tidak ada di Heartodex selain untuk gula (sumbernya ditulis di komentar tiap entri).
  * Data yang tidak ditemukan diisi `null` dan diberi komentar TODO — jangan ditebak. Bahan tidak punya level, lokasi,
  * maupun peta. Bahan juga dipakai sebagai benda (bahan resep, makanan hewan) dengan id 'ingredients/<slug>' (lihat
  * src/data/items.js); file ini satu-satunya sumber datanya.
@@ -19,6 +20,9 @@ import { findIngredientProblems } from './validateIngredients'
  * @property {?number}  buyPrice            Harga beli ("Buy Price" di kotak Market Value).
  * @property {?number}  sellPrice           Harga jual ("Sell Price"), kalau sumber mencantumkannya.
  * @property {?string}  origin              Info asal (mis. "General" dari "Origin: General"), kalau sumber mencantumkannya.
+ * @property {?{ place: string, when: ?string }} obtainedFrom Tempat membeli/mendapatkan bahan (bahasa Indonesia, nama NPC &
+ *                                          event tetap English): `place` = toko/NPC (tampil di kartu), `when` = syarat
+ *                                          waktunya, mis. 'selama event Modular Streets'. null = tidak ditemukan (+ TODO).
  * @property {string[]} [uncertain]         Opsional: field angka (mis. 'buyPrice') yang di sumber desimal.
  * @property {string}   image               Path lokal di /public, mis. '/images/ingredients/egg.webp'.
  * @property {[number, number]} imageSize   Ukuran asli gambar [lebar, tinggi] untuk width/height <img>.
@@ -40,6 +44,7 @@ export const ingredients = [
     buyPrice: 100,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://gamerant.com/heartopia-all-shops-locations-sell-items/
     image: '/images/ingredients/cooking-oil.webp',
     imageSize: [400, 343],
     source: 'https://www.heartodex.com/en/ingredients/cooking-oil',
@@ -54,6 +59,7 @@ export const ingredients = [
     buyPrice: 200,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://gamerant.com/heartopia-all-shops-locations-sell-items/
     image: '/images/ingredients/meat.webp',
     imageSize: [400, 353],
     source: 'https://www.heartodex.com/en/ingredients/meat',
@@ -68,6 +74,7 @@ export const ingredients = [
     buyPrice: 200,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Doris', when: 'hanya saat pelangi' }, // sumber: Heartodex (About) + https://www.heartopialog.com/2026/02/heartopia-ingredients-guide-massimo-doris-foraging.html
     image: '/images/ingredients/yellow-sugar.webp',
     imageSize: [400, 661],
     source: 'https://www.heartodex.com/en/ingredients/yellow-sugar',
@@ -82,6 +89,7 @@ export const ingredients = [
     buyPrice: 150,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Doris', when: 'saat hujan atau pelangi' }, // sumber: Heartodex (About) + https://www.heartopialog.com/2026/02/heartopia-ingredients-guide-massimo-doris-foraging.html
     image: '/images/ingredients/indigo-sugar.webp',
     imageSize: [400, 661],
     source: 'https://www.heartodex.com/en/ingredients/indigo-sugar',
@@ -96,6 +104,7 @@ export const ingredients = [
     buyPrice: 150,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Doris', when: 'saat hujan atau pelangi' }, // sumber: Heartodex (About) + https://www.heartopialog.com/2026/02/heartopia-ingredients-guide-massimo-doris-foraging.html
     image: '/images/ingredients/blue-sugar.webp',
     imageSize: [400, 661],
     source: 'https://www.heartodex.com/en/ingredients/blue-sugar',
@@ -110,6 +119,7 @@ export const ingredients = [
     buyPrice: 150,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Doris', when: 'saat hujan atau pelangi' }, // sumber: Heartodex (About) + https://www.heartopialog.com/2026/02/heartopia-ingredients-guide-massimo-doris-foraging.html
     image: '/images/ingredients/violet-sugar.webp',
     imageSize: [400, 635],
     source: 'https://www.heartodex.com/en/ingredients/violet-sugar',
@@ -124,6 +134,7 @@ export const ingredients = [
     buyPrice: 200,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Doris', when: 'hanya saat pelangi' }, // sumber: Heartodex (About) + https://www.heartopialog.com/2026/02/heartopia-ingredients-guide-massimo-doris-foraging.html
     image: '/images/ingredients/orange-sugar.webp',
     imageSize: [400, 635],
     source: 'https://www.heartodex.com/en/ingredients/orange-sugar',
@@ -138,6 +149,7 @@ export const ingredients = [
     buyPrice: 200,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Doris', when: 'hanya saat pelangi' }, // sumber: Heartodex (About) + https://www.heartopialog.com/2026/02/heartopia-ingredients-guide-massimo-doris-foraging.html
     image: '/images/ingredients/red-sugar.webp',
     imageSize: [400, 635],
     source: 'https://www.heartodex.com/en/ingredients/red-sugar',
@@ -152,6 +164,7 @@ export const ingredients = [
     buyPrice: 200,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Doris', when: 'hanya saat pelangi' }, // sumber: Heartodex (About) + https://www.heartopialog.com/2026/02/heartopia-ingredients-guide-massimo-doris-foraging.html
     image: '/images/ingredients/green-sugar.webp',
     imageSize: [400, 661],
     source: 'https://www.heartodex.com/en/ingredients/green-sugar',
@@ -166,6 +179,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://gamerant.com/heartopia-all-shops-locations-sell-items/
     image: '/images/ingredients/red-bean.webp',
     imageSize: [400, 315],
     source: 'https://www.heartodex.com/en/ingredients/red-bean',
@@ -180,6 +194,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://gamerant.com/heartopia-all-shops-locations-sell-items/
     image: '/images/ingredients/coffee-beans.webp',
     imageSize: [400, 418],
     source: 'https://www.heartodex.com/en/ingredients/coffee-beans',
@@ -194,6 +209,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://gamerant.com/heartopia-all-shops-locations-sell-items/
     image: '/images/ingredients/rice-flour.webp',
     imageSize: [400, 348],
     source: 'https://www.heartodex.com/en/ingredients/rice-flour',
@@ -208,6 +224,7 @@ export const ingredients = [
     buyPrice: 100,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://gamerant.com/heartopia-all-shops-locations-sell-items/
     image: '/images/ingredients/egg.webp',
     imageSize: [400, 389],
     source: 'https://www.heartodex.com/en/ingredients/egg',
@@ -222,6 +239,7 @@ export const ingredients = [
     buyPrice: 100,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://www.gamezebo.com/walkthroughs/how-to-make-onsen-egg-in-heartopia/
     image: '/images/ingredients/pasteurized-egg.webp',
     imageSize: [400, 426],
     source: 'https://www.heartodex.com/en/ingredients/pasteurized-egg',
@@ -236,6 +254,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://gamerant.com/heartopia-all-shops-locations-sell-items/
     image: '/images/ingredients/milk.webp',
     imageSize: [400, 387],
     source: 'https://www.heartodex.com/en/ingredients/milk',
@@ -250,6 +269,7 @@ export const ingredients = [
     buyPrice: 150,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://gamerant.com/heartopia-all-shops-locations-sell-items/
     image: '/images/ingredients/butter.webp',
     imageSize: [400, 374],
     source: 'https://www.heartodex.com/en/ingredients/butter',
@@ -264,6 +284,7 @@ export const ingredients = [
     buyPrice: 250,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://gamerant.com/heartopia-all-shops-locations-sell-items/
     image: '/images/ingredients/matcha-powder.webp',
     imageSize: [400, 345],
     source: 'https://www.heartodex.com/en/ingredients/matcha-powder',
@@ -278,6 +299,7 @@ export const ingredients = [
     buyPrice: 100,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://gamerant.com/heartopia-all-shops-locations-sell-items/
     image: '/images/ingredients/cheese.webp',
     imageSize: [400, 379],
     source: 'https://www.heartodex.com/en/ingredients/cheese',
@@ -292,6 +314,7 @@ export const ingredients = [
     buyPrice: 250,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: null }, // sumber: https://gamerant.com/heartopia-all-shops-locations-sell-items/
     image: '/images/ingredients/tea-leaves.webp',
     imageSize: [400, 343],
     source: 'https://www.heartodex.com/en/ingredients/tea-leaves',
@@ -306,6 +329,7 @@ export const ingredients = [
     buyPrice: 100,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko event Autumn Moon Treasury', when: null }, // sumber: https://build-heartopia.com/events/mid-autumn
     image: '/images/ingredients/osmanthus-jam.webp',
     imageSize: [400, 400],
     source: 'https://www.heartodex.com/en/ingredients/osmanthus-jam',
@@ -320,6 +344,7 @@ export const ingredients = [
     buyPrice: 100,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: null, // TODO: tempat membeli/mendapatkan tidak ditemukan di sumber yang jelas
     image: '/images/ingredients/ace-chicken.webp',
     imageSize: [400, 400],
     source: 'https://www.heartodex.com/en/ingredients/ace-chicken',
@@ -334,6 +359,7 @@ export const ingredients = [
     buyPrice: 200,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: null, // TODO: tempat membeli/mendapatkan tidak ditemukan di sumber yang jelas
     image: '/images/ingredients/ace-beef.webp',
     imageSize: [400, 400],
     source: 'https://www.heartodex.com/en/ingredients/ace-beef',
@@ -348,6 +374,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: 'selama event Echo of Ancients' }, // sumber: https://allthings.how/heartopia-echo-of-ancients-festival-how-to-unlock-every-collection-and-recipe/
     image: '/images/ingredients/fruitwood-charcoal.webp',
     imageSize: [400, 352],
     source: 'https://www.heartodex.com/en/ingredients/fruitwood-charcoal',
@@ -362,6 +389,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: 'selama event Echo of Ancients' }, // sumber: https://allthings.how/heartopia-echo-of-ancients-festival-how-to-unlock-every-collection-and-recipe/
     image: '/images/ingredients/concentrated-date-paste.webp',
     imageSize: [400, 388],
     source: 'https://www.heartodex.com/en/ingredients/concentrated-date-paste',
@@ -376,6 +404,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: 'selama event Call of Whales' }, // sumber: https://heartopia.life/guides/call-of-whales-cooking/
     image: '/images/ingredients/spirulina-powder.webp',
     imageSize: [400, 400],
     source: 'https://www.heartodex.com/en/ingredients/spirulina-powder',
@@ -390,6 +419,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko penukaran event Midsummer Rhyme', when: null }, // sumber: https://www.heartopialog.com/2026/02/heartopia-ingredients-guide-massimo-doris-foraging.html
     image: '/images/ingredients/bamboo-leaf.webp',
     imageSize: [400, 322],
     source: 'https://www.heartodex.com/en/ingredients/bamboo-leaf',
@@ -404,6 +434,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: 'selama event Modular Streets' }, // sumber: https://www.screenhype.co.uk/heartopia-modular-streets-event-guide-all-collectables-values/
     image: '/images/ingredients/brick-meat-patty.webp',
     imageSize: [400, 284],
     source: 'https://www.heartodex.com/en/ingredients/brick-meat-patty',
@@ -418,6 +449,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: 'selama event Modular Streets' }, // sumber: https://www.screenhype.co.uk/heartopia-modular-streets-event-guide-all-collectables-values/
     image: '/images/ingredients/brick-ice.webp',
     imageSize: [400, 335],
     source: 'https://www.heartodex.com/en/ingredients/brick-ice',
@@ -432,6 +464,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: 'selama event Modular Streets' }, // sumber: https://www.screenhype.co.uk/heartopia-modular-streets-event-guide-all-collectables-values/
     image: '/images/ingredients/condensed-milk.webp',
     imageSize: [400, 296],
     source: 'https://www.heartodex.com/en/ingredients/condensed-milk',
@@ -446,6 +479,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: 'selama event Dreamlight Cinematics' }, // sumber: https://gamerant.com/heartopia-all-every-dreamlight-cinematics-cooking-recipe-how-cook/
     image: '/images/ingredients/springday-brown-sugar.webp',
     imageSize: [400, 596],
     source: 'https://www.heartodex.com/en/ingredients/springday-brown-sugar',
@@ -460,6 +494,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: 'selama event Dreamlight Cinematics' }, // sumber: https://gamerant.com/heartopia-all-every-dreamlight-cinematics-cooking-recipe-how-cook/
     image: '/images/ingredients/salsa-sauce.webp',
     imageSize: [400, 396],
     source: 'https://www.heartodex.com/en/ingredients/salsa-sauce',
@@ -474,6 +509,7 @@ export const ingredients = [
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
     origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: { place: 'Toko Massimo', when: 'selama event Winter frost season' }, // sumber: https://www.heartopia-tips.com/blog/heartopia-frost-season-recipes
     image: '/images/ingredients/frosted.webp',
     imageSize: [400, 545],
     source: 'https://www.heartodex.com/en/ingredients/frosted',

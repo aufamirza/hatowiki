@@ -24,9 +24,10 @@
   transform: rotate(180deg);
 }
 
+/* Panel muncul tepat di bawah pil toolbar (tombol berada di tengah pil setinggi --header-height) */
 .nav-menu__panel {
   position: absolute;
-  top: calc(100% + var(--space-2));
+  top: calc(100% + var(--space-4));
   left: 0;
   z-index: 120;
   width: 18rem;
@@ -36,6 +37,16 @@
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-lg);
   animation: nav-pop var(--duration) var(--ease-out);
+}
+
+/* Jembatan tak terlihat di celah antara tombol dan panel, supaya kursor yang turun ke panel tidak keluar dari menu */
+.nav-menu__panel::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: calc(var(--space-4) + 2px);
 }
 
 @keyframes nav-pop {

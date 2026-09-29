@@ -3,24 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Wiki komunitas Heartopia berbahasa Indonesia: data ikan, jadwal, cuaca, lokasi, dan waktu server." />
-  <meta name="theme-color" content="#faf5ec" />
+  <meta name="description" content="Wiki komunitas Heartopia berbahasa Indonesia: ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak, lengkap dengan jadwal muncul, cuaca, lokasi, bahan, dan harga." />
+  <meta name="theme-color" content="#f5f7fc" />
   <meta name="application-name" content="Hatowiki" />
-  <meta property="og:site_name" content="Hatowiki" />
   <title>Hatowiki | Wiki Komunitas Heartopia</title>
+  <!-- Canonical & og:url diperbarui per halaman oleh Layout.jsx -->
+  <link rel="canonical" href="https://www.hatowiki.site/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Hatowiki" />
+  <meta property="og:locale" content="id_ID" />
+  <meta property="og:url" content="https://www.hatowiki.site/" />
+  <meta property="og:title" content="Hatowiki | Wiki Komunitas Heartopia" />
+  <meta property="og:description" content="Ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak Heartopia dalam bahasa Indonesia: jadwal muncul, cuaca, lokasi, bahan, dan harga." />
+  <meta property="og:image" content="https://www.hatowiki.site/og-image.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Hatowiki: pemandangan siang Heartopia dengan bukit, laut, ikan, serangga, dan burung" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Hatowiki | Wiki Komunitas Heartopia" />
+  <meta name="twitter:description" content="Ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak Heartopia dalam bahasa Indonesia: jadwal muncul, cuaca, lokasi, bahan, dan harga." />
+  <meta name="twitter:image" content="https://www.hatowiki.site/og-image.jpg" />
+  <meta name="twitter:image:alt" content="Hatowiki: pemandangan siang Heartopia dengan bukit, laut, ikan, serangga, dan burung" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,500..700,100&family=Plus+Jakarta+Sans:wght@400..700&display=swap" />
   <script>
-    // Pasang tema sebelum render supaya tidak berkedip: pilihan tersimpan, kalau tidak ada ikuti sistem.
+    // Pasang tema sebelum render supaya tidak berkedip: pilihan tersimpan dari tombol tema, kalau belum pernah memilih
+    // selalu light (tidak mengikuti pengaturan sistem).
     (function () {
       var theme
       try { theme = localStorage.getItem('hdx-theme') } catch (e) {}
-      if (theme !== 'light' && theme !== 'dark') {
-        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      }
-      document.documentElement.dataset.theme = theme
+      document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : 'light'
     })()
   </script>
 </head>

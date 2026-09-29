@@ -173,6 +173,20 @@
   color: var(--color-text-dimmed);
 }
 
+/* Tempat membeli bahan: selebar daftar saat daftar dua kolom, syarat waktunya di baris kecil sendiri */
+.spec--wide {
+  grid-column: 1 / -1;
+}
+
+.spec__note {
+  flex-basis: 100%;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+}
+
 /* Nilai jual & energi di samping gambar: satu kolom, setiap angka setinggi separuh panggung */
 @container (min-width: 520px) {
   .goods-specs--hero {

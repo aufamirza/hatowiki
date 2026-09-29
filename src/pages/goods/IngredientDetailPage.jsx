@@ -1,5 +1,5 @@
 import { useLocation, useParams } from 'react-router-dom'
-import { Coins, MapPinned } from 'lucide-react'
+import { Coins, MapPinned, Store } from 'lucide-react'
 import Breadcrumbs from '../../components/Breadcrumbs'
 import { formatCoins } from '../../components/recipes/starValues'
 import EntryImage from '../../components/wildlife/EntryImage'
@@ -14,8 +14,8 @@ import './goodsTints.css'
 import './GoodsDetailPage.css'
 
 /**
- * Halaman detail satu bahan masak: (1) nama, kategori, deskripsi; (2) gambar dengan harga beli dan harga jual (dan info
- * asal kalau sumber mencantumkannya); (3) resep yang memakainya dan (4) hewan yang menyukainya, dihitung dari data
+ * Halaman detail satu bahan masak: (1) nama, kategori, deskripsi; (2) gambar dengan harga beli, harga jual, tempat
+ * membelinya (Didapat dari), dan info asal kalau sumber mencantumkannya; (3) resep yang memakainya dan (4) hewan yang menyukainya, dihitung dari data
  * Hatowiki. Bahan tidak punya level, lokasi, maupun peta.
  */
 function IngredientDetailPage() {
@@ -37,6 +37,7 @@ function IngredientDetailPage() {
   }
 
   const usage = getItemUsage(`ingredients/${item.slug}`)
+  const obtained = item.obtainedFrom
   const amount = (key) => (item[key] != null ? formatCoins(item[key]) : item.uncertain?.includes(key) ? 'Belum pasti' : '—')
   const prices = [
     { key: 'buyPrice', label: 'Harga beli' },
@@ -61,7 +62,7 @@ function IngredientDetailPage() {
         {/* Kotak 1 — identitas. Pertama di DOM supaya nama terbaca paling awal. */}
         <IdentityPanel kind={INGREDIENT_KIND} entry={item} />
 
-        {/* Kotak 2 — gambar | harga beli & harga jual */}
+        {/* Kotak 2 — gambar | harga beli, harga jual & tempat membeli */}
         <section className="panel panel--hero" aria-label={`Gambar dan harga ${item.name}`}>
           <div className="hero-layout hero-layout--split">
             <div className="entry-stage">
@@ -80,6 +81,16 @@ function IngredientDetailPage() {
                   </dd>
                 </div>
               ))}
+              <div className="spec spec--wide">
+                <dt className="spec__label">
+                  <Store aria-hidden="true" />
+                  Didapat dari
+                </dt>
+                <dd className={`spec__value${obtained ? '' : ' is-missing'}`}>
+                  {obtained ? obtained.place : '—'}
+                  {obtained?.when && <span className="spec__note">{obtained.when}</span>}
+                </dd>
+              </div>
               {item.origin && (
                 <div className="spec">
                   <dt className="spec__label">

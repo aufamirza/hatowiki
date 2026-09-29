@@ -200,9 +200,44 @@
   color: var(--color-text-muted);
 }
 
-/* Ponsel: kolom pencarian tersembunyi di balik tombol ikon, dibuka sebagai baris di bawah toolbar */
+/* ---------- Varian hero (beranda): kolom besar, selalu tampil, hasil selebar kolom ---------- */
+.global-search--hero {
+  flex: none;
+  width: min(100%, 38rem);
+  text-align: left;
+}
+
+.global-search--hero .global-search__icon {
+  left: 22px;
+  width: 22px;
+  height: 22px;
+  color: var(--color-accent-ink);
+}
+
+.global-search.global-search--hero input {
+  height: 62px;
+  padding: 0 52px 0 58px;
+  border-color: var(--color-border-strong);
+  font-size: var(--text-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.global-search--hero .global-search__clear {
+  right: 12px;
+  width: 38px;
+  height: 38px;
+}
+
+.global-search--hero .global-search__dropdown {
+  right: auto;
+  left: 0;
+  width: 100%;
+  max-width: none;
+}
+
+/* Ponsel: kolom pencarian toolbar tersembunyi di balik tombol ikon, dibuka sebagai kartu di bawah pil toolbar */
 @media (max-width: 759px) {
-  .global-search {
+  .global-search:not(.global-search--hero) {
     position: static;
     flex: none;
   }
@@ -211,16 +246,17 @@
     display: grid;
   }
 
-  .global-search__panel {
+  .global-search:not(.global-search--hero) .global-search__panel {
     display: none;
     position: absolute;
-    top: 100%;
+    top: calc(100% + var(--space-2));
     right: 0;
     left: 0;
-    padding: var(--space-2) var(--space-5) var(--space-3);
-    background: var(--color-bg);
-    border-bottom: 1px solid var(--color-border);
-    box-shadow: var(--shadow-md);
+    padding: var(--space-2);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lg);
   }
 
   .global-search.is-open .global-search__panel {
@@ -228,17 +264,22 @@
     animation: nav-pop var(--duration) var(--ease-out);
   }
 
-  .global-search input {
+  .global-search:not(.global-search--hero) input {
     height: 44px;
     font-size: var(--text-base);
   }
 
-  .global-search__dropdown {
-    top: calc(100% - var(--space-1));
-    right: var(--space-5);
-    left: var(--space-5);
+  .global-search:not(.global-search--hero) .global-search__dropdown {
+    top: calc(100% + var(--space-1));
+    right: 0;
+    left: 0;
     width: auto;
     max-width: none;
     max-height: calc(100dvh - 140px);
+  }
+
+  .global-search.global-search--hero input {
+    height: 56px;
+    font-size: var(--text-base);
   }
 }

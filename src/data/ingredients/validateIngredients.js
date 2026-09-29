@@ -8,7 +8,8 @@ const isCount = (value) => Number.isInteger(value) && value >= 0
 /**
  * Memeriksa daftar bahan terhadap skemanya (typedef di ingredients.js). Nilai `null` diperbolehkan untuk data yang
  * belum ditemukan (harus diberi TODO), tapi nilai yang diisi wajib valid. Harga beli dan harga jual bilangan bulat;
- * nilai desimal di sumber diisi null + TODO dan dicatat di `uncertain` (tampil "Belum pasti"). Bahan tidak punya
+ * nilai desimal di sumber diisi null + TODO dan dicatat di `uncertain` (tampil "Belum pasti"). `obtainedFrom` = { place, when }
+ * atau null. Bahan tidak punya
  * level, lokasi, maupun peta.
  * Dipakai oleh file data saat development dan oleh scripts/heartodex-sync.mjs.
  * @param {object[]} list
@@ -32,6 +33,10 @@ export function findIngredientProblems(list) {
     }
     if (item.descriptionSourceLang !== undefined && (!/^[a-z]{2}$/.test(item.descriptionSourceLang) || item.descriptionSourceLang === 'en')) {
       problems.push('descriptionSourceLang harus kode bahasa 2 huruf selain "en"')
+    }
+    const obtained = item.obtainedFrom ?? null
+    if (obtained !== null && !(isText(obtained.place) && isNullOr(obtained.when ?? null, isText))) {
+      problems.push('obtainedFrom harus { place: teks, when: teks atau null } atau null')
     }
     if (!isNullOr(item.buyPrice ?? null, isCount)) problems.push('buyPrice harus bilangan bulat ≥ 0 atau null')
     if (!isNullOr(item.sellPrice ?? null, isCount)) problems.push('sellPrice harus bilangan bulat ≥ 0 atau null')

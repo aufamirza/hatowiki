@@ -150,7 +150,7 @@ const KINDS = {
     keyboard: { group: 'Kategori', first: 'Common', second: 'Meteor Shower', param: 'kategori=Meteor+Shower' },
   },
   // Bahan masak: tanpa level & lokasi; filter Kategori saja (uji ATAU memakai Kategori, tanpa kelompok ekstra);
-  // kartu berisi harga beli saja; detail & tautan Egg di bagian 20.
+  // kartu berisi harga beli & tempat membeli; detail & tautan Egg di bagian 20.
   ingredients: {
     path: '/ingredients',
     name: 'Ingredients',
@@ -161,8 +161,8 @@ const KINDS = {
     firstDropdown: 'Kategori',
     noLevel: true,
     categoryOnly: true,
-    cardFacts: 'info harga beli saja',
-    factCount: 1,
+    cardFacts: 'info harga beli & tempat membeli (Didapat dari)',
+    factCount: 2,
     goods: 'ingredients',
     keyboard: { group: 'Kategori', first: 'Common', second: 'Autumn Moon Treasury', param: 'kategori=Autumn+Moon+Treasury' },
   },
@@ -1431,8 +1431,16 @@ async function runSuite(width, kind) {
       view = await readSections('/ingredients?q=brick')
       check('Ingredients: cari "brick" → hanya section Modular Streets (Brick Meat Patty, Brick Ice), jumlah hasil total 2', view.names.join() === 'Modular Streets' && view.shown === 2, view.names.join(', '))
       await go('/ingredients')
-      const greenCard = await evaluate(`(() => { const card = [...document.querySelectorAll('.entry-card')].find((c) => c.getAttribute('href') === '/ingredients/green-sugar'); return card ? { badge: !!card.querySelector('.card-badge--category'), price: card.querySelector('.entry-card__facts li')?.title } : null })()`)
+      const readCard = (slug) => evaluate(`(() => { const card = [...document.querySelectorAll('.entry-card')].find((c) => c.getAttribute('href') === '/ingredients/${slug}'); if (!card) return null; const facts = [...card.querySelectorAll('.entry-card__facts li')]; return { badge: !!card.querySelector('.card-badge--category'), price: facts[0]?.title, obtained: facts[1]?.title, obtainedText: facts[1]?.querySelector('.entry-card__fact-text')?.textContent.trim() } })()`)
+      const greenCard = await readCard('green-sugar')
       check('Green Sugar: kategori tidak ada di sumber → kartu tanpa badge kategori, harga beli tetap tampil', greenCard && !greenCard.badge && greenCard.price === 'Harga beli: 200', JSON.stringify(greenCard))
+      // Kartu: tempat membeli ringkas (toko saja), syarat waktunya di title; tanpa data → "—".
+      const obtainedCards = { green: greenCard, frosted: await readCard('frosted'), ace: await readCard('ace-chicken') }
+      check('Kartu bahan: "Didapat dari" berisi toko saja (syarat waktu di title), "—" kalau tidak diketahui (Ace Chicken)',
+        obtainedCards.green?.obtainedText === 'Didapat dari: Toko Doris' && obtainedCards.green.obtained === 'Didapat dari: Toko Doris, hanya saat pelangi' &&
+          obtainedCards.frosted?.obtainedText === 'Didapat dari: Toko Massimo' && obtainedCards.frosted.obtained === 'Didapat dari: Toko Massimo, selama event Winter frost season' &&
+          obtainedCards.ace?.obtainedText === 'Didapat dari: —' && obtainedCards.ace.obtained === 'Didapat dari: —',
+        JSON.stringify(obtainedCards))
 
       const readIngredient = () => evaluate(`(async () => {
         ${DETAIL_PROBE}
@@ -1452,6 +1460,7 @@ async function runSuite(width, kind) {
         it.panels.join() === 'panel--info,panel--hero,panel--recipes,panel--animals' && it.level === 0 && it.map === 0 && it.eyebrow === 'Ingredients' && it.tint === 'ingredients', it.panels.join(', '))
       check('Detail bahan: harga beli sesuai data; harga jual yang tidak ada di sumber tampil "—"; tanpa baris asal kalau sumber tidak mencantumkannya',
         it.specs['Harga beli'] === `${fmt(it.item.buyPrice)}koin` && it.item.sellPrice === null && it.specs['Harga jual'] === '—' && it.item.origin === null && !('Asal' in it.specs), JSON.stringify(it.specs))
+      check('Detail bahan: baris "Didapat dari" sesuai data (Egg → Toko Massimo)', it.item.obtainedFrom?.place === 'Toko Massimo' && it.specs['Didapat dari'] === 'Toko Massimo', it.specs['Didapat dari'])
       check(
         `Dipakai di resep (Egg): ${it.usage.recipes.length} resep dari data resep Hatowiki, tertaut, dengan level & cara pakai`,
         it.usage.recipes.length > 0 && sortedHrefs(it.recipes).join() === it.usage.recipes.join() && it.recipes.every((t) => /^Lv\. (\d+|—) · Bahan (tetap x\d+|pilihan \(pilih \d+\))/.test(t.meta)),
@@ -1460,11 +1469,15 @@ async function runSuite(width, kind) {
       check('Makanan favorit hewan (Egg): Ferret dari data hewan, tertaut', it.animals.map((t) => t.href).join() === it.usage.animals.join() && it.usage.animals.includes('/wildlife/animals/ferret'), it.animals.map((t) => t.name).join(', '))
       await go('/ingredients/frosted')
       it = await readIngredient()
+      check('Bahan event (Frosted): "Didapat dari" toko + syarat waktu event', it.specs['Didapat dari'] === 'Toko Massimoselama event Winter frost season', it.specs['Didapat dari'])
       check('Bahan event (Frosted): badge kategori ⛄ Winter frost season, tanpa status event, tanpa kotak hewan kalau tidak ada yang menyukainya',
         it.tagEmoji === '⛄' && it.tagName === 'Winter frost season' && !it.statusText && it.usage.animals.length === 0 && !it.panels.includes('panel--animals') && sortedHrefs(it.recipes).join() === it.usage.recipes.join(), `${it.recipes.length} resep`)
       await go('/ingredients/green-sugar')
       it = await readIngredient()
       check('Green Sugar: tanpa tag kategori di detail (kategori tidak ada di sumber)', it.item.category === null && it.tagName === null && it.title === 'Green Sugar', String(it.tagName))
+      await go('/ingredients/ace-beef')
+      it = await readIngredient()
+      check('Tempat membeli tidak ditemukan (Ace Beef) → "Didapat dari" tampil "—"', it.item.obtainedFrom === null && it.specs['Didapat dari'] === '—', it.specs['Didapat dari'])
       await go('/ingredients/tidak-ada')
       check('Slug bahan masak tidak dikenal → halaman tidak ditemukan', (await evaluate(`document.querySelector('h1')?.textContent.trim()`)) === 'Bahan masak tidak ditemukan')
 

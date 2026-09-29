@@ -202,8 +202,6 @@ function NowAppearing() {
             )
           })}
         </div>
-
-        <p className="now-footnote">Urutan: yang waktu munculnya paling terbatas lebih dulu, lalu level terendah.</p>
       </div>
     </section>
   )

@@ -30,7 +30,7 @@ function CategorySection() {
       <div className="container">
         <header className="section-head">
           <p className="eyebrow">Koleksi</p>
-          <h2 id="categories-title">Jelajahi Kategori</h2>
+          <h2 id="categories-title">Semua Kategori</h2>
           <p>Data dari Heartodex, dengan deskripsi dalam bahasa Indonesia. Pilih kategori untuk mencari dan memfilter.</p>
         </header>
 

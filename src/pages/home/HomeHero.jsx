@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowRight, Leaf } from 'lucide-react'
-import { WILDLIFE_CATALOGS } from '../../components/layout/catalogs'
+import { useEffect, useLayoutEffect, useRef } from 'react'
+import { Leaf } from 'lucide-react'
+import { CATALOGS, WILDLIFE_CATALOGS } from '../../components/layout/catalogs'
+import GlobalSearch from '../../components/search/GlobalSearch'
 
 /**
  * Hiasan hero: ikan, serangga, dan burung dari data (gambar yang sudah ada di public/images), masing-masing
@@ -88,21 +88,45 @@ function HeroScene() {
   )
 }
 
+// "124 ikan" untuk tagline: jumlah entri dari data (termasuk entri event), dengan spasi tak terputus supaya angka tidak
+// terpisah dari kata bendanya di akhir baris.
+const countOf = (slug, noun) => `${CATALOGS.find((catalog) => catalog.slug === slug)?.entries.length ?? 0}\u00a0${noun}`
+
 /**
- * Hero beranda. Animasi hanya transform (murah untuk GPU), dijeda saat hero tidak terlihat di layar, dan
- * dimatikan kalau pengguna memilih prefers-reduced-motion (lihat HomePage.css).
+ * Hero beranda: judul, satu kalimat isi wiki, dan kolom pencarian global versi besar. Selama hero terlihat, atribut
+ * data-hero-search di <html> menyembunyikan pencarian toolbar (lihat Layout.css). Animasi hanya transform (murah untuk
+ * GPU), dijeda saat hero tidak terlihat di layar, dan dimatikan kalau pengguna memilih prefers-reduced-motion (lihat
+ * HomePage.css).
  */
 function HomeHero() {
   const heroRef = useRef(null)
 
+  // Dipasang sebelum tampil supaya pencarian toolbar tidak sempat muncul sekilas saat beranda dibuka.
+  useLayoutEffect(() => {
+    const root = document.documentElement
+    root.setAttribute('data-hero-search', '')
+    return () => root.removeAttribute('data-hero-search')
+  }, [])
+
   useEffect(() => {
     const hero = heroRef.current
     if (!hero || typeof IntersectionObserver === 'undefined') return undefined
+    const root = document.documentElement
     const observer = new IntersectionObserver(([entry]) => {
       hero.toggleAttribute('data-paused', !entry.isIntersecting)
     })
+    // Hero dianggap sudah dilewati saat bagian bawahnya masuk ke balik toolbar (dan kolom cari hero tidak terlihat).
+    const headerSpace = () => document.querySelector('.site-header')?.getBoundingClientRect().height ?? 0
+    const searchObserver = new IntersectionObserver(
+      ([entry]) => root.toggleAttribute('data-hero-search', entry.isIntersecting),
+      { rootMargin: `-${Math.round(headerSpace())}px 0px 0px 0px` },
+    )
     observer.observe(hero)
-    return () => observer.disconnect()
+    searchObserver.observe(hero)
+    return () => {
+      observer.disconnect()
+      searchObserver.disconnect()
+    }
   }, [])
 
   return (
@@ -113,20 +137,14 @@ function HomeHero() {
           <Leaf aria-hidden="true" />
           Proyek komunitas, tidak resmi
         </p>
-        <h1 id="hero-title">Wiki Komunitas Heartopia</h1>
+        <h1 id="hero-title" className="hero__title">
+          Hatowiki
+        </h1>
         <p className="hero__lead">
-          Data ikan, serangga, burung, hewan, dan resep Heartopia dalam bahasa Indonesia: jadwal muncul, cuaca, lokasi,
-          bahan, dan harga jual.
+          Jadwal, lokasi, dan harga {countOf('fish', 'ikan')}, {countOf('bugs', 'serangga')}, {countOf('birds', 'burung')},
+          dan {countOf('recipes', 'resep')} Heartopia, dalam bahasa Indonesia.
         </p>
-        <div className="hero__actions">
-          <Link to="/wildlife" className="btn btn--primary">
-            Jelajahi Wildlife
-            <ArrowRight aria-hidden="true" />
-          </Link>
-          <Link to="/recipes" className="btn btn--ghost">
-            Lihat Resep
-          </Link>
-        </div>
+        <GlobalSearch variant="hero" />
       </div>
     </section>
   )
