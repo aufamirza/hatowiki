@@ -1,8 +1,9 @@
 /*
  * Detail resep: 4 kotak. Panel dasar, panggung gambar, dan harga jual memakai gaya halaman detail wildlife.
- * Desktop: identitas (5) + gambar & harga jual (7); energi (4) + bahan (8).
+ * Desktop: identitas (5) + gambar & harga jual (7), tingginya hampir sama; energi (4) + bahan (8).
  * Tablet: identitas dan gambar selebar layar; energi (5) + bahan (7).
  * Mobile: menumpuk mengikuti urutan baca (nama → gambar & harga → energi → bahan).
+ * Energi dan bahan setinggi isinya masing-masing (jumlah bahan beragam), tidak ditarik sama tinggi.
  */
 .entry-detail__grid.entry-detail__grid--recipe {
   grid-template-areas:
@@ -14,6 +15,11 @@
 
 .panel--energy { grid-area: energy; }
 .panel--ingredients { grid-area: ingredients; }
+
+.panel--energy,
+.panel--ingredients {
+  align-self: start;
+}
 
 @media (min-width: 760px) {
   .entry-detail__grid.entry-detail__grid--recipe {

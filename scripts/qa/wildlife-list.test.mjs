@@ -21,6 +21,8 @@
  * Ingredients: filter Kategori saja, kartu harga beli, detail (harga beli & jual, tanpa level/lokasi/peta), kegunaan dari
  * data, dan tautan Egg yang mengikuti jenis bendanya (bahan → /ingredients/egg, resep → /recipes/egg), termasuk di
  * pencarian global.
+ * Semua halaman detail: nilai kotak kecil tepat di bawah labelnya (jarak sama), nilai berupa teks memakai font body, isi
+ * kotak identitas rata atas, dan kotak daftar (resep, hewan, makanan, energi, bahan, info tanam) setinggi isinya.
  * Entri event Fish, Bugs, Birds, Animals, Resep: tiap section berisi persis entri section itu, filter/pencarian/urutan
  * per section, detail event (badge kategori, tanpa status, harga yang tidak ada di sumber "—", lokasi event dengan zona
  * atau placeholder), kelompok resep event, dan tautan bahan event (termasuk Frostspore King Crab di Seafood Risotto).
@@ -990,7 +992,7 @@ async function runSuite(width, kind) {
     if (kind.extraGroup.label === 'Shadow') {
       await go(`${kind.path}/sea-bass`)
       const hero = await readHero()
-      check('Detail ikan tetap tiga kolom: Syarat level & Shadow, tanpa badge level di gambar', !hero.split && hero.specs.join() === 'Syarat level,Shadow' && hero.badge === null, hero.specs.join(', '))
+      check('Detail ikan: Syarat level & Shadow di bawah gambar (bukan badge), harga jual di sampingnya', !hero.split && hero.specs.join() === 'Syarat level,Shadow' && hero.badge === null, hero.specs.join(', '))
     } else {
       const heroes = []
       for (const entry of [media.tallest, media.widest]) {
@@ -1003,8 +1005,10 @@ async function runSuite(width, kind) {
         heroes.every((h) => h.split && h.specs.length === 0 && h.badge === `Lv. ${h.level}` && h.badgeBg === h.token && h.badgeInCorner),
         heroes.map((h) => `${h.name}: ${h.badge}`).join(', '),
       )
+      // Lebar: dua kolom sama lebar dan rata atas; panggung gambar setinggi tabel harga atau lebih (kalau kotak identitas di
+      // sebelahnya lebih tinggi, gambarnya yang memanjang, bukan baris tabel yang direnggangkan).
       const balanced = (h) => (h.wide
-        ? Math.abs(h.stage.w - h.market.w) <= 2 && Math.abs(h.stage.top - h.market.top) <= 1 && Math.abs(h.stage.h - h.market.h) <= 2
+        ? Math.abs(h.stage.w - h.market.w) <= 2 && Math.abs(h.stage.top - h.market.top) <= 1 && h.stage.h >= h.market.h - 2
         : Math.abs(h.stage.w - h.market.w) <= 2 && h.market.top > h.stage.top)
       check(
         `Detail ${kind.name}: kotak dibagi dua seimbang (gambar | harga jual${tall.wide ? '' : ', menumpuk di layar sempit'})`,
@@ -1244,6 +1248,27 @@ async function runSuite(width, kind) {
       `Detail ${kind.name}: tag kategori "${tag?.name}" memakai token yang sama, kontras AA`,
       tag && tag.bg === tag.expected.bg && tag.ink === tag.expected.ink && minContrast(tag.ink, tag.bg) >= 4.5,
       tag && `${minContrast(tag.ink, tag.bg).toFixed(2)}:1`,
+    )
+    // Tata letak: nilai kotak kecil tepat di bawah label dengan jarak sama; nilai berupa teks (shadow, tempat membeli,
+    // nama lokasi) memakai font body; isi kotak identitas rata atas (tidak ditengahkan); kotak daftar tidak ditarik
+    // lebih tinggi dari isinya.
+    const layout = await evaluate(`(() => {
+      const rect = (el) => el.getBoundingClientRect()
+      const gaps = [...document.querySelectorAll('.entry-detail__grid .spec')].map((spec) => Math.round(rect(spec.querySelector('.spec__value')).top - rect(spec.querySelector('.spec__label')).bottom))
+      const texts = [...document.querySelectorAll('.spec__value--text, .location-info__name, .location-info__list')].map((el) => getComputedStyle(el).fontFamily.split(',')[0].replace(/["']/g, '').trim())
+      const info = document.querySelector('.panel--info, .panel--ident')
+      const infoTop = Math.round(rect(info.firstElementChild).top - rect(info).top - info.clientTop - parseFloat(getComputedStyle(info).paddingTop))
+      const slack = [...document.querySelectorAll('.panel--recipes, .panel--animals, .panel--food, .panel--energy, .panel--ingredients, .panel--facts')].map((panel) => {
+        const last = [...panel.children].filter((child) => rect(child).height > 0).at(-1)
+        const border = panel.offsetHeight - panel.clientHeight - panel.clientTop
+        return [[...panel.classList].find((c) => c.startsWith('panel--') && c !== 'panel--aside'), Math.round(rect(panel).bottom - border - parseFloat(getComputedStyle(panel).paddingBottom) - rect(last).bottom)]
+      })
+      return { gaps, texts, infoTop, slack }
+    })()`)
+    check(
+      `Detail ${kind.name}${slug ? ` (${slug})` : ''}: nilai tepat di bawah label (jarak sama), nilai teks berfont body, identitas rata atas, kotak daftar setinggi isinya`,
+      new Set(layout.gaps).size <= 1 && layout.texts.every((font) => font === 'Plus Jakarta Sans') && layout.infoTop === 0 && layout.slack.every(([, px]) => px <= 1),
+      JSON.stringify(layout),
     )
   }
 
@@ -1683,7 +1708,8 @@ async function runSuite(width, kind) {
       let e = await openEvent('dolphin')
       check('Dolphin (Call of Whales): peta Whalefall Canyon dengan pin, makanan ikan tertaut', e.mapImage === '/images/maps/whalefall-canyon.webp' && e.tag === 'Call of Whales' && e.food.length === 3 && e.food.every(([, href]) => href?.startsWith('/wildlife/fish/')) && !e.status, e.food.map(([n, h]) => `${n} → ${h}`).join(', '))
       e = await openEvent('maltese')
-      check('Maltese (section & kategori Maltese): makanan Grilled Mushrooms tertaut ke resepnya, Meat tanpa tautan', e.tag === 'Maltese' && e.food.some(([n, h]) => n === 'Grilled Mushrooms' && h === '/recipes/grilled-mushrooms') && e.food.some(([n, h]) => n === 'Meat' && h === null) && !e.status, e.food.map(([n, h]) => `${n} → ${h}`).join(', '))
+      // Sejak katalog Ingredients, bahan masak (Meat) juga tertaut ke halamannya.
+      check('Maltese (section & kategori Maltese): makanan Grilled Mushrooms tertaut ke resepnya, Meat ke halaman bahan masak', e.tag === 'Maltese' && e.food.some(([n, h]) => n === 'Grilled Mushrooms' && h === '/recipes/grilled-mushrooms') && e.food.some(([n, h]) => n === 'Meat' && h === '/ingredients/meat') && !e.status, e.food.map(([n, h]) => `${n} → ${h}`).join(', '))
       e = await openEvent('penguin')
       check('Penguin (Winter frost season): tanpa titik tempat makan di sumber → zona lokasi Old Sea', e.tag === 'Winter frost season' && e.locations.join() === 'Old Sea' && e.polygons > 0 && !e.status, e.mapLabel)
     } else if (kindSlug === 'recipes') {

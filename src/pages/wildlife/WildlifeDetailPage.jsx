@@ -110,7 +110,7 @@ function WildlifeDetailPage({ kindSlug }) {
                         <Waves aria-hidden="true" />
                         Shadow
                       </dt>
-                      <dd className="spec__value">
+                      <dd className="spec__value spec__value--text">
                         <ShadowIndicator shadow={entry.shadow} />
                         {entry.shadow ?? '—'}
                       </dd>

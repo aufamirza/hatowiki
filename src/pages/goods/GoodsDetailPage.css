@@ -1,13 +1,14 @@
 /*
  * Detail tanaman, collectible & bahan masak: identitas, gambar & angka, kotak samping (info tanam / lokasi; bahan masak
- * tidak punya), resep yang memakainya, dan (kalau ada) hewan yang menyukainya. Panel dasar, panggung gambar, spec, dan harga memakai gaya detail wildlife.
- * Tanaman, desktop: identitas (5) di atas info tanam (5), gambar & nilai jual (7) setinggi keduanya; lalu resep (7) +
- *   hewan (5), atau resep selebar layar kalau tidak ada hewan.
- * Collectible, desktop: identitas (5) + gambar & angka (7); lokasi & peta (5) setinggi resep (7) dan hewan (7).
- * Bahan masak, desktop: identitas (5) + gambar & harga (7); lalu resep (7) + hewan (5), atau resep selebar layar.
- * Tablet: identitas & gambar selebar layar; tanaman: info tanam selebar layar, lalu resep (7) + hewan (5);
- *   collectible: lokasi (6) di samping resep & hewan (6).
- * Mobile: menumpuk mengikuti urutan baca (nama → gambar → info/lokasi → resep → hewan).
+ * tidak punya), resep yang memakainya, dan (kalau ada) hewan yang menyukainya. Panel dasar, panggung gambar, spec, dan
+ * harga memakai gaya detail wildlife (aturan tata letaknya di WildlifeDetailPage.css).
+ * Desktop: identitas (5) + gambar & angka (7), tingginya hampir sama; lalu kotak samping, resep, dan hewan masing-masing
+ *   selebar layar. Jumlah resep & hewan sangat beragam (0–61 resep), jadi tidak dipasangkan berdampingan.
+ *   Tanaman: info tanam berupa baris tipis (judul lalu dua angka).
+ *   Collectible (pola sama dengan hewan): kiri identitas (7) di atas gambar & angka (7), kanan lokasi & peta (5) setinggi
+ *   keduanya; sisa tinggi diserap panggung gambar (baris kedua 1fr).
+ * Tablet: semua selebar layar dengan urutan yang sama; collectible: gambar & angka (6) + lokasi (6) berdampingan.
+ * Mobile: menumpuk mengikuti urutan baca.
  */
 .entry-detail__grid.entry-detail__grid--goods {
   grid-template-areas:
@@ -16,6 +17,14 @@
     'aside'
     'recipes'
     'animals';
+}
+
+.entry-detail__grid.entry-detail__grid--goods.entry-detail__grid--no-animals {
+  grid-template-areas:
+    'info'
+    'hero'
+    'aside'
+    'recipes';
 }
 
 .entry-detail__grid--goods .panel--aside { grid-area: aside; }
@@ -28,7 +37,8 @@
       'info info info info info info info info info info info info'
       'hero hero hero hero hero hero hero hero hero hero hero hero'
       'aside aside aside aside aside aside aside aside aside aside aside aside'
-      'recipes recipes recipes recipes recipes recipes recipes animals animals animals animals animals';
+      'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes'
+      'animals animals animals animals animals animals animals animals animals animals animals animals';
   }
 
   .entry-detail__grid.entry-detail__grid--goods.entry-detail__grid--no-animals {
@@ -39,19 +49,35 @@
       'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes';
   }
 
+  /* Info tanam selebar layar: judul di kiri, dua angka di kanannya (lebar kotak terbatas) */
+  .entry-detail__grid .panel--facts {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-8);
+  }
+
+  .panel--facts .panel__title {
+    margin-bottom: 0;
+  }
+
+  .panel--facts .goods-specs {
+    flex: 0 1 34rem;
+  }
+
   .entry-detail__grid.entry-detail__grid--collectible {
     grid-template-areas:
       'info info info info info info info info info info info info'
-      'hero hero hero hero hero hero hero hero hero hero hero hero'
-      'aside aside aside aside aside aside recipes recipes recipes recipes recipes recipes'
-      'aside aside aside aside aside aside animals animals animals animals animals animals';
+      'hero hero hero hero hero hero aside aside aside aside aside aside'
+      'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes'
+      'animals animals animals animals animals animals animals animals animals animals animals animals';
   }
 
   .entry-detail__grid.entry-detail__grid--collectible.entry-detail__grid--no-animals {
     grid-template-areas:
       'info info info info info info info info info info info info'
-      'hero hero hero hero hero hero hero hero hero hero hero hero'
-      'aside aside aside aside aside aside recipes recipes recipes recipes recipes recipes';
+      'hero hero hero hero hero hero aside aside aside aside aside aside'
+      'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes';
   }
 }
 
@@ -59,28 +85,32 @@
   .entry-detail__grid.entry-detail__grid--goods {
     grid-template-areas:
       'info info info info info hero hero hero hero hero hero hero'
-      'aside aside aside aside aside hero hero hero hero hero hero hero'
-      'recipes recipes recipes recipes recipes recipes recipes animals animals animals animals animals';
+      'aside aside aside aside aside aside aside aside aside aside aside aside'
+      'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes'
+      'animals animals animals animals animals animals animals animals animals animals animals animals';
   }
 
   .entry-detail__grid.entry-detail__grid--goods.entry-detail__grid--no-animals {
     grid-template-areas:
       'info info info info info hero hero hero hero hero hero hero'
-      'aside aside aside aside aside hero hero hero hero hero hero hero'
+      'aside aside aside aside aside aside aside aside aside aside aside aside'
       'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes';
   }
 
   .entry-detail__grid.entry-detail__grid--collectible {
+    grid-template-rows: auto 1fr;
     grid-template-areas:
-      'info info info info info hero hero hero hero hero hero hero'
-      'aside aside aside aside aside recipes recipes recipes recipes recipes recipes recipes'
-      'aside aside aside aside aside animals animals animals animals animals animals animals';
+      'info info info info info info info aside aside aside aside aside'
+      'hero hero hero hero hero hero hero aside aside aside aside aside'
+      'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes'
+      'animals animals animals animals animals animals animals animals animals animals animals animals';
   }
 
   .entry-detail__grid.entry-detail__grid--collectible.entry-detail__grid--no-animals {
     grid-template-areas:
-      'info info info info info hero hero hero hero hero hero hero'
-      'aside aside aside aside aside recipes recipes recipes recipes recipes recipes recipes';
+      'info info info info info info info aside aside aside aside aside'
+      'hero hero hero hero hero hero hero aside aside aside aside aside'
+      'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes';
   }
 }
 
@@ -93,12 +123,20 @@
     'animals';
 }
 
+.entry-detail__grid.entry-detail__grid--ingredient.entry-detail__grid--no-animals {
+  grid-template-areas:
+    'info'
+    'hero'
+    'recipes';
+}
+
 @media (min-width: 760px) {
   .entry-detail__grid.entry-detail__grid--ingredient {
     grid-template-areas:
       'info info info info info info info info info info info info'
       'hero hero hero hero hero hero hero hero hero hero hero hero'
-      'recipes recipes recipes recipes recipes recipes recipes animals animals animals animals animals';
+      'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes'
+      'animals animals animals animals animals animals animals animals animals animals animals animals';
   }
 
   .entry-detail__grid.entry-detail__grid--ingredient.entry-detail__grid--no-animals {
@@ -113,7 +151,8 @@
   .entry-detail__grid.entry-detail__grid--ingredient {
     grid-template-areas:
       'info info info info info hero hero hero hero hero hero hero'
-      'recipes recipes recipes recipes recipes recipes recipes animals animals animals animals animals';
+      'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes'
+      'animals animals animals animals animals animals animals animals animals animals animals animals';
   }
 
   .entry-detail__grid.entry-detail__grid--ingredient.entry-detail__grid--no-animals {
@@ -123,16 +162,42 @@
   }
 }
 
-/* Kotak 2 — beberapa deret per bintang (Market Value, Event Tokens, …) bertumpuk di kolom kanan, sama-sama mengisi
-   tinggi kolom (baris per bintang ikut memanjang seperti harga jual serangga) */
+/* Kotak 2 — beberapa deret per bintang (Market Value, Event Tokens, …): bertumpuk di kolom kanan, setinggi isinya */
 .market-stack {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-.market-stack > .market {
-  flex: 1;
+/*
+ * Dua deret (tanaman event): kalau kotaknya cukup lebar, kedua tabel berdampingan dan gambar mengambil sepertiga, supaya
+ * kotak gambar tidak dua kali lebih tinggi dari kotak identitas di sebelahnya.
+ */
+@container (min-width: 560px) {
+  .hero-layout.hero-layout--split:has(.market-stack > .market + .market) {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+  }
+
+  /* Judul kedua tabel berbagi tinggi baris (subgrid), jadi baris per bintangnya sejajar walau satu judul dua baris */
+  .market-stack:has(> .market + .market) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    align-content: start;
+    column-gap: var(--space-4);
+    row-gap: 0;
+  }
+
+  .market-stack:has(> .market + .market) > .market {
+    display: grid;
+    grid-row: span 2;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+  }
+
+  .market-stack:has(> .market + .market) .market__title {
+    align-self: end;
+  }
 }
 
 .market__title.market__title--token svg {
@@ -150,10 +215,6 @@
 /* Angka tunggal (harga benih, waktu tumbuh, nilai jual, energi) */
 .goods-specs {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.goods-specs .spec__value {
-  align-items: baseline;
 }
 
 /* Ikon koin berisi emas seperti di tabel harga jual */
@@ -182,17 +243,17 @@
   flex-basis: 100%;
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 600;
-  line-height: 1.35;
+  font-weight: 400;
+  line-height: 1.4;
   color: var(--color-text-muted);
 }
 
-/* Nilai jual & energi di samping gambar: satu kolom, setiap angka setinggi separuh panggung */
+/* Nilai jual & energi / harga & tempat beli di samping gambar: satu kolom rata atas, setiap kotak setinggi isinya.
+   Panggung gambar di sebelahnya yang menyesuaikan tinggi. */
 @container (min-width: 520px) {
   .goods-specs--hero {
     grid-template-columns: minmax(0, 1fr);
-    grid-auto-rows: 1fr;
-    align-content: stretch;
+    align-content: start;
   }
 }
 
@@ -211,11 +272,6 @@
 .panel--facts {
   display: flex;
   flex-direction: column;
-}
-
-.panel--facts .goods-specs {
-  flex: 1 0 auto;
-  grid-auto-rows: 1fr;
 }
 
 .panel--recipes .item-list,

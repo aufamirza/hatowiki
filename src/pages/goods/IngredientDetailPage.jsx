@@ -86,7 +86,7 @@ function IngredientDetailPage() {
                   <Store aria-hidden="true" />
                   Didapat dari
                 </dt>
-                <dd className={`spec__value${obtained ? '' : ' is-missing'}`}>
+                <dd className={`spec__value spec__value--text${obtained ? '' : ' is-missing'}`}>
                   {obtained ? obtained.place : '—'}
                   {obtained?.when && <span className="spec__note">{obtained.when}</span>}
                 </dd>
@@ -97,7 +97,7 @@ function IngredientDetailPage() {
                     <MapPinned aria-hidden="true" />
                     Asal
                   </dt>
-                  <dd className="spec__value">{item.origin}</dd>
+                  <dd className="spec__value spec__value--text">{item.origin}</dd>
                 </div>
               )}
             </dl>
