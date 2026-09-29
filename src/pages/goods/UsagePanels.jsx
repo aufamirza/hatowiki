@@ -9,7 +9,7 @@ function useText(uses) {
 }
 
 /**
- * Kotak "Dipakai di resep" dan "Makanan favorit hewan" di halaman detail tanaman & collectible. Keduanya dihitung dari
+ * Kotak "Dipakai di resep" dan "Makanan favorit hewan" di halaman detail tanaman, collectible & bahan masak. Keduanya dihitung dari
  * data resep dan hewan Hatowiki (src/data/itemUsage.js). "Dipakai di resep" selalu tampil (dengan keterangan kalau
  * kosong); "Makanan favorit hewan" hanya kalau ada hewan yang menyukainya.
  */

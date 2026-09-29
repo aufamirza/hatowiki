@@ -12,6 +12,7 @@ const SAMPLE_SLUGS = {
   recipes: ['tiramisu', 'fish-and-chips', 'strawberry-milkshake'],
   crops: ['tomato', 'strawberry', 'corn'],
   collectibles: ['apple', 'penny-bun', 'black-truffle'],
+  ingredients: ['egg', 'cheese', 'butter'],
 }
 
 function samplesOf(catalog) {

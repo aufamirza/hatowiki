@@ -1,5 +1,5 @@
 import { CookingPot } from 'lucide-react'
-import { COLLECTIBLE_KIND, CROP_KIND } from '../../pages/goods/goodsKinds'
+import { COLLECTIBLE_KIND, CROP_KIND, INGREDIENT_KIND } from '../../pages/goods/goodsKinds'
 import { RECIPE_KIND } from '../../pages/recipes/recipeKind'
 import { WILDLIFE_KINDS } from '../../pages/wildlife/wildlifeKinds'
 
@@ -42,7 +42,7 @@ export const RECIPE_CATALOG = {
   href: (entry) => (entry ? `/recipes/${entry.slug}` : '/recipes'),
 }
 
-// Tanaman & collectible (grup Wiki bersama resep).
+// Tanaman, collectible & bahan masak (grup Wiki bersama resep).
 function goodsCatalog(kind) {
   return {
     slug: kind.slug,
@@ -61,8 +61,9 @@ function goodsCatalog(kind) {
 
 export const CROP_CATALOG = goodsCatalog(CROP_KIND)
 export const COLLECTIBLE_CATALOG = goodsCatalog(COLLECTIBLE_KIND)
+export const INGREDIENT_CATALOG = goodsCatalog(INGREDIENT_KIND)
 
-// Isi menu "Wiki" di toolbar dan drawer: Resep, Crops, Collectibles.
-export const WIKI_CATALOGS = [RECIPE_CATALOG, CROP_CATALOG, COLLECTIBLE_CATALOG]
+// Isi menu "Wiki" di toolbar dan drawer: Resep, Crops, Collectibles, Ingredients.
+export const WIKI_CATALOGS = [RECIPE_CATALOG, CROP_CATALOG, COLLECTIBLE_CATALOG, INGREDIENT_CATALOG]
 
 export const CATALOGS = [...WILDLIFE_CATALOGS, ...WIKI_CATALOGS]

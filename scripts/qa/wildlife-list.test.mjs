@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 /**
  * Uji interaksi halaman daftar katalog di Chrome headless (lewat Chrome DevTools Protocol): wildlife
- * (/wildlife/fish, /wildlife/bugs, /wildlife/birds, /wildlife/animals), resep (/recipes), tanaman (/crops), dan
- * collectible (/collectibles). Rangkaian uji yang
+ * (/wildlife/fish, /wildlife/bugs, /wildlife/birds, /wildlife/animals), resep (/recipes), tanaman (/crops), collectible
+ * (/collectibles), dan bahan masak (/ingredients). Rangkaian uji yang
  * sama dijalankan untuk tiap kategori; Bugs, Birds, dan Animals ditambah uji lokasi jamak (filter lokasi,
  * "lokasi pertama +N", detail dengan beberapa lokasi). Kategori berlevel juga menguji warna badge level
  * (token per level, light & dark, kontras AA, warna cadangan). Animals menguji tanpa level/jadwal/harga, peta
  * dengan pin tempat makan, dan makanan favorit; Resep menguji pencarian nama bahan, energi, harga jual, bahan
  * tetap & pilihan, serta tautan bahan ke halaman resep lain. Bahan resep & makanan hewan berjenis ikan (serangga,
- * burung) tertaut ke detailnya, "Any Fish" ke daftar Fish, jenis lain tanpa tautan. Semua kategori: kotak gambar
+ * burung) tertaut ke detailnya, "Any Fish" ke daftar Fish, Recipe/Crop/Collectible/Ingredient ke detailnya; semua bahan
+ * yang dipakai resep bisa diklik. Semua kategori: kotak gambar
  * kartu persegi & seragam (gambar tinggi/lebar tetap utuh). Bugs & Birds: detail dengan badge level di gambar dan
  * dua bagian seimbang (tanpa kolom Level). Resep: satu jenis masakan (field family) selalu berdampingan, dengan urutan
  * manual familyOrder (Roll Cake: urutan pelangi). Semua kategori: warna badge kategori dari token --category-<kunci>
@@ -17,13 +18,16 @@
  * judul section berisi emoji, nama, dan jumlah; section kosong disembunyikan; status event tidak tampil. Crops &
  * Collectibles: detail (nilai per bintang semua deret, info tanam, nilai jual & energi, lokasi & peta), "Dipakai di
  * resep" & "Makanan favorit hewan" dihitung dari data, bahan & makanan Crop/Collectible tertaut ke detailnya.
+ * Ingredients: filter Kategori saja, kartu harga beli, detail (harga beli & jual, tanpa level/lokasi/peta), kegunaan dari
+ * data, dan tautan Egg yang mengikuti jenis bendanya (bahan → /ingredients/egg, resep → /recipes/egg), termasuk di
+ * pencarian global.
  * Entri event Fish, Bugs, Birds, Animals, Resep: tiap section berisi persis entri section itu, filter/pencarian/urutan
  * per section, detail event (badge kategori, tanpa status, harga yang tidak ada di sumber "—", lokasi event dengan zona
  * atau placeholder), kelompok resep event, dan tautan bahan event (termasuk Frostspore King Crab di Seafood Risotto).
  *
  * Pemakaian (dev server harus sudah jalan):
  *   npm run dev
- *   npm run test:ui                                  → Fish, Bugs, Birds, Animals, Resep, Crops & Collectibles, lebar 1280, 820, 390
+ *   npm run test:ui                                  → Fish, Bugs, Birds, Animals, Resep, Crops, Collectibles & Ingredients, lebar 1280, 820, 390
  *   node scripts/qa/wildlife-list.test.mjs 390       → lebar tertentu
  *   node scripts/qa/wildlife-list.test.mjs bugs 390  → kategori tertentu
  *
@@ -145,6 +149,23 @@ const KINDS = {
     goods: 'collectibles',
     keyboard: { group: 'Kategori', first: 'Common', second: 'Meteor Shower', param: 'kategori=Meteor+Shower' },
   },
+  // Bahan masak: tanpa level & lokasi; filter Kategori saja (uji ATAU memakai Kategori, tanpa kelompok ekstra);
+  // kartu berisi harga beli saja; detail & tautan Egg di bagian 20.
+  ingredients: {
+    path: '/ingredients',
+    name: 'Ingredients',
+    noun: 'bahan masak',
+    search: 'SuGaR',
+    searchMatch: /sugar/i,
+    groups: ['Kategori'],
+    firstDropdown: 'Kategori',
+    noLevel: true,
+    categoryOnly: true,
+    cardFacts: 'info harga beli saja',
+    factCount: 1,
+    goods: 'ingredients',
+    keyboard: { group: 'Kategori', first: 'Common', second: 'Autumn Moon Treasury', param: 'kategori=Autumn+Moon+Treasury' },
+  },
 }
 const ONLY_KINDS = process.argv.slice(2).filter((arg) => KINDS[arg])
 const PORT = 9400 + Math.floor(Math.random() * 400)
@@ -172,18 +193,19 @@ const DATA_MODULES = {
   recipes: ['/src/data/recipes/recipes.js', 'recipes'],
   crops: ['/src/data/crops/crops.js', 'crops'],
   collectibles: ['/src/data/collectibles/collectibles.js', 'collectibles'],
+  ingredients: ['/src/data/ingredients/ingredients.js', 'ingredients'],
 }
 
 // Kode (dijalankan di halaman lewat evaluate) yang mendefinisikan expectedHref(id): tautan yang diharapkan untuk
-// sebuah benda. Resep, tanaman, collectible yang ada datanya → /recipes|crops|collectibles/<slug>; ikan/serangga/burung
-// yang ada datanya → /wildlife/<kategori>/<slug>; benda generik any/<kategori> ("Any Fish") → halaman daftar
-// kategorinya; lainnya (Ingredient) null.
+// sebuah benda. Resep, tanaman, collectible, bahan masak yang ada datanya → /recipes|crops|collectibles|ingredients/<slug>
+// (menurut awalan id, jadi 'ingredients/egg' dan 'recipes/egg' tidak tertukar); ikan/serangga/burung yang ada datanya →
+// /wildlife/<kategori>/<slug>; benda generik any/<kategori> ("Any Fish") → halaman daftar kategorinya; lainnya null.
 const EXPECTED_ITEM_HREF = `
-  const [{ recipes }, { fish }, { bugs }, { birds }, { crops }, { collectibles }] = await Promise.all(
-    ['/src/data/recipes/recipes.js', '/src/data/wildlife/fish.js', '/src/data/wildlife/bugs.js', '/src/data/wildlife/birds.js', '/src/data/crops/crops.js', '/src/data/collectibles/collectibles.js'].map((p) => import(p)),
+  const [{ recipes }, { fish }, { bugs }, { birds }, { crops }, { collectibles }, { ingredients }] = await Promise.all(
+    ['/src/data/recipes/recipes.js', '/src/data/wildlife/fish.js', '/src/data/wildlife/bugs.js', '/src/data/wildlife/birds.js', '/src/data/crops/crops.js', '/src/data/collectibles/collectibles.js', '/src/data/ingredients/ingredients.js'].map((p) => import(p)),
   )
   const wild = { fish: ['fish', fish], insects: ['bugs', bugs], birds: ['birds', birds] }
-  const wiki = { recipes, crops, collectibles }
+  const wiki = { recipes, crops, collectibles, ingredients }
   const expectedHref = (id) => {
     const [segment, slug] = id.split('/')
     if (wiki[segment]) return wiki[segment].some((x) => x.slug === slug) ? '/' + segment + '/' + slug : null
@@ -307,6 +329,8 @@ async function runSuite(width, kind) {
   // 3. Filter: ATAU dalam kelompok, DAN antar kelompok
   // Parameter yang harus tetap ada setelah chip kelompok ekstra dihapus (bagian 4).
   let keepParam
+  // Dua kategori yang dicentang kalau Kategori satu-satunya kelompok filter (categoryOnly).
+  let categoryPair = []
   if (kind.recipe || kind.filterByLevel) {
     // Resep & tanaman: Level (ATAU) dibaca dari badge level di kartu.
     const levels = (await optionValues('Level')).slice(0, 2)
@@ -314,6 +338,13 @@ async function runSuite(width, kind) {
     s = await snapshot()
     check(`${levels.join(' ATAU ')}`, s.cards.length > 0 && s.cards.every((c) => levels.includes(`Level ${c.level}`)), `${s.cards.length} ${kind.noun}`)
     keepParam = 'level='
+  } else if (kind.categoryOnly) {
+    // Hanya satu kelompok filter (Kategori): ATAU di dalamnya, dibaca dari badge kategori kartu.
+    categoryPair = (await optionValues('Kategori')).slice(0, 2)
+    for (const value of categoryPair) { await toggleOption('Kategori', value); await sleep(250) }
+    s = await snapshot()
+    check(`Kategori ${categoryPair.join(' ATAU ')}`, categoryPair.length === 2 && s.cards.length > 0 && s.cards.every((c) => categoryPair.includes(c.category)) && categoryPair.every((v) => s.chips.some((c) => c.includes(v))), `${s.cards.length} ${kind.noun}`)
+    keepParam = 'kategori='
   } else {
     const locations = (await optionValues('Lokasi')).slice(0, 2)
     for (const value of locations) { await toggleOption('Lokasi', value); await sleep(250) }
@@ -332,10 +363,12 @@ async function runSuite(width, kind) {
     keepParam = and ? and.param : 'lokasi='
   }
   const extra = kind.extraGroup
-  const extraValues = await optionValues(extra.label)
-  await toggleOption(extra.label, extraValues[0]); await sleep(250)
-  s = await snapshot()
-  check(`… DAN ${extra.label} ${extraValues[0]} (chip tampil)`, s.chips.some((c) => c.includes(extraValues[0])), `${s.cards.length} ${kind.noun}`)
+  if (extra) {
+    const extraValues = await optionValues(extra.label)
+    await toggleOption(extra.label, extraValues[0]); await sleep(250)
+    s = await snapshot()
+    check(`… DAN ${extra.label} ${extraValues[0]} (chip tampil)`, s.chips.some((c) => c.includes(extraValues[0])), `${s.cards.length} ${kind.noun}`)
+  }
   await evaluate(`(() => { const sel = document.querySelector('.list-sort select'); sel.value = 'az'; sel.dispatchEvent(new Event('change', { bubbles: true })) })()`); await sleep(300)
   s = await snapshot()
   // Urutan berlaku di dalam tiap section (section tetap Base Game dulu, lalu event).
@@ -343,9 +376,16 @@ async function runSuite(width, kind) {
   check('Urut A–Z tersimpan di URL (A–Z di dalam tiap section)', s.url.includes('urut=az') && azOk, s.url)
 
   // 4. Hapus satu chip
-  await evaluate(`[...document.querySelectorAll('.active-chip')].find(c => c.textContent.includes(${JSON.stringify(extra.label)})).click()`); await sleep(300)
-  s = await snapshot()
-  check(`Hapus chip ${extra.label} (filter lain tetap)`, !s.url.includes(`${extra.param}=`) && s.url.includes(keepParam), s.url)
+  if (extra) {
+    await evaluate(`[...document.querySelectorAll('.active-chip')].find(c => c.textContent.includes(${JSON.stringify(extra.label)})).click()`); await sleep(300)
+    s = await snapshot()
+    check(`Hapus chip ${extra.label} (filter lain tetap)`, !s.url.includes(`${extra.param}=`) && s.url.includes(keepParam), s.url)
+  } else {
+    await evaluate(`[...document.querySelectorAll('.active-chip')].find(c => c.textContent.includes(${JSON.stringify(categoryPair[0])})).click()`); await sleep(300)
+    s = await snapshot()
+    const left = new URLSearchParams(s.url.split('?')[1] ?? '').getAll('kategori')
+    check(`Hapus chip Kategori ${categoryPair[0]} (kategori lain tetap)`, left.join() === categoryPair[1] && s.cards.every((c) => c.category === categoryPair[1]), s.url)
+  }
 
   // 5. Refresh dengan filter aktif
   const filteredUrl = s.url
@@ -586,15 +626,22 @@ async function runSuite(width, kind) {
   //     Kategori tanpa level (hewan): kartu tanpa badge level, filter & urutan level tidak ada.
   await go(kind.path)
   if (kind.noLevel) {
-    const noLevel = await evaluate(`({
+    const [levelModule, levelExport] = DATA_MODULES[kind.path.split('/').pop()]
+    const noLevel = await evaluate(`(async () => ({
       badges: document.querySelectorAll('.entry-grid .card-badge--level').length,
       categoryBadges: document.querySelectorAll('.entry-grid .card-badge--category').length,
       cards: document.querySelectorAll('.entry-grid .entry-card').length,
+      // Entri tanpa kategori di sumber (category: null, mis. Green Sugar) tidak punya badge kategori.
+      noCategory: (await import(${JSON.stringify(levelModule)}))[${JSON.stringify(levelExport)}].filter((e) => e.category == null).length,
       sorts: [...document.querySelectorAll('.list-sort option')].map(o => o.value),
       facts: [...document.querySelectorAll('.entry-grid .entry-card')].map(c => c.querySelectorAll('.entry-card__facts li').length),
-    })`)
-    check(`Kartu ${kind.name}: badge kategori saja, tanpa badge level`, noLevel.badges === 0 && noLevel.categoryBadges === noLevel.cards && noLevel.cards > 0, `${noLevel.cards} kartu`)
-    check(`Kartu ${kind.name}: ${kind.cardFacts ?? 'info lokasi & cuaca favorit saja (tanpa waktu)'}`, noLevel.facts.every((n) => n === 2))
+    }))()`)
+    check(
+      `Kartu ${kind.name}: badge kategori saja, tanpa badge level${noLevel.noCategory ? ` (${noLevel.noCategory} tanpa kategori di sumber → tanpa badge)` : ''}`,
+      noLevel.badges === 0 && noLevel.categoryBadges === noLevel.cards - noLevel.noCategory && noLevel.cards > 0,
+      `${noLevel.cards} kartu`,
+    )
+    check(`Kartu ${kind.name}: ${kind.cardFacts ?? 'info lokasi & cuaca favorit saja (tanpa waktu)'}`, noLevel.facts.every((n) => n === (kind.factCount ?? 2)))
     check(`Urutan ${kind.name}: default & A–Z saja`, noLevel.sorts.join() === 'default,az', noLevel.sorts.join(', '))
     await send('Page.navigate', { url: `${BASE_URL}${kind.path}?urut=level` }); await sleep(1600)
     const sortAfter = await evaluate(`document.querySelector('.list-sort select').value`)
@@ -705,20 +752,21 @@ async function runSuite(width, kind) {
       animal.food.map((item) => `${item.name} (${item.type})`).join(', '),
     )
 
-    // Tautan makanan favorit semua hewan: resep, ikan, tanaman, collectible ke halamannya; ingredient tanpa tautan.
+    // Tautan makanan favorit semua hewan: resep, ikan, tanaman, collectible, bahan masak ke halamannya.
     const foodLinks = await evaluate(`(async () => {
       ${EXPECTED_ITEM_HREF}
       const { animals } = await import('/src/data/wildlife/animals.js')
       return animals.map((a) => ({ slug: a.slug, expected: a.favoriteFood.map(expectedHref) }))
     })()`)
     let foodOk = foodLinks.some((a) => a.expected.some((href) => href?.startsWith('/wildlife/fish/'))) &&
-      foodLinks.some((a) => a.expected.some((href) => href?.startsWith('/crops/'))) && foodLinks.some((a) => a.expected.some((href) => href?.startsWith('/collectibles/')))
+      foodLinks.some((a) => a.expected.some((href) => href?.startsWith('/crops/'))) && foodLinks.some((a) => a.expected.some((href) => href?.startsWith('/collectibles/'))) &&
+      foodLinks.some((a) => a.expected.some((href) => href?.startsWith('/ingredients/'))) && foodLinks.every((a) => !a.expected.includes(null))
     for (const { slug, expected } of foodLinks) {
       await go(`/wildlife/animals/${slug}`)
       const hrefs = await evaluate(`[...document.querySelectorAll('.panel--food .item-tile')].map(t => t.querySelector('a')?.getAttribute('href') ?? null)`)
       if (hrefs.join() !== expected.join()) { foodOk = false; console.log(`       ${slug}: ${hrefs.join()} ≠ ${expected.join()}`) }
     }
-    check(`Tautan makanan favorit di ${foodLinks.length} hewan: ikan → /wildlife/fish/…, resep → /recipes/…, Crop → /crops/…, Collectible → /collectibles/…`, foodOk)
+    check(`Tautan makanan favorit di ${foodLinks.length} hewan: ikan → /wildlife/fish/…, resep → /recipes/…, Crop → /crops/…, Collectible → /collectibles/…, Ingredient → /ingredients/…, semua bisa diklik`, foodOk)
     await go('/wildlife/animals/capybara')
     const tomatoHref = await evaluate(`[...document.querySelectorAll('.panel--food .item-tile')].find((t) => t.querySelector('.item-tile__name').textContent === 'Tomato')?.querySelector('a')?.getAttribute('href') ?? null`)
     await evaluate(`[...document.querySelectorAll('.panel--food .item-tile a')].find(a => a.textContent.includes('Tomato'))?.click()`); await sleep(1200)
@@ -802,7 +850,7 @@ async function runSuite(width, kind) {
     r = await readRecipe()
     check('Klik bahan Tiramisu membuka halaman resep Tiramisu', r.slug === 'tiramisu' && r.title === 'Tiramisu', r.title)
 
-    // Semua resep yang punya bahan bertautan (resep lain, ikan, "Any Fish"): tautannya benar; bahan lain tanpa tautan.
+    // Semua resep yang punya bahan bertautan: tautannya benar, dan tidak ada bahan yang tersisa tanpa tautan.
     const linked = await evaluate(`(async () => {
       const ids = (r) => r.ingredients.flatMap((g) => g.type === 'fixed' ? g.items.map((e) => e.item) : g.options)
       ${EXPECTED_ITEM_HREF}
@@ -810,13 +858,13 @@ async function runSuite(width, kind) {
     })()`)
     const targets = linked.flatMap((r) => r.expected)
     let linkOk = targets.some((href) => href?.startsWith('/recipes/')) && targets.some((href) => href?.startsWith('/wildlife/fish/')) && targets.includes('/wildlife/fish') &&
-      targets.some((href) => href?.startsWith('/crops/')) && targets.some((href) => href?.startsWith('/collectibles/')) && targets.includes(null)
+      targets.some((href) => href?.startsWith('/crops/')) && targets.some((href) => href?.startsWith('/collectibles/')) && targets.some((href) => href?.startsWith('/ingredients/')) && !targets.includes(null)
     for (const { slug, expected } of linked) {
       await go(`/recipes/${slug}`)
       const hrefs = (await readRecipe()).groups.flatMap((g) => g.tiles.map((t) => t.href))
       if (hrefs.join() !== expected.join()) { linkOk = false; console.log(`       ${slug}: ${hrefs.join()} ≠ ${expected.join()}`) }
     }
-    check(`Tautan bahan di ${linked.length} resep: resep → /recipes/…, ikan → /wildlife/fish/…, "Any Fish" → /wildlife/fish, Crop → /crops/…, Collectible → /collectibles/…, Ingredient tanpa tautan`, linkOk)
+    check(`Tautan bahan di ${linked.length} resep: resep → /recipes/…, ikan → /wildlife/fish/…, "Any Fish" → /wildlife/fish, Crop → /crops/…, Collectible → /collectibles/…, Ingredient → /ingredients/…, semua bisa diklik`, linkOk)
 
     // Contoh konkret: ikan di bahan tetap, "Any Fish", dan ikan event.
     await go('/recipes/deluxe-seafood-platter')
@@ -1112,10 +1160,10 @@ async function runSuite(width, kind) {
   //     di dark, tiap event punya warna, kategori tak terdaftar → cadangan). Gaya beda dari badge level (latar lembut +
   //     garis tepi vs blok penuh) dan warnanya tidak mirip level di sebelahnya. Kontras teks AA. Light & dark.
   const CATEGORY_PROBE = `
-    const [{ FISH_CATEGORIES, BUG_CATEGORIES, BIRD_CATEGORIES, ANIMAL_CATEGORIES }, { RECIPE_CATEGORIES }, { CROP_CATEGORIES }, { COLLECTIBLE_CATEGORIES }, { categoryKey, categoryToneStyle }] = await Promise.all(
-      ['/src/data/wildlife/attributes.js', '/src/data/recipes/categories.js', '/src/data/crops/categories.js', '/src/data/collectibles/categories.js', '/src/components/catalog/categoryTone.js'].map((p) => import(p)),
+    const [{ FISH_CATEGORIES, BUG_CATEGORIES, BIRD_CATEGORIES, ANIMAL_CATEGORIES }, { RECIPE_CATEGORIES }, { CROP_CATEGORIES }, { COLLECTIBLE_CATEGORIES }, { INGREDIENT_CATEGORIES }, { categoryKey, categoryToneStyle }] = await Promise.all(
+      ['/src/data/wildlife/attributes.js', '/src/data/recipes/categories.js', '/src/data/crops/categories.js', '/src/data/collectibles/categories.js', '/src/data/ingredients/categories.js', '/src/components/catalog/categoryTone.js'].map((p) => import(p)),
     )
-    const known = { fish: FISH_CATEGORIES, bugs: BUG_CATEGORIES, birds: BIRD_CATEGORIES, animals: ANIMAL_CATEGORIES, recipes: RECIPE_CATEGORIES, crops: CROP_CATEGORIES, collectibles: COLLECTIBLE_CATEGORIES }[${JSON.stringify(kindSlug)}]
+    const known = { fish: FISH_CATEGORIES, bugs: BUG_CATEGORIES, birds: BIRD_CATEGORIES, animals: ANIMAL_CATEGORIES, recipes: RECIPE_CATEGORIES, crops: CROP_CATEGORIES, collectibles: COLLECTIBLE_CATEGORIES, ingredients: INGREDIENT_CATEGORIES }[${JSON.stringify(kindSlug)}]
     const root = getComputedStyle(document.documentElement)
     const probe = document.createElement('span'); document.body.append(probe)
     // Nilai token → nilai terhitung yang bisa dibandingkan dengan gaya badge (warna, atau gradasi untuk Rainbow Verse).
@@ -1186,6 +1234,7 @@ async function runSuite(width, kind) {
     recipes: [null, 'mooncake'],
     crops: ['tomato', 'prickly-pear'],
     collectibles: ['starfall-shard', 'glasswort'],
+    ingredients: ['egg', 'spirulina-powder'],
   }
   for (const slug of EVENT_SAMPLES[kindSlug] ?? [null]) {
     await go(slug ? `${kind.path}/${slug}` : kind.path)
@@ -1244,7 +1293,8 @@ async function runSuite(width, kind) {
   )
   check(`Section ${kind.name}: status event (aktif/selesai) tidak tampil`, !sec.statusText)
 
-  // 20. Crops & Collectibles: section tersembunyi saat tanpa hasil, lalu halaman detail.
+  // 20. Crops, Collectibles & Ingredients: section tersembunyi saat tanpa hasil, lalu halaman detail. Ingredients juga
+  //     menguji tautan Egg: bahan (ingredients/egg) dan resep (recipes/egg) bernama sama tapi halamannya berbeda.
   if (kind.goods) {
     const readSections = async (route) => { await go(route); return evaluate(`(async () => { ${SECTION_PROBE} return { names: heads.map((h) => h.name), cards: heads.map((h) => h.cards), shown, statusText } })()`) }
     const fmt = (value) => new Intl.NumberFormat('id-ID').format(value)
@@ -1327,7 +1377,7 @@ async function runSuite(width, kind) {
         c.description === 'Deskripsi belum tersedia.' && c.usage.animals.length === 0 && !c.panels.includes('panel--animals') && sortedHrefs(c.recipes).join() === c.usage.recipes.join(), `${c.recipes.length} resep`)
       await go('/crops/tidak-ada')
       check('Slug tanaman tidak dikenal → halaman tidak ditemukan', (await evaluate(`document.querySelector('h1')?.textContent.trim()`)) === 'Tanaman tidak ditemukan')
-    } else {
+    } else if (kind.goods === 'collectibles') {
       let view = await readSections('/collectibles?kategori=Meteor+Shower')
       check('Collectibles: Starfall Shard (kategori Meteor Shower) ada di section Base Game', view.names.join() === 'Base Game' && view.shown === 1, view.names.join(', '))
       view = await readSections('/collectibles?lokasi=Whalefall+Canyon')
@@ -1375,9 +1425,113 @@ async function runSuite(width, kind) {
       check('Nama janggal di sumber disimpan apa adanya (Bizarre Shiitak Black)', it.title === 'Bizarre Shiitak Black', it.title)
       await go('/collectibles/tidak-ada')
       check('Slug collectible tidak dikenal → halaman tidak ditemukan', (await evaluate(`document.querySelector('h1')?.textContent.trim()`)) === 'Bahan alam tidak ditemukan')
+    } else {
+      let view = await readSections('/ingredients?kategori=Common')
+      check('Ingredients: filter Kategori Common → hanya section Base Game (section event tanpa hasil disembunyikan)', view.names.join() === 'Base Game' && view.cards[0] === view.shown, `${view.names.join(', ')} (${view.shown})`)
+      view = await readSections('/ingredients?q=brick')
+      check('Ingredients: cari "brick" → hanya section Modular Streets (Brick Meat Patty, Brick Ice), jumlah hasil total 2', view.names.join() === 'Modular Streets' && view.shown === 2, view.names.join(', '))
+      await go('/ingredients')
+      const greenCard = await evaluate(`(() => { const card = [...document.querySelectorAll('.entry-card')].find((c) => c.getAttribute('href') === '/ingredients/green-sugar'); return card ? { badge: !!card.querySelector('.card-badge--category'), price: card.querySelector('.entry-card__facts li')?.title } : null })()`)
+      check('Green Sugar: kategori tidak ada di sumber → kartu tanpa badge kategori, harga beli tetap tampil', greenCard && !greenCard.badge && greenCard.price === 'Harga beli: 200', JSON.stringify(greenCard))
+
+      const readIngredient = () => evaluate(`(async () => {
+        ${DETAIL_PROBE}
+        const { getIngredientBySlug } = await import('/src/data/ingredients/ingredients.js')
+        const item = getIngredientBySlug(location.pathname.split('/').pop())
+        return {
+          ...base, item, usage: await usage('ingredients/' + item?.slug),
+          eyebrow: document.querySelector('.panel--info .eyebrow')?.textContent.trim(),
+          tint: document.querySelector('.entry-detail')?.dataset.wildlife,
+          level: document.querySelectorAll('.stage-level, .card-badge--level').length,
+          map: document.querySelectorAll('.location-map, .panel--location').length,
+        }
+      })()`)
+      await go('/ingredients/egg')
+      let it = await readIngredient()
+      check('Detail bahan: 4 kotak (identitas, gambar & harga, dipakai di resep, makanan hewan), tanpa level, lokasi, dan peta',
+        it.panels.join() === 'panel--info,panel--hero,panel--recipes,panel--animals' && it.level === 0 && it.map === 0 && it.eyebrow === 'Ingredients' && it.tint === 'ingredients', it.panels.join(', '))
+      check('Detail bahan: harga beli sesuai data; harga jual yang tidak ada di sumber tampil "—"; tanpa baris asal kalau sumber tidak mencantumkannya',
+        it.specs['Harga beli'] === `${fmt(it.item.buyPrice)}koin` && it.item.sellPrice === null && it.specs['Harga jual'] === '—' && it.item.origin === null && !('Asal' in it.specs), JSON.stringify(it.specs))
+      check(
+        `Dipakai di resep (Egg): ${it.usage.recipes.length} resep dari data resep Hatowiki, tertaut, dengan level & cara pakai`,
+        it.usage.recipes.length > 0 && sortedHrefs(it.recipes).join() === it.usage.recipes.join() && it.recipes.every((t) => /^Lv\. (\d+|—) · Bahan (tetap x\d+|pilihan \(pilih \d+\))/.test(t.meta)),
+        `${it.recipes.length} resep`,
+      )
+      check('Makanan favorit hewan (Egg): Ferret dari data hewan, tertaut', it.animals.map((t) => t.href).join() === it.usage.animals.join() && it.usage.animals.includes('/wildlife/animals/ferret'), it.animals.map((t) => t.name).join(', '))
+      await go('/ingredients/frosted')
+      it = await readIngredient()
+      check('Bahan event (Frosted): badge kategori ⛄ Winter frost season, tanpa status event, tanpa kotak hewan kalau tidak ada yang menyukainya',
+        it.tagEmoji === '⛄' && it.tagName === 'Winter frost season' && !it.statusText && it.usage.animals.length === 0 && !it.panels.includes('panel--animals') && sortedHrefs(it.recipes).join() === it.usage.recipes.join(), `${it.recipes.length} resep`)
+      await go('/ingredients/green-sugar')
+      it = await readIngredient()
+      check('Green Sugar: tanpa tag kategori di detail (kategori tidak ada di sumber)', it.item.category === null && it.tagName === null && it.title === 'Green Sugar', String(it.tagName))
+      await go('/ingredients/tidak-ada')
+      check('Slug bahan masak tidak dikenal → halaman tidak ditemukan', (await evaluate(`document.querySelector('h1')?.textContent.trim()`)) === 'Bahan masak tidak ditemukan')
+
+      // Egg ada dua: bahan (ingredients/egg) dan resep level 1 (recipes/egg). Tautan mengikuti jenis benda, bukan nama.
+      const pageOf = () => evaluate(`({ path: location.pathname, title: document.querySelector('h1')?.textContent.trim(), tint: document.querySelector('.entry-detail')?.dataset.wildlife, eyebrow: document.querySelector('.panel--info .eyebrow')?.textContent.trim() })`)
+      const eggTiles = () => evaluate(`[...document.querySelectorAll('.item-tile')].filter((t) => t.querySelector('.item-tile__name').textContent === 'Egg').map((t) => t.querySelector('a')?.getAttribute('href') ?? null)`)
+      await go('/recipes/egg')
+      let hrefs = await eggTiles()
+      await evaluate(`[...document.querySelectorAll('.ingredient-group .item-tile a')].find((a) => a.querySelector('.item-tile__name').textContent === 'Egg')?.click()`); await sleep(1200)
+      let page = await pageOf()
+      check('Resep Egg: bahannya Egg (ingredients/egg) tertaut ke /ingredients/egg dan membuka halaman bahan, bukan resepnya sendiri',
+        hrefs.join() === '/ingredients/egg' && page.path === '/ingredients/egg' && page.title === 'Egg' && page.tint === 'ingredients' && page.eyebrow === 'Ingredients', `${hrefs.join()} → ${page.path} (${page.eyebrow})`)
+      await go('/recipes/colorful-egg-feast')
+      hrefs = await eggTiles()
+      await evaluate(`[...document.querySelectorAll('.ingredient-group .item-tile a')].find((a) => a.getAttribute('href') === '/recipes/egg')?.click()`); await sleep(1200)
+      page = await pageOf()
+      check('Colorful Egg Feast: bahan Egg berupa resep (recipes/egg) tertaut ke /recipes/egg dan membuka halaman resep',
+        hrefs.includes('/recipes/egg') && page.path === '/recipes/egg' && page.title === 'Egg' && page.tint === 'recipes' && page.eyebrow === 'Recipes', `${hrefs.join()} → ${page.path} (${page.eyebrow})`)
+      await go('/ingredients/egg')
+      await evaluate(`[...document.querySelectorAll('.panel--recipes .item-tile a')].find((a) => a.getAttribute('href') === '/recipes/egg')?.click()`); await sleep(1200)
+      page = await pageOf()
+      const back = await eggTiles()
+      check('Dari /ingredients/egg ke resep Egg ("Dipakai di resep"), lalu bahan Egg di sana tertaut balik ke /ingredients/egg', page.path === '/recipes/egg' && back.join() === '/ingredients/egg', `${page.path}: ${back.join()}`)
+
+      // Semua resep & hewan yang memakai salah satu Egg: setiap tile "Egg" menuju halaman jenisnya sendiri.
+      const eggUses = await evaluate(`(async () => {
+        const [{ recipes }, { animals }] = await Promise.all(['/src/data/recipes/recipes.js', '/src/data/wildlife/animals.js'].map((p) => import(p)))
+        const ids = (r) => r.ingredients.flatMap((g) => (g.type === 'fixed' ? g.items.map((e) => e.item) : g.options))
+        const want = (list) => list.filter((id) => id === 'ingredients/egg' || id === 'recipes/egg').map((id) => '/' + id)
+        return [
+          ...recipes.filter((r) => want(ids(r)).length).map((r) => ({ route: '/recipes/' + r.slug, expected: want(ids(r)) })),
+          ...animals.filter((a) => want(a.favoriteFood ?? []).length).map((a) => ({ route: '/wildlife/animals/' + a.slug, expected: want(a.favoriteFood) })),
+        ]
+      })()`)
+      const wrongEgg = []
+      for (const { route, expected } of eggUses) {
+        await go(route)
+        const got = await eggTiles()
+        if (got.join() !== expected.join()) wrongEgg.push(`${route}: ${got.join()} ≠ ${expected.join()}`)
+      }
+      check(`Tautan Egg di ${eggUses.length} halaman resep & hewan mengikuti jenis bendanya (bahan → /ingredients/egg, resep → /recipes/egg)`,
+        eggUses.some((u) => u.expected.includes('/recipes/egg')) && eggUses.some((u) => u.route.startsWith('/wildlife/')) && wrongEgg.length === 0, wrongEgg.join('; '))
+
+      // Pencarian global: dua hasil "Egg" dengan label katalog berbeda, masing-masing ke halamannya sendiri.
+      await go('/ingredients')
+      await evaluate(`(async () => {
+        const toggle = document.querySelector('.global-search__toggle')
+        if (toggle && getComputedStyle(toggle).display !== 'none' && toggle.getAttribute('aria-expanded') !== 'true') { toggle.click(); await new Promise((r) => setTimeout(r, 700)) }
+        const input = document.querySelector('.global-search input'); input.focus(); input.select()
+      })()`)
+      for (const char of 'egg') { await send('Input.insertText', { text: char }); await sleep(40) }
+      await sleep(300)
+      const readOptions = () => evaluate(`(() => {
+        const input = document.querySelector('.global-search input')
+        const list = document.getElementById(input.getAttribute('aria-controls') ?? '')
+        return list ? [...list.querySelectorAll('[role="option"]')].map((o) => ({ name: o.querySelector('.search-option__name').textContent, label: o.querySelector('.search-option__kind').textContent.trim(), href: o.dataset.href })) : []
+      })()`)
+      const eggs = (await readOptions()).filter((o) => o.name === 'Egg')
+      await evaluate(`(() => { const input = document.querySelector('.global-search input'); const list = document.getElementById(input.getAttribute('aria-controls') ?? ''); [...(list?.querySelectorAll('[role="option"]') ?? [])].find((o) => o.dataset.href === '/ingredients/egg')?.click() })()`); await sleep(1300)
+      page = await pageOf()
+      check('Pencarian global "egg": dua hasil Egg (Bahan Masak → /ingredients/egg, Resep → /recipes/egg); memilih Bahan Masak membuka halaman bahan',
+        eggs.map((o) => `${o.label}>${o.href}`).sort().join() === 'Bahan Masak>/ingredients/egg,Resep>/recipes/egg' && page.path === '/ingredients/egg' && page.eyebrow === 'Ingredients',
+        eggs.map((o) => `${o.name} (${o.label}) ${o.href}`).join(', '))
     }
     const detailStatus = []
-    for (const slug of kind.goods === 'crops' ? ['prickly-pear', 'white-radish'] : ['tall-mustard', 'wakame']) {
+    const STATUS_SAMPLES = { crops: ['prickly-pear', 'white-radish'], collectibles: ['tall-mustard', 'wakame'], ingredients: ['spirulina-powder', 'condensed-milk'] }
+    for (const slug of STATUS_SAMPLES[kind.goods]) {
       await go(`${kind.path}/${slug}`)
       if (STATUS_RE.test(await evaluate(`document.querySelector('main').textContent`))) detailStatus.push(slug)
     }
@@ -1541,12 +1695,12 @@ async function runSuite(width, kind) {
       const base = sectionNames('Base Game')
       check('Starfruit Jam di section Call of Whales, bukan di kelompok Jam Base Game', whales.includes('Starfruit Jam') && !base.includes('Starfruit Jam') && base.filter((n) => / Jam$/.test(n))[0] === 'Mixed Jam', `${whales.length} resep Call of Whales`)
 
-      // Tautan bahan resep event: ikan event, tanaman & collectible event, resep lain; Ingredient tanpa tautan.
+      // Tautan bahan resep event: ikan event, tanaman & collectible event, bahan masak event, resep lain.
       const LINKS = {
-        'prickly-pear-black-garfish-soup': { 'Black Garfish': '/wildlife/fish/black-garfish', 'Prickly Pear': '/crops/prickly-pear', 'Concentrated Date Paste': null },
+        'prickly-pear-black-garfish-soup': { 'Black Garfish': '/wildlife/fish/black-garfish', 'Prickly Pear': '/crops/prickly-pear', 'Concentrated Date Paste': '/ingredients/concentrated-date-paste' },
         'grilled-squid-w-apple-jam': { 'Japanese Flying Squid': '/wildlife/fish/japanese-flying-squid', Wakame: '/collectibles/wakame', 'Sea Grape': '/collectibles/sea-grape', 'Apple Jam': '/recipes/apple-jam' },
         'wild-burdock-celtuce-taco': { Burdock: '/collectibles/burdock', 'Romaine Lettuce Taco': '/recipes/romaine-lettuce-taco' },
-        'ocean-iced-drink': { Starfruit: '/crops/starfruit', 'Spirulina Powder': null },
+        'ocean-iced-drink': { Starfruit: '/crops/starfruit', 'Spirulina Powder': '/ingredients/spirulina-powder' },
         'creamy-white-radish-soup': { 'White Radish': '/crops/white-radish' },
         'apple-pearl-cake': { Scallop: '/wildlife/fish/scallop' },
       }
@@ -1556,7 +1710,7 @@ async function runSuite(width, kind) {
         const tiles = Object.fromEntries(await evaluate(`[...document.querySelectorAll('.ingredient-group .item-tile')].map((t) => [t.querySelector('.item-tile__name').textContent, t.querySelector('a')?.getAttribute('href') ?? null])`))
         for (const [name, href] of Object.entries(expected)) if (tiles[name] !== href) wrong.push(`${slug}: ${name} ${tiles[name]} ≠ ${href}`)
       }
-      check('Bahan resep event tertaut: ikan event → /wildlife/fish/…, tanaman/collectible event → detailnya, resep → /recipes/…', wrong.length === 0, wrong.join('; '))
+      check('Bahan resep event tertaut: ikan event → /wildlife/fish/…, tanaman/collectible/bahan masak event → detailnya, resep → /recipes/…', wrong.length === 0, wrong.join('; '))
       await go('/recipes/prickly-pear-black-garfish-soup')
       await evaluate(`[...document.querySelectorAll('.item-tile a')].find(a => a.textContent.includes('Black Garfish'))?.click()`); await sleep(1200)
       let page = await evaluate(`({ path: location.pathname, title: document.querySelector('h1')?.textContent.trim() })`)

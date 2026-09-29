@@ -740,7 +740,8 @@
   }
 }
 
-/* Tujuh kategori: baris Wildlife (Fish, Bugs, Birds, Animals) 4 kartu, baris Wiki (Resep, Crops, Collectibles) 3 kartu */
+/* Delapan kategori: baris Wildlife (Fish, Bugs, Birds, Animals) dan baris Wiki (Resep, Crops, Collectibles,
+   Ingredients), masing-masing 4 kartu */
 @media (min-width: 1080px) {
   .category-grid {
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -749,11 +750,6 @@
   .category-grid > *,
   .category-grid > :last-child:nth-child(odd) {
     grid-column: span 3;
-  }
-
-  .category-grid > :nth-child(n + 5),
-  .category-grid > :nth-child(n + 5):last-child:nth-child(odd) {
-    grid-column: span 4;
   }
 }
 

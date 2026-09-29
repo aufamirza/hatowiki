@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * Sinkronisasi data dari Heartodex: wildlife ke src/data/wildlife/<kind>.js (Fish, Bugs, Birds, Animals), resep ke
- * src/data/recipes/recipes.js, tanaman ke src/data/crops/crops.js, dan collectible ke
- * src/data/collectibles/collectibles.js. Bahan resep dan makanan favorit hewan yang bukan Crop/Collectible disimpan
- * sebagai data bersama di src/data/items.js (gambarnya di public/images/items/); Crop dan Collectible hanya punya satu
- * sumber data, yaitu file datanya sendiri.
+ * src/data/recipes/recipes.js, tanaman ke src/data/crops/crops.js, collectible ke src/data/collectibles/collectibles.js,
+ * dan bahan masak ke src/data/ingredients/ingredients.js. Bahan resep dan makanan favorit hewan yang bukan
+ * Crop/Collectible/Ingredient disimpan sebagai data bersama di src/data/items.js (gambarnya di public/images/items/);
+ * Crop, Collectible, dan Ingredient hanya punya satu sumber data, yaitu file datanya sendiri.
  *
  * Pemakaian:
  *   node scripts/heartodex-sync.mjs --kind bugs --section "Base Game" --level 1           dry run: ambil, validasi, laporkan
@@ -14,6 +14,7 @@
  *   node scripts/heartodex-sync.mjs --kind recipes --section "Base Game" --level 7 [--write]
  *   node scripts/heartodex-sync.mjs --kind crops --section "Echo of Ancients" [--write]
  *   node scripts/heartodex-sync.mjs --kind collectibles --section "Base Game" [--write]  (tanpa level)
+ *   node scripts/heartodex-sync.mjs --kind ingredients --section "Base Game" [--write]   (tanpa level & lokasi)
  *
  * Setiap entri menyimpan `section`: nama section tempat entri itu berada di halaman daftar Heartodex ('Base Game' atau
  * nama event), bukan kategorinya. --section memakai nama yang sama.
@@ -38,6 +39,8 @@
  * - Crops: level dari halaman daftar; harga benih (Buy Price), waktu tumbuh (Growth Time), dan semua deret angka per
  *   bintang (Market Value, Event Tokens, …) beserta label aslinya. Farming Mastery tidak diambil.
  * - Collectibles: nilai jual (Sell Value), energi (Energy Boost, kalau ada), dan lokasi dengan zona peta seperti serangga.
+ * - Ingredients: harga beli (Buy Price) dan harga jual (Sell Price) dari kotak Market Value, dan info asal ("Origin: …")
+ *   kalau ada. Yang tidak dicantumkan sumber diisi null + TODO. Tanda "Work in Progress" di halaman dilaporkan.
  * - Urutan array mengikuti heartodex: section (Base Game, lalu event terbaru → terlama, lihat src/data/events.js),
  *   level, lalu urutan di halaman daftar (benda: urut id).
  */
@@ -176,6 +179,24 @@ const KINDS = {
     fieldOrder: [
       'slug', 'name', 'category', 'section', 'description', 'descriptionOriginal', 'descriptionSourceLang', 'sellValue', 'energy',
       'uncertain', 'locations', 'image', 'imageSize', 'locationImage', 'source',
+    ],
+  },
+  // Bahan masak: benda yang dipakai resep dan hewan (id benda 'ingredients/<slug>'). Tanpa level, lokasi, dan peta.
+  // Gambar lama di public/images/items/ingredients-<slug>.webp sudah dipindah ke public/images/ingredients/, jadi tidak
+  // diunduh ulang.
+  ingredients: {
+    slug: 'ingredients',
+    family: 'goods',
+    segment: 'ingredients',
+    dataFile: 'src/data/ingredients/ingredients.js',
+    exportName: 'ingredients',
+    translationsFile: 'scripts/translations/ingredients.id.json',
+    imageDir: 'public/images/ingredients',
+    imageUrl: '/images/ingredients',
+    storeImageSize: true,
+    fieldOrder: [
+      'slug', 'name', 'category', 'section', 'description', 'descriptionOriginal', 'descriptionSourceLang', 'buyPrice', 'sellPrice',
+      'origin', 'uncertain', 'image', 'imageSize', 'source',
     ],
   },
 }
@@ -722,6 +743,26 @@ function parseGoodsDetail(html) {
   }
 }
 
+// Halaman detail bahan masak: nama, kategori, deskripsi, status, dan gambar sama dengan tanaman/collectible. Kotak
+// "Market Value" berisi "Buy Price" dan (kalau ada) "Sell Price"; labelnya huruf biasa (tampil kapital lewat CSS).
+// Info asal ("Origin: General") diambil kalau ada, dari teks yang sama atau dari elemen setelah label "Origin".
+function parseIngredientDetail(html) {
+  const goods = parseGoodsDetail(html)
+  const main = between(html, '<main', '</main>') ?? html
+  const text = stripTags(main)
+  const price = (label) => new RegExp(`\\b${label} (\\+?[\\d.,]+)(?= |$)`, 'i').exec(text)?.[1] ?? null
+  const originMatch = />\s*Origin:\s*([^<\s][^<]*?)\s*</.exec(main) ?? />\s*Origin:?\s*<\/[a-z0-9]+>\s*<[a-z0-9]+[^>]*>\s*([^<]+?)\s*</i.exec(main)
+  return {
+    ...goods,
+    buyPrice: price('Buy Price'),
+    sellPrice: price('Sell Price'),
+    origin: originMatch ? decode(originMatch[1]) : null,
+    // "Origin" muncul di halaman tapi nilainya tidak terbaca: dilaporkan, tidak ditebak.
+    originUnread: !originMatch && /\bOrigin\b/.test(text),
+    workInProgress: /Work in Progress/i.test(text),
+  }
+}
+
 // Halaman benda (crop, collectible, ingredient, fish, recipe): nama dari judul, gambar utama.
 function parseItemPage(html) {
   return {
@@ -912,7 +953,7 @@ async function loadAppModules(kind) {
       fishModule, bugsModule, birdsModule, animalsModule, zonesModule, viewBoxModule, validateModule, timeModule,
       attributesModule, categoriesModule, itemsModule, recipesModule, validateRecipesModule, recipeCategoriesModule,
       recipeFamiliesModule, eventsModule, cropsModule, validateCropsModule, cropCategoriesModule, collectiblesModule,
-      validateCollectiblesModule, collectibleCategoriesModule,
+      validateCollectiblesModule, collectibleCategoriesModule, ingredientsModule, validateIngredientsModule, ingredientCategoriesModule,
     ] = await Promise.all([
       load('/src/data/wildlife/fish.js'),
       load('/src/data/wildlife/bugs.js'),
@@ -936,6 +977,9 @@ async function loadAppModules(kind) {
       load('/src/data/collectibles/collectibles.js'),
       load('/src/data/collectibles/validateCollectibles.js'),
       load('/src/data/collectibles/categories.js'),
+      load('/src/data/ingredients/ingredients.js'),
+      load('/src/data/ingredients/validateIngredients.js'),
+      load('/src/data/ingredients/categories.js'),
     ])
     const all = { fish: fishModule.fish, bugs: bugsModule.bugs, birds: birdsModule.birds, animals: animalsModule.animals }
     // Semua katalog selain wildlife: file data, validator, dan kategori entrinya.
@@ -947,6 +991,11 @@ async function loadAppModules(kind) {
         validate: validateCollectiblesModule.findCollectibleProblems,
         categories: collectibleCategoriesModule.COLLECTIBLE_CATEGORIES,
       },
+      ingredients: {
+        entries: ingredientsModule.ingredients,
+        validate: validateIngredientsModule.findIngredientProblems,
+        categories: ingredientCategoriesModule.INGREDIENT_CATEGORIES,
+      },
     }
     const other = others[kind.slug]
     const schema = other ? null : categoriesModule.getWildlifeCategory(kind.slug)
@@ -956,7 +1005,8 @@ async function loadAppModules(kind) {
       recipes: structuredClone(recipesModule.recipes),
       crops: structuredClone(cropsModule.crops),
       collectibles: structuredClone(collectiblesModule.collectibles),
-      // items.js saja (bahan, resep, ikan); Crop & Collectible ada di crops/collectibles.
+      ingredients: structuredClone(ingredientsModule.ingredients),
+      // items.js saja (resep, ikan, bahan generik); Crop, Collectible & Ingredient ada di file datanya sendiri.
       items: structuredClone(itemsModule.items),
       itemTypes: structuredClone(itemsModule.ITEM_TYPES),
       zones: structuredClone(zonesModule.LOCATION_ZONES),
@@ -1087,8 +1137,9 @@ async function prepareImage({ imageSrc, imageDir, fileName, imageUrl, write }) {
 // ---------- benda bersama (items.js) ----------
 // Benda yang belum ada di items.js diambil dari halamannya sendiri: nama dari judul, gambar utama ke
 // public/images/items/<bagian>-<slug>.webp. Jenis dari bagian URL (crops → Crop, …).
-// Crop & Collectible tidak disimpan di items.js: sumber tunggalnya crops.js / collectibles.js (sinkronkan dulu dengan
-// --kind crops / --kind collectibles). Gambarnya juga hanya ada di public/images/crops|collectibles/.
+// Crop, Collectible & Ingredient tidak disimpan di items.js: sumber tunggalnya crops.js / collectibles.js / ingredients.js
+// (sinkronkan dulu dengan --kind crops|collectibles|ingredients). Gambarnya juga hanya ada di
+// public/images/crops|collectibles|ingredients/.
 //
 // Benda baru yang juga entri Hatowiki sendiri (resep, ikan, serangga, burung) memakai gambar entri itu, tidak diunduh lagi.
 // `batch` = resep yang ditambahkan di run yang sama (slug → true): gambar & namanya diisi dari hasil run itu (finishBatch).
@@ -1096,6 +1147,7 @@ function createItemResolver(app, write, { batch = new Set() } = {}) {
   const ownData = {
     crops: new Map(app.crops.map((entry) => [entry.slug, entry])),
     collectibles: new Map(app.collectibles.map((entry) => [entry.slug, entry])),
+    ingredients: new Map(app.ingredients.map((entry) => [entry.slug, entry])),
   }
   const entryData = {
     recipes: new Map(app.recipes.map((entry) => [entry.slug, entry])),
@@ -1797,7 +1849,7 @@ async function syncRecipes(args, kind) {
   items.finishBatch(results)
 
   const vocabulary = buildVocabulary(
-    [...Object.values(app.allEntries).flat(), ...app.recipes, ...app.crops, ...app.collectibles, ...results.map((result) => result.entry)]
+    [...Object.values(app.allEntries).flat(), ...app.recipes, ...app.crops, ...app.collectibles, ...app.ingredients, ...results.map((result) => result.entry)]
       .map((item) => item.descriptionOriginal),
   )
   for (const result of results) result.suspicious = suspiciousWords(result.entry.descriptionOriginal, vocabulary)
@@ -1900,6 +1952,7 @@ function growthSeconds(raw, todos) {
 async function syncGoods(args, kind) {
   const app = await loadAppModules(kind)
   const crop = kind.slug === 'crops'
+  const ingredient = kind.slug === 'ingredients'
   const translationsFile = path.join(ROOT, kind.translationsFile)
   const imageDir = path.join(ROOT, kind.imageDir)
   const existingSlugs = new Set(app.entries.map((item) => item.slug))
@@ -1908,9 +1961,9 @@ async function syncGoods(args, kind) {
   console.log('Mengambil halaman daftar…')
   const list = parseList(await getCached(`${BASE_URL}/en/${kind.segment}`), kind.segment, kind.untitledSection)
   const { listIndex, toAdd } = selectTargets(list, args, existingSlugs)
-  // Collectible punya lokasi & zona peta seperti serangga.
+  // Collectible punya lokasi & zona peta seperti serangga (tanaman & bahan masak tidak).
   let locationTools = null
-  if (!crop) {
+  if (!crop && !ingredient) {
     const mapPage = await getCached(`${BASE_URL}/en/map`)
     const mapScriptPath = /src="(\/_astro\/HeartopiaMap[^"]+\.js)"/.exec(mapPage)?.[1]
     const mapScript = mapScriptPath ? await getCached(`${BASE_URL}${mapScriptPath}`) : ''
@@ -1924,7 +1977,8 @@ async function syncGoods(args, kind) {
 
   for (const listItem of toAdd) {
     const source = `${BASE_URL}/en/${kind.segment}/${listItem.slug}`
-    const detail = parseGoodsDetail(await getCached(source))
+    const html = await getCached(source)
+    const detail = ingredient ? parseIngredientDetail(html) : parseGoodsDetail(html)
     const todos = {}
     const notes = []
     const uncertain = []
@@ -1973,6 +2027,17 @@ async function syncGoods(args, kind) {
       else if (starValues[0].label !== 'Market Value') notes.push(`deret pertama berlabel "${starValues[0].label}", bukan Market Value`)
       if (detail.sellValue || detail.energyBoost) notes.push(`tanaman punya Sell Value/Energy Boost: ${detail.sellValue}/${detail.energyBoost}`)
       fields = { level, seedPrice, growthTime, starValues }
+    } else if (ingredient) {
+      const buyPrice = integerStat(detail.buyPrice, 'harga beli (Buy Price)', 'buyPrice', todos, uncertain)
+      const sellPrice = integerStat(detail.sellPrice, 'harga jual (Sell Price)', 'sellPrice', todos, uncertain)
+      const origin = detail.origin || null
+      if (!origin) todos.origin = detail.originUnread ? 'info asal ada di sumber tapi tidak terbaca' : 'info asal (Origin) tidak ada di sumber'
+      if (detail.workInProgress) notes.push('halaman sumber bertanda "Work in Progress"')
+      if (detail.growthTime || detail.sellValue || detail.energyBoost || detail.starRows.length) {
+        notes.push('bahan punya Growth Time/Sell Value/Energy Boost/deret per bintang (tidak disimpan)')
+      }
+      if (detail.zone || detail.pins.length || detail.locationLabel) notes.push('halaman bahan punya peta/lokasi (tidak disimpan)')
+      fields = { buyPrice, sellPrice, origin }
     } else {
       const sellValue = integerStat(detail.sellValue, 'nilai jual (Sell Value)', 'sellValue', todos, uncertain)
       // Energy Boost hanya ada untuk benda yang bisa dimakan; tidak ada di sumber → null tanpa TODO.
@@ -2013,7 +2078,7 @@ async function syncGoods(args, kind) {
       uncertain: uncertain.length ? uncertain : undefined,
       image: image.image,
       imageSize: image.image ? image.imageSize : null,
-      ...(crop ? {} : { locationImage }),
+      ...(crop || ingredient ? {} : { locationImage }),
       source,
     }, kind.fieldOrder)
     if (image.image && !image.imageSize) todos.imageSize = 'ukuran gambar tidak terbaca'
@@ -2025,7 +2090,7 @@ async function syncGoods(args, kind) {
   }
 
   const vocabulary = buildVocabulary(
-    [...Object.values(app.allEntries).flat(), ...app.recipes, ...app.crops, ...app.collectibles, ...results.map((result) => result.entry)]
+    [...Object.values(app.allEntries).flat(), ...app.recipes, ...app.crops, ...app.collectibles, ...app.ingredients, ...results.map((result) => result.entry)]
       .map((item) => item.descriptionOriginal),
   )
   for (const result of results) result.suspicious = suspiciousWords(result.entry.descriptionOriginal, vocabulary)
@@ -2040,10 +2105,12 @@ async function syncGoods(args, kind) {
   for (const { entry, todos, notes, imageStatus, suspicious } of results) {
     const head = crop
       ? `Lv ${entry.level} | benih ${entry.seedPrice ?? '—'} | tumbuh ${clock(entry.growthTime)}`
-      : `jual ${entry.sellValue ?? '—'} | energi ${entry.energy ?? '—'}`
+      : ingredient
+        ? `beli ${entry.buyPrice ?? '—'} | jual ${entry.sellPrice ?? '—'} | asal ${entry.origin ?? '—'}`
+        : `jual ${entry.sellValue ?? '—'} | energi ${entry.energy ?? '—'}`
     console.log(`• ${entry.slug} — ${entry.name} | ${entry.category} | section ${entry.section} | ${head} | gambar: ${imageStatus}`)
     if (crop) for (const row of entry.starValues) console.log(`    ${row.label}: ${stars(row.values)}`)
-    else console.log(`    lokasi: ${entry.locations.map((location) => `${location.name} [${location.zone ?? 'placeholder'}]`).join(' · ')}`)
+    else if (!ingredient) console.log(`    lokasi: ${entry.locations.map((location) => `${location.name} [${location.zone ?? 'placeholder'}]`).join(' · ')}`)
     console.log(`    EN: ${entry.descriptionOriginal ?? '(tidak ada)'}`)
     console.log(`    ID: ${entry.description ?? '(belum diterjemahkan)'}`)
     if (suspicious.length) console.log(`    kata mencurigakan (y→g?): ${suspicious.join(', ')}`)
@@ -2055,7 +2122,7 @@ async function syncGoods(args, kind) {
   }
   const flagged = results.filter((result) => result.suspicious.length)
   console.log(`\nKata mencurigakan: ${flagged.map((result) => `${result.entry.slug} [${result.suspicious.join(', ')}]`).join('; ') || '-'}`)
-  if (!crop) console.log(`Zona baru: ${newZones.map((zone) => zone.key).join(', ') || '-'}`)
+  if (!crop && !ingredient) console.log(`Zona baru: ${newZones.map((zone) => zone.key).join(', ') || '-'}`)
   if (problems.length) {
     console.log('\nValidasi GAGAL:')
     for (const { slug, problems: list } of problems) console.log(`  ${slug}: ${list.join('; ')}`)
@@ -2143,13 +2210,14 @@ function appendZones(original, newZones) {
   return `${original.slice(0, end)}${zoneSource}\n${original.slice(end)}`
 }
 
-// Data lama di semua file (wildlife, resep, tanaman, collectible, benda, zona) harus identik setelah menulis.
+// Data lama di semua file (wildlife, resep, tanaman, collectible, bahan, benda, zona) harus identik setelah menulis.
 function assertUnchanged(before, after) {
   const collections = [
     ...Object.keys(before.allEntries).map((slug) => [slug, before.allEntries[slug], after.allEntries[slug], 'slug']),
     ['recipes', before.recipes, after.recipes, 'slug'],
     ['crops', before.crops, after.crops, 'slug'],
     ['collectibles', before.collectibles, after.collectibles, 'slug'],
+    ['ingredients', before.ingredients, after.ingredients, 'slug'],
     ['items', before.items, after.items, 'id'],
   ]
   for (const [name, list, afterList, key] of collections) {
@@ -2191,8 +2259,8 @@ async function commitWrites(writes, verify, withImages) {
 
 // Parser diekspor untuk pengecekan; sinkronisasi hanya jalan kalau skrip dipanggil langsung.
 export {
-  buildVocabulary, parseAnimalDetail, parseDetail, parseGoodsDetail, parseItemPage, parseList, parseMapMarkers, parseMapZones, parseRecipeDetail,
-  suspiciousWords,
+  buildVocabulary, parseAnimalDetail, parseDetail, parseGoodsDetail, parseIngredientDetail, parseItemPage, parseList, parseMapMarkers, parseMapZones,
+  parseRecipeDetail, suspiciousWords,
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

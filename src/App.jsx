@@ -10,6 +10,7 @@ import RecipeDetailPage from './pages/recipes/RecipeDetailPage'
 import GoodsListPage from './pages/goods/GoodsListPage'
 import CropDetailPage from './pages/goods/CropDetailPage'
 import CollectibleDetailPage from './pages/goods/CollectibleDetailPage'
+import IngredientDetailPage from './pages/goods/IngredientDetailPage'
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,13 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <GoodsListPage key="collectibles" kindSlug="collectibles" /> },
           { path: ':slug', element: <CollectibleDetailPage /> },
+        ],
+      },
+      {
+        path: 'ingredients',
+        children: [
+          { index: true, element: <GoodsListPage key="ingredients" kindSlug="ingredients" /> },
+          { path: ':slug', element: <IngredientDetailPage /> },
         ],
       },
       { path: '*', element: <NotFoundPage /> },

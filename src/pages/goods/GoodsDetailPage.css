@@ -1,9 +1,10 @@
 /*
- * Detail tanaman & collectible: identitas, gambar & angka, kotak samping (info tanam / lokasi), resep yang memakainya,
- * dan (kalau ada) hewan yang menyukainya. Panel dasar, panggung gambar, spec, dan harga memakai gaya detail wildlife.
+ * Detail tanaman, collectible & bahan masak: identitas, gambar & angka, kotak samping (info tanam / lokasi; bahan masak
+ * tidak punya), resep yang memakainya, dan (kalau ada) hewan yang menyukainya. Panel dasar, panggung gambar, spec, dan harga memakai gaya detail wildlife.
  * Tanaman, desktop: identitas (5) di atas info tanam (5), gambar & nilai jual (7) setinggi keduanya; lalu resep (7) +
  *   hewan (5), atau resep selebar layar kalau tidak ada hewan.
  * Collectible, desktop: identitas (5) + gambar & angka (7); lokasi & peta (5) setinggi resep (7) dan hewan (7).
+ * Bahan masak, desktop: identitas (5) + gambar & harga (7); lalu resep (7) + hewan (5), atau resep selebar layar.
  * Tablet: identitas & gambar selebar layar; tanaman: info tanam selebar layar, lalu resep (7) + hewan (5);
  *   collectible: lokasi (6) di samping resep & hewan (6).
  * Mobile: menumpuk mengikuti urutan baca (nama → gambar → info/lokasi → resep → hewan).
@@ -80,6 +81,45 @@
     grid-template-areas:
       'info info info info info hero hero hero hero hero hero hero'
       'aside aside aside aside aside recipes recipes recipes recipes recipes recipes recipes';
+  }
+}
+
+/* Bahan masak: tanpa kotak samping. Ditaruh setelah aturan tanaman & collectible supaya menang di lebar yang sama. */
+.entry-detail__grid.entry-detail__grid--ingredient {
+  grid-template-areas:
+    'info'
+    'hero'
+    'recipes'
+    'animals';
+}
+
+@media (min-width: 760px) {
+  .entry-detail__grid.entry-detail__grid--ingredient {
+    grid-template-areas:
+      'info info info info info info info info info info info info'
+      'hero hero hero hero hero hero hero hero hero hero hero hero'
+      'recipes recipes recipes recipes recipes recipes recipes animals animals animals animals animals';
+  }
+
+  .entry-detail__grid.entry-detail__grid--ingredient.entry-detail__grid--no-animals {
+    grid-template-areas:
+      'info info info info info info info info info info info info'
+      'hero hero hero hero hero hero hero hero hero hero hero hero'
+      'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes';
+  }
+}
+
+@media (min-width: 1080px) {
+  .entry-detail__grid.entry-detail__grid--ingredient {
+    grid-template-areas:
+      'info info info info info hero hero hero hero hero hero hero'
+      'recipes recipes recipes recipes recipes recipes recipes animals animals animals animals animals';
+  }
+
+  .entry-detail__grid.entry-detail__grid--ingredient.entry-detail__grid--no-animals {
+    grid-template-areas:
+      'info info info info info hero hero hero hero hero hero hero'
+      'recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes recipes';
   }
 }
 

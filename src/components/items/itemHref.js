@@ -1,5 +1,6 @@
 import { getCollectibleBySlug } from '../../data/collectibles/collectibles'
 import { getCropBySlug } from '../../data/crops/crops'
+import { getIngredientBySlug } from '../../data/ingredients/ingredients'
 import { getRecipeBySlug } from '../../data/recipes/recipes'
 import { fish } from '../../data/wildlife/fish'
 import { bugs } from '../../data/wildlife/bugs'
@@ -17,13 +18,16 @@ const WIKI_SEGMENTS = {
   recipes: getRecipeBySlug,
   crops: getCropBySlug,
   collectibles: getCollectibleBySlug,
+  ingredients: getIngredientBySlug,
 }
 
 /**
- * Tautan internal sebuah benda (bahan resep / makanan hewan), atau null. Recipe, Crop, dan Collectible → halaman
- * detailnya (/recipes|crops|collectibles/<slug>); ikan, serangga, dan burung → /wildlife/<kategori>/<slug>. Tautan
- * hanya dibuat kalau entrinya ada di data Hatowiki, jadi entri yang ditambahkan nanti otomatis tertaut. Bahan generik
- * seperti "Any Fish" (`any/fish`) → halaman daftar kategorinya. Ingredient belum punya halaman, jadi tanpa tautan.
+ * Tautan internal sebuah benda (bahan resep / makanan hewan), atau null. Recipe, Crop, Collectible, dan Ingredient →
+ * halaman detailnya (/recipes|crops|collectibles|ingredients/<slug>); ikan, serangga, dan burung →
+ * /wildlife/<kategori>/<slug>. Tautan mengikuti awalan id (jenis benda), bukan namanya: Egg si bahan
+ * ('ingredients/egg') → /ingredients/egg, Egg si resep ('recipes/egg') → /recipes/egg. Tautan hanya dibuat kalau
+ * entrinya ada di data Hatowiki, jadi entri yang ditambahkan nanti otomatis tertaut. Bahan generik seperti "Any Fish"
+ * (`any/fish`) → halaman daftar kategorinya.
  */
 export function itemHref(item) {
   const [segment, slug] = item.id.split('/')

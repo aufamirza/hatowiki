@@ -1,5 +1,6 @@
 import { collectibles } from './collectibles/collectibles'
 import { crops } from './crops/crops'
+import { ingredients } from './ingredients/ingredients'
 
 /**
  * Benda di game yang dipakai bersama oleh beberapa halaman: bahan resep dan makanan favorit hewan. Semua nilai
@@ -7,9 +8,10 @@ import { crops } from './crops/crops'
  * halaman, gambar dari gambar utamanya. Diisi oleh scripts/heartodex-sync.mjs saat resep atau hewan yang memakainya
  * disinkronkan.
  *
- * Crop dan Collectible tidak ditulis di sini: satu-satunya sumber datanya src/data/crops/crops.js dan
- * src/data/collectibles/collectibles.js (gambar di public/images/crops|collectibles/). Benda 'crops/<slug>' dan
- * 'collectibles/<slug>' diturunkan dari data itu (lihat ALL_ITEMS), jadi tidak ada data maupun gambar ganda.
+ * Crop, Collectible, dan Ingredient tidak ditulis di sini: satu-satunya sumber datanya src/data/crops/crops.js,
+ * src/data/collectibles/collectibles.js, dan src/data/ingredients/ingredients.js (gambar di
+ * public/images/crops|collectibles|ingredients/). Benda 'crops/<slug>', 'collectibles/<slug>', dan 'ingredients/<slug>'
+ * diturunkan dari data itu (lihat ALL_ITEMS), jadi tidak ada data maupun gambar ganda.
  * Benda baru yang juga entri Hatowiki sendiri (resep, ikan, serangga, burung) memakai gambar entri itu
  * (mis. '/images/fish/sardine.webp'), jadi gambarnya tidak diunduh dua kali.
  *
@@ -19,7 +21,7 @@ import { crops } from './crops/crops'
  *                               Bahan generik tanpa halaman di Heartodex (mis. "Any Fish") memakai 'any/<slug>'.
  * @property {string}  name      Nama resmi (English), sama dengan di halaman resep/hewan.
  * @property {string}  type      Kunci ITEM_TYPES (istilah game berbahasa Inggris).
- * @property {?string} image     Path lokal di /public, mis. '/images/items/ingredients-milk.webp', atau gambar entrinya sendiri
+ * @property {?string} image     Path lokal di /public, mis. '/images/items/fish-common-prawn.webp', atau gambar entrinya sendiri
  *                               (mis. '/images/recipes/grilled-mushrooms.webp'); null = tidak ada gambar di sumber.
  * @property {?[number, number]} imageSize Ukuran asli gambar [lebar, tinggi] untuk width/height <img>.
  * @property {?string} source    URL halaman benda di Heartodex; null untuk bahan generik yang tidak punya halaman.
@@ -43,9 +45,13 @@ export const ITEM_TYPES = {
 const ENTRY_IMAGE_DIRS = { recipes: '/images/recipes', fish: '/images/fish', insects: '/images/bugs', birds: '/images/birds' }
 
 // Jenis yang datanya ada di file lain (bukan di `items`).
-const OWN_DATA = { crops: { type: 'Crop', entries: crops }, collectibles: { type: 'Collectible', entries: collectibles } }
+const OWN_DATA = {
+  crops: { type: 'Crop', entries: crops },
+  collectibles: { type: 'Collectible', entries: collectibles },
+  ingredients: { type: 'Ingredient', entries: ingredients },
+}
 
-/** Benda yang disimpan di file ini (bahan, resep, ikan, bahan generik). Crop & Collectible ada di ALL_ITEMS. */
+/** Benda yang disimpan di file ini (resep, ikan, bahan generik). Crop, Collectible & Ingredient ada di ALL_ITEMS. */
 /** @type {Item[]} */
 export const items = [
   {
@@ -239,262 +245,6 @@ export const items = [
     image: '/images/fish/silver-garfish.webp',
     imageSize: [400, 400],
     source: 'https://www.heartodex.com/en/fish/silver-garfish',
-  },
-  {
-    id: 'ingredients/ace-beef',
-    name: 'Ace Beef',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-ace-beef.webp',
-    imageSize: [400, 400],
-    source: 'https://www.heartodex.com/en/ingredients/ace-beef',
-  },
-  {
-    id: 'ingredients/ace-chicken',
-    name: 'Ace Chicken',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-ace-chicken.webp',
-    imageSize: [400, 400],
-    source: 'https://www.heartodex.com/en/ingredients/ace-chicken',
-  },
-  {
-    id: 'ingredients/bamboo-leaf',
-    name: 'Bamboo Leaf',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-bamboo-leaf.webp',
-    imageSize: [400, 322],
-    source: 'https://www.heartodex.com/en/ingredients/bamboo-leaf',
-  },
-  {
-    id: 'ingredients/blue-sugar',
-    name: 'Blue Sugar',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-blue-sugar.webp',
-    imageSize: [400, 661],
-    source: 'https://www.heartodex.com/en/ingredients/blue-sugar',
-  },
-  {
-    id: 'ingredients/brick-ice',
-    name: 'Brick Ice',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-brick-ice.webp',
-    imageSize: [400, 335],
-    source: 'https://www.heartodex.com/en/ingredients/brick-ice',
-  },
-  {
-    id: 'ingredients/brick-meat-patty',
-    name: 'Brick Meat Patty',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-brick-meat-patty.webp',
-    imageSize: [400, 284],
-    source: 'https://www.heartodex.com/en/ingredients/brick-meat-patty',
-  },
-  {
-    id: 'ingredients/butter',
-    name: 'Butter',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-butter.webp',
-    imageSize: [400, 374],
-    source: 'https://www.heartodex.com/en/ingredients/butter',
-  },
-  {
-    id: 'ingredients/cheese',
-    name: 'Cheese',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-cheese.webp',
-    imageSize: [400, 379],
-    source: 'https://www.heartodex.com/en/ingredients/cheese',
-  },
-  {
-    id: 'ingredients/coffee-beans',
-    name: 'Coffee Beans',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-coffee-beans.webp',
-    imageSize: [400, 418],
-    source: 'https://www.heartodex.com/en/ingredients/coffee-beans',
-  },
-  {
-    id: 'ingredients/concentrated-date-paste',
-    name: 'Concentrated Date Paste',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-concentrated-date-paste.webp',
-    imageSize: [400, 388],
-    source: 'https://www.heartodex.com/en/ingredients/concentrated-date-paste',
-  },
-  {
-    id: 'ingredients/condensed-milk',
-    name: 'Condensed Milk',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-condensed-milk.webp',
-    imageSize: [400, 296],
-    source: 'https://www.heartodex.com/en/ingredients/condensed-milk',
-  },
-  {
-    id: 'ingredients/cooking-oil',
-    name: 'Cooking Oil',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-cooking-oil.webp',
-    imageSize: [400, 343],
-    source: 'https://www.heartodex.com/en/ingredients/cooking-oil',
-  },
-  {
-    id: 'ingredients/egg',
-    name: 'Egg',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-egg.webp',
-    imageSize: [400, 389],
-    source: 'https://www.heartodex.com/en/ingredients/egg',
-  },
-  {
-    id: 'ingredients/frosted',
-    name: 'Frosted',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-frosted.webp',
-    imageSize: [400, 545],
-    source: 'https://www.heartodex.com/en/ingredients/frosted',
-  },
-  {
-    id: 'ingredients/fruitwood-charcoal',
-    name: 'Fruitwood Charcoal',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-fruitwood-charcoal.webp',
-    imageSize: [400, 352],
-    source: 'https://www.heartodex.com/en/ingredients/fruitwood-charcoal',
-  },
-  {
-    id: 'ingredients/green-sugar',
-    name: 'Green Sugar',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-green-sugar.webp',
-    imageSize: [400, 661],
-    source: 'https://www.heartodex.com/en/ingredients/green-sugar',
-  },
-  {
-    id: 'ingredients/indigo-sugar',
-    name: 'Indigo Sugar',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-indigo-sugar.webp',
-    imageSize: [400, 661],
-    source: 'https://www.heartodex.com/en/ingredients/indigo-sugar',
-  },
-  {
-    id: 'ingredients/matcha-powder',
-    name: 'Matcha Powder',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-matcha-powder.webp',
-    imageSize: [400, 345],
-    source: 'https://www.heartodex.com/en/ingredients/matcha-powder',
-  },
-  {
-    id: 'ingredients/meat',
-    name: 'Meat',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-meat.webp',
-    imageSize: [400, 353],
-    source: 'https://www.heartodex.com/en/ingredients/meat',
-  },
-  {
-    id: 'ingredients/milk',
-    name: 'Milk',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-milk.webp',
-    imageSize: [400, 387],
-    source: 'https://www.heartodex.com/en/ingredients/milk',
-  },
-  {
-    id: 'ingredients/orange-sugar',
-    name: 'Orange Sugar',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-orange-sugar.webp',
-    imageSize: [400, 635],
-    source: 'https://www.heartodex.com/en/ingredients/orange-sugar',
-  },
-  {
-    id: 'ingredients/osmanthus-jam',
-    name: 'Osmanthus Jam',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-osmanthus-jam.webp',
-    imageSize: [400, 400],
-    source: 'https://www.heartodex.com/en/ingredients/osmanthus-jam',
-  },
-  {
-    id: 'ingredients/pasteurized-egg',
-    name: 'Pasteurized Egg',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-pasteurized-egg.webp',
-    imageSize: [400, 426],
-    source: 'https://www.heartodex.com/en/ingredients/pasteurized-egg',
-  },
-  {
-    id: 'ingredients/red-bean',
-    name: 'Red Bean',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-red-bean.webp',
-    imageSize: [400, 315],
-    source: 'https://www.heartodex.com/en/ingredients/red-bean',
-  },
-  {
-    id: 'ingredients/red-sugar',
-    name: 'Red Sugar',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-red-sugar.webp',
-    imageSize: [400, 635],
-    source: 'https://www.heartodex.com/en/ingredients/red-sugar',
-  },
-  {
-    id: 'ingredients/rice-flour',
-    name: 'Rice Flour',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-rice-flour.webp',
-    imageSize: [400, 348],
-    source: 'https://www.heartodex.com/en/ingredients/rice-flour',
-  },
-  {
-    id: 'ingredients/salsa-sauce',
-    name: 'Salsa Sauce',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-salsa-sauce.webp',
-    imageSize: [400, 396],
-    source: 'https://www.heartodex.com/en/ingredients/salsa-sauce',
-  },
-  {
-    id: 'ingredients/spirulina-powder',
-    name: 'Spirulina Powder',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-spirulina-powder.webp',
-    imageSize: [400, 400],
-    source: 'https://www.heartodex.com/en/ingredients/spirulina-powder',
-  },
-  {
-    id: 'ingredients/springday-brown-sugar',
-    name: 'Springday Brown Sugar',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-springday-brown-sugar.webp',
-    imageSize: [400, 596],
-    source: 'https://www.heartodex.com/en/ingredients/springday-brown-sugar',
-  },
-  {
-    id: 'ingredients/tea-leaves',
-    name: 'Tea Leaves',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-tea-leaves.webp',
-    imageSize: [400, 343],
-    source: 'https://www.heartodex.com/en/ingredients/tea-leaves',
-  },
-  {
-    id: 'ingredients/violet-sugar',
-    name: 'Violet Sugar',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-violet-sugar.webp',
-    imageSize: [400, 635],
-    source: 'https://www.heartodex.com/en/ingredients/violet-sugar',
-  },
-  {
-    id: 'ingredients/yellow-sugar',
-    name: 'Yellow Sugar',
-    type: 'Ingredient',
-    image: '/images/items/ingredients-yellow-sugar.webp',
-    imageSize: [400, 661],
-    source: 'https://www.heartodex.com/en/ingredients/yellow-sugar',
   },
   {
     id: 'recipes/apple-frosted-pancake',
@@ -1354,7 +1104,7 @@ export const items = [
   },
 ]
 
-/** Semua benda: `items` ditambah tanaman dan collectible (diturunkan dari datanya sendiri). */
+/** Semua benda: `items` ditambah tanaman, collectible, dan bahan (diturunkan dari datanya sendiri). */
 export const ALL_ITEMS = [
   ...items,
   ...Object.entries(OWN_DATA).flatMap(([segment, { type, entries }]) =>

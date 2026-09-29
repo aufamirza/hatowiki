@@ -1,15 +1,18 @@
-import { Sprout, TreeDeciduous } from 'lucide-react'
+import { ShoppingBasket, Sprout, TreeDeciduous } from 'lucide-react'
 import { COLLECTIBLE_CATEGORIES } from '../../data/collectibles/categories'
 import { COLLECTIBLES_TOTAL_IN_GAME, collectibles } from '../../data/collectibles/collectibles'
 import { CROP_CATEGORIES } from '../../data/crops/categories'
 import { CROPS_TOTAL_IN_GAME, crops } from '../../data/crops/crops'
+import { INGREDIENT_CATEGORIES } from '../../data/ingredients/categories'
+import { INGREDIENTS_TOTAL_IN_GAME, ingredients } from '../../data/ingredients/ingredients'
 import { LEVEL_FILTER, LOCATION_FILTER, categoryFilter } from '../catalog/filterDefs'
 import { SORT_OPTIONS, SORT_OPTIONS_NO_LEVEL } from '../catalog/listState'
 
 /**
- * Konfigurasi halaman daftar & detail Crops dan Collectibles (untuk CatalogListPage dan halaman detailnya). Nama
- * tampilan mengikuti pola kategori lain: nama Inggris dengan subjudul Indonesia. Filter mengikuti heartodex:
- * Crops = Level & Kategori, Collectibles = Lokasi & Kategori (collectible tidak punya level).
+ * Konfigurasi halaman daftar & detail Crops, Collectibles, dan Ingredients (untuk CatalogListPage dan halaman
+ * detailnya). Nama tampilan mengikuti pola kategori lain: nama Inggris dengan subjudul Indonesia. Filter mengikuti
+ * heartodex: Crops = Level & Kategori, Collectibles = Lokasi & Kategori (collectible tidak punya level), Ingredients =
+ * Kategori saja (bahan tidak punya level maupun lokasi).
  */
 export const CROP_KIND = {
   slug: 'crops',
@@ -50,7 +53,26 @@ export const COLLECTIBLE_KIND = {
   href: (entry) => (entry ? `/collectibles/${entry.slug}` : '/collectibles'),
 }
 
-export const GOODS_KINDS = { crops: CROP_KIND, collectibles: COLLECTIBLE_KIND }
+export const INGREDIENT_KIND = {
+  slug: 'ingredients',
+  name: 'Ingredients',
+  label: 'Bahan Masak',
+  noun: 'bahan masak',
+  icon: ShoppingBasket,
+  hobby: 'Dibeli di toko',
+  intro:
+    'Gula, telur, susu, dan bahan masak lain yang bisa kamu beli untuk hobi cooking. Pilih bahan untuk melihat harga, resep yang memakainya, dan hewan yang menyukainya.',
+  description: 'Gula, telur, susu, dan bahan masak lain yang bisa kamu beli, lengkap dengan harga dan resep yang memakainya.',
+  entries: ingredients,
+  totalInGame: INGREDIENTS_TOTAL_IN_GAME,
+  entryCategories: INGREDIENT_CATEGORIES,
+  detailCategoryEmoji: {},
+  sortOptions: SORT_OPTIONS_NO_LEVEL,
+  filters: [categoryFilter(INGREDIENT_CATEGORIES)],
+  href: (entry) => (entry ? `/ingredients/${entry.slug}` : '/ingredients'),
+}
+
+export const GOODS_KINDS = { crops: CROP_KIND, collectibles: COLLECTIBLE_KIND, ingredients: INGREDIENT_KIND }
 
 const formatNumber = new Intl.NumberFormat('id-ID')
 

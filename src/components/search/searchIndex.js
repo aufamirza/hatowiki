@@ -2,7 +2,8 @@ import { CATALOGS } from '../layout/catalogs'
 
 /**
  * Indeks pencarian global: nama semua entri di semua katalog (ikan, serangga, burung, hewan, resep, tanaman,
- * collectible), termasuk entri event.
+ * collectible, bahan masak), termasuk entri event. Nama yang sama di dua katalog (Egg: resep & bahan masak) tampil
+ * sebagai dua hasil, dibedakan oleh label katalognya.
  * Datanya lokal (file data yang sudah dimuat aplikasi), jadi pencarian berjalan langsung di browser.
  */
 

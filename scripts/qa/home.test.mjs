@@ -2,7 +2,7 @@
 /**
  * Uji beranda dan toolbar global di Chrome headless (lewat Chrome DevTools Protocol), untuk lebar 1280, 820, dan 390:
  * - Toolbar: sticky di beberapa halaman; menu Wildlife (dropdown, klik & keyboard) dan menu Wiki (Resep, Crops,
- *   Collectibles) di desktop; di ponsel menu pindah ke drawer (dialog modal: fokus terkunci, Escape, klik latar, tautan
+ *   Collectibles, Ingredients) di desktop; di ponsel menu pindah ke drawer (dialog modal: fokus terkunci, Escape, klik latar, tautan
  *   menutup drawer, scroll terkunci).
  * - Pencarian global: hasil dari semua kategori (gambar, nama, label kategori, tautan) dicocokkan dengan data,
  *   keyboard (panah, Enter, Escape), klik mouse, tanpa hasil, dan dropdown tidak melebar ke samping.
@@ -10,7 +10,7 @@
  *   teks, dijeda di luar layar, mati saat prefers-reduced-motion); Waktu Server 5 kotak (jam, UTC, periode, tata
  *   letak per lebar) sementara detail wildlife tetap versi daftar; Muncul Sekarang (server bawaan SEA, ganti server,
  *   isi & urutan dari data, hanya entri section Base Game, "Lihat semua" ke daftar berfilter waktu); kartu kategori
- *   (Wildlife + Resep, Crops, Collectibles) dengan jumlah dari data, termasuk entri event.
+ *   (Wildlife + Resep, Crops, Collectibles, Ingredients) dengan jumlah dari data, termasuk entri event.
  * - Gambar entri: kotak persegi (object-fit: contain) di Muncul Sekarang, contoh gambar kartu kategori, hiasan hero,
  *   dan thumbnail pencarian; gambar tinggi (Black Stork 400×846) tidak mengubah ukuran kotak; tile Muncul Sekarang
  *   sebaris sama tinggi, nama maks. 2 baris (teks lengkap di title), badge level di pojok gambar.
@@ -50,8 +50,8 @@ const serverClock = (offset, date = new Date()) => {
 
 // Kode di halaman: data semua katalog, label & tautan yang diharapkan, dan normalisasi teks pencarian.
 const LOAD_DATA = `
-  const [{ fish }, { bugs }, { birds }, { animals }, { recipes }, { crops }, { collectibles }] = await Promise.all(
-    ['/src/data/wildlife/fish.js', '/src/data/wildlife/bugs.js', '/src/data/wildlife/birds.js', '/src/data/wildlife/animals.js', '/src/data/recipes/recipes.js', '/src/data/crops/crops.js', '/src/data/collectibles/collectibles.js'].map((p) => import(p)),
+  const [{ fish }, { bugs }, { birds }, { animals }, { recipes }, { crops }, { collectibles }, { ingredients }] = await Promise.all(
+    ['/src/data/wildlife/fish.js', '/src/data/wildlife/bugs.js', '/src/data/wildlife/birds.js', '/src/data/wildlife/animals.js', '/src/data/recipes/recipes.js', '/src/data/crops/crops.js', '/src/data/collectibles/collectibles.js', '/src/data/ingredients/ingredients.js'].map((p) => import(p)),
   )
   const CATALOGS = [
     { slug: 'fish', name: 'Fish', label: 'Ikan', noun: 'ikan', entries: fish, list: '/wildlife/fish' },
@@ -61,6 +61,7 @@ const LOAD_DATA = `
     { slug: 'recipes', name: 'Recipes', label: 'Resep', noun: 'resep', entries: recipes, list: '/recipes' },
     { slug: 'crops', name: 'Crops', label: 'Tanaman', noun: 'tanaman', entries: crops, list: '/crops' },
     { slug: 'collectibles', name: 'Collectibles', label: 'Bahan Alam', noun: 'bahan alam', entries: collectibles, list: '/collectibles' },
+    { slug: 'ingredients', name: 'Ingredients', label: 'Bahan Masak', noun: 'bahan masak', entries: ingredients, list: '/ingredients' },
   ]
   const ALL = CATALOGS.flatMap((c) => c.entries.map((e) => ({ name: e.name, label: c.label, href: c.list + '/' + e.slug })))
   const norm = (t) => t.normalize('NFD').replace(/\\p{Diacritic}/gu, '').toLowerCase().replace(/['’]/g, '').replace(/[^\\p{L}\\p{N}]+/gu, ' ').trim()
@@ -273,7 +274,7 @@ async function runSuite(width) {
     await mouseClick(outside)
     const outsideState = await evaluate(`({ open: !!document.querySelector('.nav-menu__panel'), path: location.pathname })`)
     check('Menu Wildlife: klik di luar menutup menu (tanpa pindah halaman)', !outsideState.open && outsideState.path === '/wildlife/bugs', outsideState.path)
-    // Menu Wiki: Resep, Crops, Collectibles (tanpa tautan "Semua"); Resep tidak lagi berupa tautan terpisah di toolbar.
+    // Menu Wiki: Resep, Crops, Collectibles, Ingredients (tanpa tautan "Semua"); Resep tidak lagi berupa tautan terpisah di toolbar.
     const buttons = await evaluate(`[...document.querySelectorAll('.site-nav .nav-menu__button')].map((b) => b.textContent.trim())`)
     const plainLinks = await evaluate(`[...document.querySelectorAll('.site-nav > a')].map((a) => a.textContent.trim())`)
     await evaluate(`[...document.querySelectorAll('.nav-menu__button')].find((b) => b.textContent.trim() === 'Wiki').click()`); await sleep(300)
@@ -290,9 +291,9 @@ async function runSuite(width) {
     })()`)
     const counts = await evaluate(`(async () => { ${LOAD_DATA} return Object.fromEntries(CATALOGS.map((c) => [c.slug, c.entries.length])) })()`)
     check(
-      'Toolbar: menu Wildlife & Wiki (tanpa tautan Resep terpisah); Wiki berisi Resep, Crops, Collectibles (nama Inggris + label Indonesia & jumlah entri)',
+      'Toolbar: menu Wildlife & Wiki (tanpa tautan Resep terpisah); Wiki berisi Resep, Crops, Collectibles, Ingredients (nama Inggris + label Indonesia & jumlah entri)',
       buttons.join() === 'Wildlife,Wiki' && plainLinks.length === 0 && wiki.expanded === 'true' && !wiki.all && wiki.inView && wiki.items.every((i) => i.icon) &&
-        wiki.items.map((i) => `${i.name}|${i.meta}>${i.href}`).join() === `Recipes|Resep · ${counts.recipes} entri>/recipes,Crops|Tanaman · ${counts.crops} entri>/crops,Collectibles|Bahan Alam · ${counts.collectibles} entri>/collectibles`,
+        wiki.items.map((i) => `${i.name}|${i.meta}>${i.href}`).join() === `Recipes|Resep · ${counts.recipes} entri>/recipes,Crops|Tanaman · ${counts.crops} entri>/crops,Collectibles|Bahan Alam · ${counts.collectibles} entri>/collectibles,Ingredients|Bahan Masak · ${counts.ingredients} entri>/ingredients`,
       wiki.items.map((i) => `${i.name} (${i.meta})`).join(', '),
     )
     // Escape menutup menu dan mengembalikan fokus ke tombol Wiki; panah bawah membuka lagi & fokus ke tautan pertama.
@@ -335,9 +336,9 @@ async function runSuite(width) {
     await evaluate(`document.querySelector('.site-header .menu-button').click()`); await sleep(450)
     let drawer = await readDrawer()
     check('Drawer: tombol menu membuka dialog modal berlabel, fokus ke tombol tutup, scroll halaman terkunci', drawer.open && drawer.modal === 'true' && drawer.label === 'Menu' && drawer.expanded === 'true' && drawer.focusClose && drawer.locked && drawer.inView && drawer.overflow <= 0, JSON.stringify({ label: drawer.label, locked: drawer.locked, overflow: drawer.overflow }))
-    const expectedLinks = 'Beranda>/,Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Semua kategori wildlife>/wildlife,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles'
+    const expectedLinks = 'Beranda>/,Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Semua kategori wildlife>/wildlife,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles,Ingredients>/ingredients'
     const drawerGroups = await evaluate(`[...document.querySelectorAll('.drawer__group')].map((g) => g.textContent.trim()).join()`)
-    check('Drawer: tautan Beranda, grup Wildlife (Fish, Bugs, Birds, Animals, Semua kategori), grup Wiki (Resep, Crops, Collectibles), dengan ikon', drawer.links.map((l) => `${l.text}>${l.href}`).join() === expectedLinks && drawer.links.filter((l) => l.href !== '/wildlife').every((l) => l.icon) && drawerGroups === 'Wildlife,Wiki', drawer.links.map((l) => l.text).join(', '))
+    check('Drawer: tautan Beranda, grup Wildlife (Fish, Bugs, Birds, Animals, Semua kategori), grup Wiki (Resep, Crops, Collectibles, Ingredients), dengan ikon', drawer.links.map((l) => `${l.text}>${l.href}`).join() === expectedLinks && drawer.links.filter((l) => l.href !== '/wildlife').every((l) => l.icon) && drawerGroups === 'Wildlife,Wiki', drawer.links.map((l) => l.text).join(', '))
     // Tab dari elemen terakhir kembali ke elemen pertama (dan sebaliknya).
     await evaluate(`[...document.querySelectorAll('.drawer__panel a')].at(-1).focus()`)
     await KEY.tab()
@@ -459,7 +460,7 @@ async function runSuite(width) {
     found.push(hit && hit.label === sample.label && hit.href === sample.href ? `${sample.name} ✓` : `${sample.name} ✗ (${hit?.label} ${hit?.href})`)
     await KEY.escape(); await KEY.escape()
   }
-  check('Tiap kategori bisa dicari (ikan, serangga, burung, hewan, resep, tanaman, bahan alam) dengan label yang benar', found.every((f) => f.endsWith('✓')) && found.length === 7, found.join(', '))
+  check('Tiap kategori bisa dicari (ikan, serangga, burung, hewan, resep, tanaman, bahan alam, bahan masak) dengan label yang benar', found.every((f) => f.endsWith('✓')) && found.length === 8, found.join(', '))
   // Entri event (Prickly Pear, section Echo of Ancients) juga masuk pencarian.
   await openSearch()
   await type('prickly')
@@ -764,13 +765,13 @@ async function runSuite(width) {
       }
     })
   })()`)
-  check('Kategori: kartu Fish, Bugs, Birds, Animals, Recipes, Crops, Collectibles dengan tautan ke daftarnya', categories.map((c) => `${c.title}>${c.href}`).join() === 'Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles', categories.map((c) => c.title).join(', '))
-  check('Kategori: jumlah entri dihitung dari data (termasuk entri event: Crops 19, Collectibles 40)', categories.every((c) => c.count === c.expectedCount && c.noun === c.expectedNoun) && categories.find((c) => c.title === 'Crops')?.count === 19 && categories.find((c) => c.title === 'Collectibles')?.count === 40, categories.map((c) => `${c.count} ${c.noun}`).join(', '))
+  check('Kategori: kartu Fish, Bugs, Birds, Animals, Recipes, Crops, Collectibles, Ingredients dengan tautan ke daftarnya', categories.map((c) => `${c.title}>${c.href}`).join() === 'Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles,Ingredients>/ingredients', categories.map((c) => c.title).join(', '))
+  check('Kategori: jumlah entri dihitung dari data (termasuk entri event: Crops 19, Collectibles 40, Ingredients 32)', categories.every((c) => c.count === c.expectedCount && c.noun === c.expectedNoun) && categories.find((c) => c.title === 'Crops')?.count === 19 && categories.find((c) => c.title === 'Collectibles')?.count === 40 && categories.find((c) => c.title === 'Ingredients')?.count === 32, categories.map((c) => `${c.count} ${c.noun}`).join(', '))
   const titles = await evaluate(`[...document.querySelectorAll('.category-card')].map((card) => card.querySelector('.category-card__title').firstChild.textContent + '/' + card.querySelector('.category-card__label').textContent).join()`)
-  check('Kategori: nama Inggris dengan subjudul Indonesia (Crops/Tanaman, Collectibles/Bahan Alam)', titles.includes('Crops/Tanaman') && titles.includes('Collectibles/Bahan Alam'), titles)
+  check('Kategori: nama Inggris dengan subjudul Indonesia (Crops/Tanaman, Collectibles/Bahan Alam, Ingredients/Bahan Masak)', titles.includes('Crops/Tanaman') && titles.includes('Collectibles/Bahan Alam') && titles.includes('Ingredients/Bahan Masak'), titles)
   if (width >= 1080) {
     const rows = await evaluate(`[...document.querySelectorAll('.category-card')].map((c) => Math.round(c.getBoundingClientRect().top))`)
-    check('Kategori (desktop): baris Wildlife 4 kartu, baris Wiki 3 kartu', new Set(rows.slice(0, 4)).size === 1 && new Set(rows.slice(4)).size === 1 && rows[4] > rows[0], rows.join(','))
+    check('Kategori (desktop): baris Wildlife 4 kartu, baris Wiki 4 kartu', rows.length === 8 && new Set(rows.slice(0, 4)).size === 1 && new Set(rows.slice(4)).size === 1 && rows[4] > rows[0], rows.join(','))
   }
   check('Kategori: ikon, deskripsi singkat, dan 3 contoh gambar termuat', categories.every((c) => c.icon && c.desc > 20 && c.samples === 3), categories.map((c) => c.samples).join('/'))
   const sampleBoxes = await evaluate(`(async () => {

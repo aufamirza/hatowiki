@@ -1,5 +1,5 @@
 import { Coins, Hourglass, MapPin } from 'lucide-react'
-import { COLLECTIBLE_KIND, CROP_KIND, formatGrowthTime } from '../../pages/goods/goodsKinds'
+import { COLLECTIBLE_KIND, CROP_KIND, INGREDIENT_KIND, formatGrowthTime } from '../../pages/goods/goodsKinds'
 import CatalogCard from '../catalog/CatalogCard'
 import { formatCoins } from '../recipes/starValues'
 
@@ -58,6 +58,23 @@ export function CollectibleCard({ item, linkState }) {
       name={item.name}
       category={item.category}
       categoryEmoji={COLLECTIBLE_KIND.entryCategories[item.category]?.emoji}
+      facts={facts}
+    />
+  )
+}
+
+/** Kartu bahan masak di halaman daftar: gambar, badge kategori (tanpa level), dan harga beli. */
+export function IngredientCard({ item, linkState }) {
+  const facts = [{ key: 'buy', label: 'Harga beli', Icon: Coins, ...amount(item, 'buyPrice') }]
+  return (
+    <CatalogCard
+      to={INGREDIENT_KIND.href(item)}
+      linkState={linkState}
+      image={item.image}
+      imageSize={item.imageSize}
+      name={item.name}
+      category={item.category}
+      categoryEmoji={INGREDIENT_KIND.entryCategories[item.category]?.emoji}
       facts={facts}
     />
   )
