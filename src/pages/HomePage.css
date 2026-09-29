@@ -409,8 +409,8 @@
   padding: var(--space-4) var(--space-5);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
 }
 
 .server-picker {
@@ -522,12 +522,11 @@
   margin-top: var(--space-6);
 }
 
+/* Tiap kategori: baki datar berwarna kategori (tanpa garis & bayangan); yang taktil adalah tile di dalamnya */
 .now-group {
   padding: var(--space-5);
   border-radius: var(--radius-xl);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-md);
+  background: color-mix(in srgb, var(--tint) 62%, var(--color-bg));
 }
 
 .now-group__head {
@@ -545,7 +544,8 @@
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: var(--tint);
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 var(--card-edge-width) color-mix(in oklab, var(--tint) 70%, var(--tint-ink));
   color: var(--tint-ink);
 }
 
@@ -600,7 +600,8 @@
   min-width: 0;
 }
 
-/* Semua tile dalam satu baris sama tinggi: kotak gambar persegi + nama selalu setinggi dua baris */
+/* Semua tile dalam satu baris sama tinggi: kotak gambar persegi + nama selalu setinggi dua baris. Tile = kartu taktil
+   (hover menggeser warna garis & bayangan sedikit, ditekan turun seperti tombol). */
 .now-tile {
   --tile-pad: var(--space-2);
   position: relative;
@@ -611,19 +612,26 @@
   height: 100%;
   padding: var(--tile-pad) var(--tile-pad) var(--space-3);
   border-radius: var(--radius-lg);
-  border: 1px solid transparent;
+  background: var(--color-surface);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
   color: var(--color-text);
   text-align: center;
   text-decoration: none;
   transition:
-    transform var(--duration) var(--ease-out),
-    border-color var(--duration) ease,
-    background-color var(--duration) ease;
+    transform var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
 }
 
 .now-tile:hover {
-  border-color: var(--color-border);
-  background: var(--color-surface-sunken);
+  border-color: var(--card-edge-hover);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.now-tile:active {
+  box-shadow: var(--card-shadow-pressed);
+  transform: var(--card-press);
 }
 
 /* Kotak gambar persegi. Gambar diletakkan absolut (tidak ikut menentukan ukuran kotak) dalam kotak persegi
@@ -703,6 +711,38 @@
   }
 }
 
+/*
+ * Ponsel: tiap kategori jadi satu baris yang digeser ke samping dengan snap per tile. Baris dibuat selebar baki
+ * (margin negatif) dan tile berikutnya sedikit terlihat di tepi kanan sebagai tanda bisa digeser. Padding atas & bawah
+ * memberi ruang untuk bayangan keras dan cincin fokus.
+ */
+@media (max-width: 639px) {
+  .now-group {
+    overflow: hidden;
+  }
+
+  .now-grid {
+    grid-template-columns: none;
+    grid-auto-columns: 40%;
+    grid-auto-flow: column;
+    margin-inline: calc(var(--space-4) * -1);
+    padding: var(--space-1) var(--space-4) var(--space-2);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: var(--space-4);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .now-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .now-grid > li {
+    scroll-snap-align: start;
+  }
+}
+
 @media (max-width: 720px) {
   .now-controls {
     padding: var(--space-4);
@@ -732,82 +772,174 @@
   }
 }
 
-/* ================= Kategori ================= */
+/* ================= Kategori (bento) ================= */
+/*
+ * Ukuran kartu dipilih dari jumlah entri (CategorySection.jsx): besar (terbanyak), lebar (kedua), sedang (ketiga &
+ * keempat), kecil (sisanya); urutan tampil = urutan jumlah.
+ * Desktop 12 kolom: besar 6×2 baris di kiri; lebar 6 di kanan atas; dua sedang (3 + 3) di bawahnya; kecil 3 di baris
+ * terakhir. Tablet 4 kolom: besar 2×2, lebar 2, sedang & kecil 1. Ponsel 2 kolom: besar & lebar selebar baris.
+ * Tiap kartu berwarna kategorinya dengan garis tepi & bayangan keras yang diturunkan dari warna itu; contoh gambar
+ * sedikit keluar dari tepi kartu.
+ */
 .category-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-5);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-4);
+  /* Ruang untuk gambar yang keluar dari tepi atas kartu di baris pertama */
+  padding-top: var(--space-3);
 }
 
-/* 2 kolom; kartu terakhir yang sendirian dibuat selebar baris */
+.category-grid__item--xl,
+.category-grid__item--wide {
+  grid-column: 1 / -1;
+}
+
 @media (min-width: 640px) {
   .category-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-6) var(--space-5);
   }
 
-  .category-grid > :last-child:nth-child(odd) {
-    grid-column: 1 / -1;
+  .category-grid__item--xl {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .category-grid__item--wide {
+    grid-column: span 2;
   }
 }
 
-/* Delapan kategori: baris Wildlife (Fish, Bugs, Birds, Animals) dan baris Wiki (Resep, Crops, Collectibles,
-   Ingredients), masing-masing 4 kartu */
 @media (min-width: 1080px) {
   .category-grid {
     grid-template-columns: repeat(12, minmax(0, 1fr));
   }
 
-  .category-grid > *,
-  .category-grid > :last-child:nth-child(odd) {
+  .category-grid__item--xl {
+    grid-column: span 6;
+    grid-row: span 2;
+  }
+
+  .category-grid__item--wide {
+    grid-column: span 6;
+  }
+
+  .category-grid__item--md,
+  .category-grid__item--sm {
     grid-column: span 3;
   }
 }
 
 .category-card {
+  /* Kartu taktil di atas warna kategori: garis tepi sedikit lebih gelap dari permukaannya, bayangan keras lebih gelap lagi */
+  --card-edge: color-mix(in oklab, var(--tint) 78%, var(--tint-ink));
+  --card-drop: color-mix(in oklab, var(--tint) 60%, var(--tint-ink));
+  --art-size: 76px;
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
   height: 100%;
-  padding: var(--space-6);
+  padding: var(--space-5);
   border-radius: var(--radius-xl);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  background: var(--tint);
+  border: var(--card-edge-width) solid var(--card-edge);
+  box-shadow: 0 var(--card-drop-y) 0 var(--card-drop);
   color: var(--color-text);
   text-decoration: none;
-  transition: border-color var(--duration) ease;
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .category-card:hover {
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  --card-edge: color-mix(in oklab, var(--tint) 62%, var(--tint-ink));
 }
 
+.category-card:active {
+  box-shadow: 0 var(--card-drop-y-pressed) 0 var(--card-drop);
+  transform: var(--card-press);
+}
+
+/* ---------- Contoh gambar: stiker yang menyembul dari pojok kanan atas ---------- */
+.category-card__art {
+  position: absolute;
+  top: -14px;
+  right: -8px;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+/* Tiap contoh gambar berupa kotak persegi (object-fit: contain), jadi gambar tinggi seperti Black Stork atau
+   Milkshake tidak mengubah ukuran kartu */
+.category-card__sample {
+  flex: none;
+  width: var(--art-size);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 4px var(--stage-shadow));
+  transition: transform var(--duration) var(--ease-out);
+}
+
+.category-card__sample:nth-child(1) {
+  rotate: 8deg;
+}
+
+.category-card__sample + .category-card__sample {
+  margin-left: calc(var(--art-size) * -0.3);
+}
+
+.category-card__sample:nth-child(2) {
+  rotate: -6deg;
+  translate: 0 -12%;
+}
+
+.category-card__sample:nth-child(3) {
+  rotate: 5deg;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .category-card:hover .category-card__sample:nth-child(1) {
+    transform: translateY(-5px) rotate(4deg);
+  }
+
+  .category-card:hover .category-card__sample:nth-child(2) {
+    transform: translateY(-7px) rotate(-4deg);
+  }
+
+  .category-card:hover .category-card__sample:nth-child(3) {
+    transform: translateY(-5px) rotate(4deg);
+  }
+}
+
+/* ---------- Isi kartu ---------- */
 .category-card__head {
   display: flex;
-  align-items: center;
-  gap: var(--space-4);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 0;
 }
 
 .category-card__icon {
   display: grid;
   flex: none;
   place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  background: var(--tint);
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 var(--card-edge-width) var(--card-edge);
   color: var(--tint-ink);
-  transition: transform var(--duration) var(--ease-out);
 }
 
 .category-card__icon svg {
-  width: 28px;
-  height: 28px;
-  stroke-width: 1.75;
-}
-
-.category-card:hover .category-card__icon {
-  transform: rotate(-6deg);
+  width: 23px;
+  height: 23px;
+  stroke-width: 1.8;
 }
 
 .category-card__titles {
@@ -830,9 +962,9 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0 var(--space-2);
-  font-size: var(--text-2xl);
+  font-size: var(--text-xl);
   font-weight: 650;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .category-card__label {
@@ -843,60 +975,18 @@
 }
 
 .category-card__desc {
-  flex: 1;
+  max-width: 34ch;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
-/* Panggung contoh gambar: warna kategori memudar ke permukaan kartu */
-.category-card__stage {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  height: 116px;
-  padding: var(--space-3) var(--space-3) var(--space-2);
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  background:
-    radial-gradient(ellipse at 50% 100%, var(--stage-glow), transparent 70%),
-    linear-gradient(to bottom, var(--tint), color-mix(in srgb, var(--tint) 45%, var(--color-surface)));
-}
-
-/* Tiap contoh gambar berupa kotak persegi (object-fit: contain), jadi gambar tinggi seperti Black Stork atau
-   Milkshake tidak memanjangkan panggung */
-.category-card__sample {
-  width: min(30%, 84px);
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
-  filter: drop-shadow(0 6px 6px var(--stage-shadow));
-  transition: transform var(--duration) var(--ease-out);
-}
-
-.category-card__sample:nth-child(2) {
-  position: relative;
-  z-index: 1;
-  width: min(36%, 96px);
-  margin-inline: -3%;
-}
-
-.category-card:hover .category-card__sample:nth-child(1) {
-  transform: translateY(-4px) rotate(-6deg);
-}
-
-.category-card:hover .category-card__sample:nth-child(2) {
-  transform: translateY(-6px) scale(1.04);
-}
-
-.category-card:hover .category-card__sample:nth-child(3) {
-  transform: translateY(-4px) rotate(6deg);
-}
-
 .category-card__footer {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: baseline;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-1) var(--space-3);
+  margin-top: auto;
   font-size: var(--text-sm);
 }
 
@@ -905,7 +995,7 @@
 }
 
 .category-card__count strong {
-  margin-right: 2px;
+  margin-right: 3px;
   font-family: var(--font-body);
   font-size: var(--text-xl);
   font-weight: 800;
@@ -931,6 +1021,211 @@
   transform: translateX(4px);
 }
 
+/* ---------- Kecil & sedang: ikon sebaris dengan stiker, nama di bawahnya; tombol panah bulat ---------- */
+.category-card[data-size='sm'] .category-card__hobby {
+  display: none;
+}
+
+.category-card[data-size='md'] {
+  --art-size: 84px;
+}
+
+:is(.category-card[data-size='md'], .category-card[data-size='sm']) .category-card__footer {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+:is(.category-card[data-size='md'], .category-card[data-size='sm']) .category-card__cta {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 var(--card-edge-width) var(--card-edge);
+}
+
+:is(.category-card[data-size='md'], .category-card[data-size='sm']) .category-card__cta-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+/* Desktop: kartu kecil lebih pendek, ikon & nama sebaris (nama boleh turun baris sebelum menyentuh stiker) */
+@media (min-width: 1080px) {
+  .category-card[data-size='sm'] .category-card__head {
+    flex-direction: row;
+    align-items: center;
+    padding-right: calc(var(--art-size) * 0.6);
+  }
+}
+
+/* ---------- Lebar: teks di kiri, tiga stiker di kanan ---------- */
+.category-card[data-size='wide'] {
+  --art-size: clamp(84px, 9vw, 108px);
+  padding-right: calc(var(--art-size) * 2.3);
+}
+
+.category-card[data-size='wide'] .category-card__head {
+  flex-direction: row;
+  align-items: center;
+}
+
+.category-card[data-size='wide'] .category-card__title {
+  font-size: var(--text-2xl);
+}
+
+.category-card[data-size='wide'] .category-card__art {
+  top: -18px;
+  right: -10px;
+}
+
+/* ---------- Besar: judul & angka besar, kolase tiga stiker besar di kanan ---------- */
+.category-card[data-size='xl'] {
+  --art-size: clamp(100px, 10.5vw, 136px);
+  gap: var(--space-4);
+  min-height: 22rem;
+  padding: var(--space-6);
+}
+
+.category-card[data-size='xl'] .category-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+}
+
+.category-card[data-size='xl'] .category-card__icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.category-card[data-size='xl'] .category-card__title {
+  font-size: var(--text-3xl);
+}
+
+.category-card[data-size='xl'] .category-card__desc {
+  max-width: 24ch;
+  font-size: var(--text-base);
+}
+
+.category-card[data-size='xl'] .category-card__footer {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.category-card[data-size='xl'] .category-card__count strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 2rem + 3vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.category-card[data-size='xl'] .category-card__art {
+  top: -20px;
+  right: -14px;
+  bottom: var(--space-12);
+  display: grid;
+  grid-template-columns: repeat(2, var(--art-size));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  align-items: center;
+}
+
+.category-card[data-size='xl'] .category-card__sample {
+  margin: 0;
+  translate: none;
+}
+
+.category-card[data-size='xl'] .category-card__sample:nth-child(1) {
+  grid-area: 1 / 2;
+}
+
+.category-card[data-size='xl'] .category-card__sample:nth-child(2) {
+  grid-area: 2 / 1 / span 2;
+  width: calc(var(--art-size) * 1.15);
+}
+
+.category-card[data-size='xl'] .category-card__sample:nth-child(3) {
+  grid-area: 3 / 2;
+}
+
+/* Tablet & ponsel: kartu lebar memakai susunan kartu lain (stiker di pojok, teks selebar kartu); jumlah entri kartu
+   sedang & kecil tidak terbungkus */
+@media (max-width: 1079px) {
+  .category-card[data-size='wide'] {
+    --art-size: 88px;
+    padding-right: var(--space-5);
+  }
+
+  .category-card[data-size='wide'] .category-card__head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .category-card[data-size='wide'] .category-card__desc {
+    max-width: 40ch;
+  }
+
+  :is(.category-card[data-size='md'], .category-card[data-size='sm']) .category-card__count {
+    font-size: var(--text-xs);
+    white-space: nowrap;
+  }
+
+  /* Dua stiker di kartu sempit: dikecilkan supaya tidak menutupi ikon */
+  .category-card[data-size='md'] {
+    --art-size: 64px;
+  }
+}
+
+/* Ponsel: kartu besar tidak perlu setinggi dua baris */
+@media (max-width: 639px) {
+  .category-card {
+    --art-size: 64px;
+    padding: var(--space-4);
+  }
+
+  .category-card[data-size='wide'] {
+    --art-size: 80px;
+    padding-right: var(--space-4);
+  }
+
+  .category-card[data-size='wide'] .category-card__desc {
+    max-width: none;
+  }
+
+  /* Kartu besar di ponsel: stiker berjajar di pojok kanan atas seperti kartu lain, teks selebar kartu di bawahnya */
+  .category-card[data-size='xl'] {
+    --art-size: 84px;
+    min-height: 0;
+    padding: var(--space-5);
+  }
+
+  .category-card[data-size='xl'] .category-card__art {
+    top: -14px;
+    right: -8px;
+    bottom: auto;
+    display: flex;
+  }
+
+  .category-card[data-size='xl'] .category-card__sample:nth-child(n) {
+    grid-area: auto;
+    width: var(--art-size);
+  }
+
+  .category-card[data-size='xl'] .category-card__sample + .category-card__sample {
+    margin-left: calc(var(--art-size) * -0.3);
+  }
+
+  .category-card[data-size='xl'] .category-card__desc {
+    max-width: none;
+  }
+}
+
 @media (max-width: 720px) {
   .home-section {
     padding-top: var(--space-12);
@@ -938,9 +1233,5 @@
 
   .home-time {
     padding-top: var(--space-4);
-  }
-
-  .category-card {
-    padding: var(--space-5);
   }
 }

@@ -1,0 +1,301 @@
+/*
+ * Pita siklus hari (beranda), di dalam satu kotak taktil.
+ * Lebar: label server (nama + jam) di atas, garis penghubung, pita 24 jam, lalu skala (nama periode di tengah tiap
+ *   bagian, jam batas di bawah garis pergantiannya).
+ * Sempit (.day-cycle--vertical, dipasang dari DayCycle.jsx): skala | pita | garis | label, 00 di atas → 24 di bawah.
+ * Posisi label (--at) dihitung di JS supaya label yang berdekatan tidak saling menutupi (lihat dayCycleLayout.js).
+ */
+.day-cycle {
+  padding: var(--space-5) var(--space-6);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+}
+
+.day-cycle__figure {
+  --band-thickness: 44px;
+  --leader: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'labels'
+    'leaders'
+    'band'
+    'scale';
+}
+
+/* ---------- Label server: semua ditumpuk di sel yang sama, digeser ke posisinya ---------- */
+.day-cycle__labels {
+  grid-area: labels;
+  display: grid;
+  align-items: end;
+  justify-items: start;
+}
+
+.day-cycle__label {
+  --period-ink: var(--color-text);
+  position: relative;
+  left: var(--at);
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 12px 7px;
+  border-radius: 12px;
+  background: var(--color-surface);
+  border: var(--card-border);
+  box-shadow: 0 2px 0 var(--card-drop);
+  line-height: 1.1;
+  white-space: nowrap;
+  translate: -50% 0;
+}
+
+.day-cycle__server {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+
+.day-cycle__server svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.25;
+  color: var(--period-ink);
+}
+
+/* Font body: angka tabularnya sama lebar, jadi label tidak bergoyang saat menit berganti */
+.day-cycle__clock {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.day-cycle [data-period='Night'] { --period-ink: var(--color-night-ink); }
+.day-cycle [data-period='Dawn'] { --period-ink: var(--color-dawn-ink); }
+.day-cycle [data-period='Day'] { --period-ink: var(--color-day-ink); }
+.day-cycle [data-period='Dusk'] { --period-ink: var(--color-dusk-ink); }
+
+/* ---------- Garis penghubung label → penanda ---------- */
+.day-cycle__leaders {
+  grid-area: leaders;
+  display: block;
+  width: 100%;
+  height: var(--leader);
+  overflow: visible;
+}
+
+.day-cycle__leaders path {
+  fill: none;
+  stroke: var(--cycle-leader);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ---------- Pita 24 jam ---------- */
+.day-cycle__band {
+  --cycle-dir: to right;
+  position: relative;
+  grid-area: band;
+  height: var(--band-thickness);
+}
+
+.day-cycle__track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 0 1.5px rgba(23, 24, 58, 0.14);
+}
+
+.day-cycle__period {
+  flex: 1;
+}
+
+/* Malam: biru pekat dengan beberapa bintang kecil */
+.day-cycle__period[data-period='Night'] {
+  background:
+    radial-gradient(1.4px 1.4px at 18% 30%, var(--cycle-star) 50%, transparent 100%),
+    radial-gradient(1.1px 1.1px at 38% 68%, var(--cycle-star) 50%, transparent 100%),
+    radial-gradient(1.6px 1.6px at 57% 24%, var(--cycle-star) 50%, transparent 100%),
+    radial-gradient(1.1px 1.1px at 76% 58%, var(--cycle-star) 50%, transparent 100%),
+    radial-gradient(1.3px 1.3px at 90% 20%, var(--cycle-star) 50%, transparent 100%),
+    linear-gradient(var(--cycle-dir), var(--cycle-night-from), var(--cycle-night-to));
+}
+
+.day-cycle__period[data-period='Dawn'] {
+  background: linear-gradient(var(--cycle-dir), var(--cycle-dawn-from), var(--cycle-dawn-to));
+}
+
+.day-cycle__period[data-period='Day'] {
+  background: linear-gradient(var(--cycle-dir), var(--cycle-day-from), var(--cycle-day-to));
+}
+
+.day-cycle__period[data-period='Dusk'] {
+  background: linear-gradient(var(--cycle-dir), var(--cycle-dusk-from), var(--cycle-dusk-to));
+}
+
+/* Penanda server: jarum melintang pita + kenop di tepi yang menghadap label; lingkar --cycle-halo supaya terlihat di
+   bagian gelap maupun terang */
+.day-cycle__marker {
+  position: absolute;
+  inset-block: 0;
+  left: calc(var(--pos) * 100%);
+  width: 2px;
+  background: var(--cycle-needle);
+  box-shadow: 0 0 0 1.5px var(--cycle-halo);
+  translate: -50% 0;
+}
+
+.day-cycle__marker::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cycle-needle);
+  box-shadow: 0 0 0 2px var(--cycle-halo);
+  translate: -50% 0;
+}
+
+/* ---------- Skala: nama periode & jam batas ---------- */
+.day-cycle__scale {
+  position: relative;
+  grid-area: scale;
+  height: 1.5rem;
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  line-height: 1.5rem;
+}
+
+.day-cycle__name,
+.day-cycle__hour {
+  position: absolute;
+  top: 0;
+  left: calc(var(--pos) * 100%);
+  white-space: nowrap;
+  translate: -50% 0;
+}
+
+.day-cycle__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 700;
+}
+
+.day-cycle__name svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.25;
+  color: var(--period-ink);
+}
+
+.day-cycle__hour {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.day-cycle__hour--start {
+  translate: 0 0;
+}
+
+.day-cycle__hour--end {
+  translate: -100% 0;
+}
+
+/* ---------- Vertikal (wadah sempit) ---------- */
+.day-cycle--vertical {
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-3);
+}
+
+.day-cycle--vertical .day-cycle__figure {
+  --band-thickness: 34px;
+  --leader: 26px;
+  grid-template-columns: 5.25rem var(--band-thickness) var(--leader) minmax(0, 1fr);
+  grid-template-rows: 22rem;
+  grid-template-areas: 'scale band leaders labels';
+}
+
+.day-cycle--vertical .day-cycle__labels {
+  align-items: start;
+}
+
+.day-cycle--vertical .day-cycle__label {
+  top: var(--at);
+  left: 0;
+  flex-direction: row;
+  gap: var(--space-2);
+  padding: 5px 10px;
+  translate: 0 -50%;
+}
+
+.day-cycle--vertical .day-cycle__clock {
+  font-size: 1rem;
+}
+
+.day-cycle--vertical .day-cycle__leaders {
+  width: var(--leader);
+  height: 100%;
+}
+
+.day-cycle--vertical .day-cycle__band {
+  --cycle-dir: to bottom;
+  height: auto;
+}
+
+.day-cycle--vertical .day-cycle__track {
+  flex-direction: column;
+}
+
+.day-cycle--vertical .day-cycle__marker {
+  inset-block: auto;
+  inset-inline: 0;
+  top: calc(var(--pos) * 100%);
+  width: auto;
+  height: 2px;
+  translate: 0 -50%;
+}
+
+.day-cycle--vertical .day-cycle__marker::before {
+  top: 50%;
+  right: -5px;
+  left: auto;
+  translate: 0 -50%;
+}
+
+.day-cycle--vertical .day-cycle__scale {
+  height: auto;
+  margin: 0 var(--space-2) 0 0;
+}
+
+.day-cycle--vertical .day-cycle__name {
+  top: calc(var(--pos) * 100%);
+  left: 0;
+  translate: 0 -50%;
+}
+
+.day-cycle--vertical .day-cycle__hour {
+  top: calc(var(--pos) * 100%);
+  right: 0;
+  left: auto;
+  translate: 0 -50%;
+}
+
+.day-cycle--vertical .day-cycle__hour--start {
+  translate: 0 0;
+}
+
+.day-cycle--vertical .day-cycle__hour--end {
+  translate: 0 -100%;
+}

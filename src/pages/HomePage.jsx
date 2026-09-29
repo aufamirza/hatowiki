@@ -1,11 +1,11 @@
-import ServerTime from '../components/ServerTime'
+import DayCycle from '../components/DayCycle'
 import { usePageTitle } from '../hooks/usePageTitle'
 import CategorySection from './home/CategorySection'
 import HomeHero from './home/HomeHero'
 import NowAppearing from './home/NowAppearing'
 import './HomePage.css'
 
-// Beranda: hero, waktu server (versi kotak), kartu kategori, dan Muncul Sekarang.
+// Beranda: hero, waktu server (pita siklus hari), kartu kategori, dan Muncul Sekarang.
 function HomePage() {
   usePageTitle()
 
@@ -23,7 +23,7 @@ function HomePage() {
               dan burung mengikuti periode ini.
             </p>
           </header>
-          <ServerTime variant="cards" />
+          <DayCycle />
         </div>
       </section>
 

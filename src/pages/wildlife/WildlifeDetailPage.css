@@ -49,14 +49,14 @@
   }
 }
 
-/* Panel dasar */
+/* Panel dasar: kotak taktil (garis tepi tipis + bayangan keras, token --card-* di tokens.css) */
 .panel {
   container-type: inline-size;
   padding: var(--space-6);
   border-radius: var(--radius-xl);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-md);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
 }
 
 .panel__title {

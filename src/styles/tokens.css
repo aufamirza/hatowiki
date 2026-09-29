@@ -242,6 +242,44 @@
   --shadow-md: 0 1px 2px rgba(35, 40, 90, 0.04), 0 8px 20px -12px rgba(35, 40, 90, 0.18);
   --shadow-lg: 0 2px 6px rgba(35, 40, 90, 0.05), 0 18px 40px -18px rgba(35, 40, 90, 0.3);
 
+  /*
+   * Kartu & kotak taktil (kartu daftar, kotak halaman detail, kartu beranda): garis tepi tipis sedikit lebih gelap dari
+   * permukaan kartu, plus bayangan keras tanpa blur yang bergeser ke bawah, berwarna tint lavender dari aksen.
+   * Hover hanya menggeser warna garis & bayangan sedikit ke aksen; saat ditekan kartu turun dan bayangannya mengecil.
+   * --card-edge: garis tepi, --card-drop: bayangan, --card-drop-y: jarak bayangan (ditekan: --card-drop-y-pressed).
+   */
+  --card-edge-width: 1.5px;
+  --card-edge: #d6d8ec;
+  --card-edge-hover: #bdb4ec;
+  --card-drop: #d9d3f6;
+  --card-drop-hover: #c8bef2;
+  --card-drop-y: 3px;
+  --card-drop-y-pressed: 1px;
+  --card-border: var(--card-edge-width) solid var(--card-edge);
+  --card-shadow: 0 var(--card-drop-y) 0 var(--card-drop);
+  --card-shadow-hover: 0 var(--card-drop-y) 0 var(--card-drop-hover);
+  --card-shadow-pressed: 0 var(--card-drop-y-pressed) 0 var(--card-drop-hover);
+  --card-press: translateY(calc(var(--card-drop-y) - var(--card-drop-y-pressed)));
+
+  /*
+   * Pita siklus hari di beranda (24 jam): tiap periode punya gradasi suasananya sendiri, dari kiri ke kanan mengikuti
+   * jam. Night biru malam pekat, Dawn jingga kemerahan, Day terang (kuning matahari ke biru langit), Dusk jingga ke
+   * ungu. --cycle-needle = jarum penanda server di atas pita (dengan lingkar --cycle-halo supaya terlihat di semua
+   * warna), --cycle-leader = garis dari penanda ke label.
+   */
+  --cycle-night-from: #1b1d4b;
+  --cycle-night-to: #3a3584;
+  --cycle-dawn-from: #df5d4d;
+  --cycle-dawn-to: #f7ad62;
+  --cycle-day-from: #fff0b3;
+  --cycle-day-to: #bfe1f6;
+  --cycle-dusk-from: #f39a5f;
+  --cycle-dusk-to: #7b4ea3;
+  --cycle-star: rgba(255, 255, 255, 0.85);
+  --cycle-needle: #17183a;
+  --cycle-halo: #ffffff;
+  --cycle-leader: #8d90b3;
+
   /* Toolbar melayang (pil): latar semi transparan + blur. --toolbar-bg-solid dipakai browser tanpa backdrop-filter. */
   --toolbar-bg: color-mix(in srgb, var(--color-surface) 74%, transparent);
   --toolbar-bg-solid: var(--color-surface);
@@ -405,6 +443,27 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
   --shadow-md: inset 0 1px 0 rgba(225, 228, 255, 0.04), 0 12px 28px -12px rgba(0, 0, 0, 0.6);
   --shadow-lg: inset 0 1px 0 rgba(225, 228, 255, 0.05), 0 24px 48px -20px rgba(0, 0, 0, 0.72);
+
+  /* Kartu taktil di gelap: garis tepi sedikit lebih terang dari permukaan (garis yang lebih gelap tenggelam di latar
+     gelap), bayangan keras ungu tua bernuansa aksen. */
+  --card-edge: #34376b;
+  --card-edge-hover: #5a5199;
+  --card-drop: #2b2863;
+  --card-drop-hover: #3b3584;
+
+  /* Pita siklus hari: warna sama, sedikit diredam supaya tidak menyilaukan di latar gelap */
+  --cycle-night-from: #10122f;
+  --cycle-night-to: #2a2766;
+  --cycle-dawn-from: #b94c41;
+  --cycle-dawn-to: #cf8a4c;
+  --cycle-day-from: #d8c783;
+  --cycle-day-to: #8fb6cf;
+  --cycle-dusk-from: #c7744c;
+  --cycle-dusk-to: #5e3d86;
+  --cycle-star: rgba(248, 244, 255, 0.8);
+  --cycle-needle: #f4f2ff;
+  --cycle-halo: #13142a;
+  --cycle-leader: #6d71a3;
 
   --toolbar-bg: color-mix(in srgb, var(--color-surface) 72%, transparent);
   --toolbar-bg-solid: var(--color-surface);

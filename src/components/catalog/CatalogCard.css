@@ -14,16 +14,26 @@
   padding: var(--card-pad) var(--card-pad) var(--space-4);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
   color: var(--color-text);
   text-decoration: none;
-  transition: border-color var(--duration) ease;
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    transform var(--duration-fast) var(--ease-out);
 }
 
-/* Hover: kartu tidak terangkat; garis tepi berwarna aksen dan gambarnya yang bergerak (lihat di bawah) */
+/* Kartu taktil. Hover: kartu tidak terangkat; garis tepi & bayangan sedikit bergeser ke aksen dan gambarnya yang
+   bergerak (lihat di bawah). Ditekan: kartu turun dan bayangannya mengecil seperti tombol. */
 .entry-card:hover {
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  border-color: var(--card-edge-hover);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.entry-card:active {
+  box-shadow: var(--card-shadow-pressed);
+  transform: var(--card-press);
 }
 
 .entry-card:focus-visible {

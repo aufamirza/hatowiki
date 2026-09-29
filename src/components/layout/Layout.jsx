@@ -86,7 +86,17 @@ function SiteFooter() {
             Hatowiki adalah proyek komunitas tidak resmi untuk Heartopia dan tidak berafiliasi dengan XD
             Entertainment Co., Ltd. Semua aset game adalah milik XD Entertainment Co., Ltd.
           </p>
-          <p>© 2026 Hatowiki · Dibuat untuk komunitas</p>
+          <p className="site-footer__meta">
+            <span>© 2026 Hatowiki · Dibuat untuk komunitas</span>
+            {/* Ikon X dari Simple Icons (CC0), satu warna mengikuti teks */}
+            <a href="https://x.com/pingkendi" className="site-footer__social" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+              </svg>
+              @pingkendi
+              <span className="visually-hidden"> di X (membuka tab baru)</span>
+            </a>
+          </p>
         </div>
       </div>
     </footer>

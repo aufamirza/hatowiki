@@ -67,10 +67,9 @@
   line-height: 1;
 }
 
-/* Badge periode (versi daftar & kartu; .period-badge untuk tempat lain, mis. Muncul Sekarang di beranda).
+/* Badge periode (versi daftar; .period-badge untuk tempat lain, mis. Muncul Sekarang di beranda).
    Di daftar selebar kolomnya, jadi kelima badge sama lebar dan ikonnya sejajar. */
 .server-row__period,
-.server-card__period,
 .period-badge {
   --period-bg: var(--color-surface);
   --period-ink: var(--color-text);
@@ -93,7 +92,6 @@
 }
 
 .server-row__period svg,
-.server-card__period svg,
 .period-badge svg {
   flex: none;
   width: 14px;
@@ -155,103 +153,5 @@
   .server-row__period svg {
     width: 13px;
     height: 13px;
-  }
-}
-
-/* ---------- Varian kartu (beranda): lima kotak terpisah dengan jam besar ---------- */
-.server-cards {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-}
-
-.server-card {
-  --period-bg: var(--color-surface-sunken);
-  --period-ink: var(--color-text);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-3);
-  min-width: 0;
-  padding: var(--space-4) var(--space-5) var(--space-5);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  /* Nuansa warna periode di bagian atas kotak, memudar ke warna permukaan */
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--period-bg) 75%, var(--color-surface)), var(--color-surface) 70%);
-  box-shadow: var(--shadow-md);
-}
-
-.server-card__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2);
-  align-self: stretch;
-  line-height: 1.25;
-}
-
-.server-card__name {
-  font-size: var(--text-sm);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.server-card__offset {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--color-text-muted);
-  white-space: nowrap;
-}
-
-/* Font body: angka tabularnya benar-benar sama lebar (Fraunces tidak punya angka tabular). */
-.server-card__clock {
-  font-family: var(--font-body);
-  font-size: 2rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-
-/* Sempit (ponsel): 2 kolom; kotak kelima selebar baris dengan susunan mendatar supaya tidak ada ruang kosong. */
-@container (max-width: 559px) {
-  .server-card:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .server-card:last-child:nth-child(odd) .server-card__head {
-    flex-direction: column;
-    align-self: auto;
-    gap: 0;
-  }
-}
-
-/* Sedang (tablet): 3 + 2, baris kedua di tengah. */
-@container (min-width: 560px) and (max-width: 899px) {
-  .server-cards {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-
-  .server-card {
-    grid-column: span 2;
-  }
-
-  .server-card:nth-child(4):nth-last-child(2) {
-    grid-column: 2 / span 2;
-  }
-}
-
-/* Lebar (desktop): 5 kolom. */
-@container (min-width: 900px) {
-  .server-cards {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: var(--space-4);
-  }
-
-  .server-card__clock {
-    font-size: 2.375rem;
   }
 }

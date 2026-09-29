@@ -368,6 +368,34 @@
   line-height: 1.7;
 }
 
+/* Baris kredit: hak cipta lalu tautan X kecil (ikon + @nama) berwarna teks sekunder, tidak mencolok */
+.site-footer__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-3);
+}
+
+.site-footer__social {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-footer__social:hover {
+  text-decoration: underline;
+}
+
+.site-footer__social svg {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  fill: currentColor;
+}
+
 /* Toolbar seluler: logo | cari, tema, menu. Menu pindah ke drawer, pencarian ke balik tombol ikon. Pil lebih rapat ke
    tepi layar dan lebih pendek supaya tidak menutupi banyak konten. */
 @media (max-width: 759px) {

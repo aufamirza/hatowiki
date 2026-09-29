@@ -1774,7 +1774,8 @@ async function runSuite(width, kind) {
     }
   }
 
-  const problems = tab.logs.filter((line) => !/\[vite\] connect|React DevTools/.test(line))
+  // Log debug Vercel Web Analytics hanya muncul di mode dev (tanpa request ke server), jadi diabaikan.
+  const problems = tab.logs.filter((line) => !/\[vite\] connect|React DevTools|\[Vercel Web Analytics\]/.test(line))
   check('Console bersih selama uji', problems.length === 0, problems.join(' | '))
   await tab.close()
   return results

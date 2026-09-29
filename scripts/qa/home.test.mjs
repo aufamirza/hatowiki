@@ -10,14 +10,19 @@
  *   keyboard (panah, Enter, Escape), klik mouse, tanpa hasil, dan dropdown tidak melebar ke samping.
  * - Beranda: klaim & tombol mati sudah hilang; hero dengan judul besar, tagline satu kalimat, dan kolom cari global
  *   (pencarian toolbar tersembunyi selama hero terlihat), pemandangan & hiasan dari aset lokal (tidak menutupi
- *   teks, dijeda di luar layar, mati saat prefers-reduced-motion); Waktu Server 5 kotak (jam, UTC, periode, tata
- *   letak per lebar) sementara detail wildlife tetap versi daftar; Muncul Sekarang (server bawaan SEA, ganti server,
- *   isi & urutan dari data, hanya entri section Base Game, "Lihat semua" ke daftar berfilter waktu); kartu kategori
- *   (Wildlife + Resep, Crops, Collectibles, Ingredients) dengan jumlah dari data, termasuk entri event.
+ *   teks, dijeda di luar layar, mati saat prefers-reduced-motion); Waktu Server berupa pita siklus hari 24 jam (empat
+ *   periode, penanda tiap server di posisi jamnya dengan nama & jam, label tidak saling menutupi di semua jam, pita
+ *   vertikal di ponsel, daftar teks untuk pembaca layar) sementara detail wildlife tetap versi daftar; Muncul Sekarang
+ *   (server bawaan SEA, ganti server, isi & urutan dari data, hanya entri section Base Game, "Lihat semua" ke daftar
+ *   berfilter waktu, baris geser dengan snap di ponsel); kartu kategori bento (ukuran dari jumlah entri, jumlah dari
+ *   data termasuk entri event, gambar sedikit keluar dari kartu).
+ * - Kartu taktil: kartu beranda, kartu daftar, dan kotak detail memakai garis tepi 1,5px & bayangan keras tanpa blur
+ *   berwarna tint (bukan hitam); hover tidak mengangkat kartu, ditekan kartu turun & bayangannya mengecil.
  * - Gambar entri: kotak persegi (object-fit: contain) di Muncul Sekarang, contoh gambar kartu kategori, hiasan hero,
  *   dan thumbnail pencarian; gambar tinggi (Black Stork 400×846) tidak mengubah ukuran kotak; tile Muncul Sekarang
  *   sebaris sama tinggi, nama maks. 2 baris (teks lengkap di title), badge level di pojok gambar.
- * - Footer: tombol unduh App Store, Google Play, Steam (listing resmi, tab baru, noopener); meta Open Graph & Twitter
+ * - Footer: tombol unduh App Store, Google Play, Steam (listing resmi, tab baru, noopener); tautan X @pingkendi kecil
+ *   di baris kredit (teks sekunder, tab baru, noopener); meta Open Graph & Twitter
  *   Card dengan gambar preview 1200×630, canonical per halaman.
  * - Animasi: transisi halaman & hasil filter, gerak gambar kartu per jenis saat hover (hanya opacity/transform, mati
  *   saat prefers-reduced-motion).
@@ -760,56 +765,97 @@ async function runSuite(width) {
   check('Hero: teks hitam pekat di light mode', hero.h1 === 'rgb(0, 0, 0)', hero.h1)
   await send('Network.setCacheDisabled', { cacheDisabled: false }); await send('Network.disable')
 
-  // ================= 6. Waktu Server (varian kotak) =================
-  const cards = await evaluate(`(() => {
-    const list = document.querySelector('.home-time .server-cards')
-    const cs = getComputedStyle(list)
-    return [...list.querySelectorAll('.server-card')].map((c) => {
-      const r = c.getBoundingClientRect()
-      const clock = c.querySelector('.server-card__clock')
+  // ================= 6. Waktu Server (pita siklus hari) =================
+  await go('/')
+  const cycle = await evaluate(`(async () => {
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms))
+    const root = document.querySelector('.home-time .day-cycle')
+    root.scrollIntoView({ block: 'center' }); await document.fonts.ready; await wait(400)
+    const rect = (el) => el.getBoundingClientRect()
+    const band = rect(root.querySelector('.day-cycle__band'))
+    const vertical = root.classList.contains('day-cycle--vertical')
+    const length = vertical ? band.height : band.width
+    // Posisi (0–1) sepanjang pita, dari 00 (kiri/atas) ke 24 (kanan/bawah)
+    const at = (x, y) => (vertical ? (y - band.top) / band.height : (x - band.left) / band.width)
+    const segments = [...root.querySelectorAll('.day-cycle__period')].map((el) => {
+      const r = rect(el)
+      return { id: el.dataset.period, from: at(r.left, r.top), to: at(r.right, r.bottom), bg: getComputedStyle(el).backgroundImage }
+    })
+    const labels = [...root.querySelectorAll('.day-cycle__label')].map((el) => {
+      const r = rect(el)
+      const m = rect(root.querySelector('.day-cycle__marker[data-server="' + el.dataset.server + '"]'))
+      const clock = el.querySelector('.day-cycle__clock')
       return {
-        name: c.querySelector('.server-card__name').textContent,
-        utc: c.querySelector('.server-card__offset').textContent,
-        clock: clock.textContent,
+        name: el.querySelector('.day-cycle__server').textContent.trim(),
+        clock: clock.textContent.trim(),
         tabular: getComputedStyle(clock).fontVariantNumeric.includes('tabular-nums'),
-        clockSize: parseFloat(getComputedStyle(clock).fontSize),
-        period: c.querySelector('.server-card__period').textContent.trim(),
-        icon: !!c.querySelector('.server-card__period svg'),
-        rect: { left: r.left, top: Math.round(r.top), right: r.right, width: r.width },
-        container: list.getBoundingClientRect().width,
+        icon: !!el.querySelector('.day-cycle__server svg'),
+        box: { left: r.left, right: r.right, top: r.top, bottom: r.bottom },
+        size: vertical ? r.height : r.width,
+        marker: at(m.left + m.width / 2, m.top + m.height / 2),
       }
     })
+    const card = rect(root)
+    const list = root.querySelector('.day-cycle__list')
+    // Algoritma penyebaran label dengan ukuran label & panjang pita sebenarnya, untuk setiap 10 menit dalam sehari.
+    const { spreadLabels } = await import('/src/components/dayCycleLayout.js')
+    const OFFSETS = [-5, 1, 7, 8, 9]
+    const sweep = []
+    for (let minute = 0; minute < 1440; minute += 10) {
+      const items = OFFSETS.map((offset, i) => ({ target: (((minute + offset * 60) % 1440 + 1440) % 1440) / 1440 * length, size: labels[i].size }))
+      const centers = spreadLabels(items, length, 8)
+      const order = items.map((item, i) => i).sort((a, b) => items[a].target - items[b].target || a - b)
+      const bad = order.some((i, k) => {
+        const inside = centers[i] - items[i].size / 2 >= -0.5 && centers[i] + items[i].size / 2 <= length + 0.5
+        if (!inside) return true
+        if (k === 0) return false
+        const p = order[k - 1]
+        return centers[i] - items[i].size / 2 < centers[p] + items[p].size / 2 - 0.5
+      })
+      if (bad) sweep.push(String(Math.floor(minute / 60)).padStart(2, '0') + ':' + String(minute % 60).padStart(2, '0'))
+    }
+    return {
+      vertical, segments, labels, sweep,
+      leaders: root.querySelectorAll('.day-cycle__leaders path').length,
+      figureHidden: root.querySelector('.day-cycle__figure').getAttribute('aria-hidden') === 'true',
+      listHidden: list.classList.contains('visually-hidden') && list.getBoundingClientRect().width <= 1,
+      list: [...list.querySelectorAll('li')].map((li) => ({ text: li.textContent.replace(/\\s+/g, ' ').trim(), time: li.querySelector('time')?.getAttribute('datetime') })),
+      card: { left: card.left, right: card.right, top: card.top, bottom: card.bottom },
+      oldCards: document.querySelectorAll('.home .server-card').length,
+    }
   })()`)
   const now = new Date()
-  const cardsOk = cards.length === 5 && cards.every((c, i) => {
+  const bandOk = cycle.segments.map((s) => s.id).join() === 'Night,Dawn,Day,Dusk' &&
+    cycle.segments.every((s, i) => Math.abs(s.from - i / 4) < 0.01 && Math.abs(s.to - (i + 1) / 4) < 0.01 && s.bg.includes('linear-gradient'))
+  check('Waktu Server: 5 kotak lama diganti satu pita 24 jam — Night 00–06, Dawn 06–12, Day 12–18, Dusk 18–24 (masing-masing seperempat, bergradasi)',
+    bandOk && cycle.oldCards === 0, cycle.segments.map((s) => `${s.id} ${(s.from * 24).toFixed(1)}–${(s.to * 24).toFixed(1)}`).join(', '))
+  const markerDetail = []
+  const markersOk = cycle.labels.length === 5 && cycle.labels.every((label, i) => {
     const server = SERVERS[i]
-    const current = serverClock(server.offset, now)
-    const previous = serverClock(server.offset, new Date(now.getTime() - 60_000))
-    const match = [current, previous].find((t) => t.clock === c.clock)
-    return c.name === server.name && c.utc === server.utc && match && c.period === periodAt(match.hours) && c.icon && c.tabular
+    const match = [serverClock(server.offset, now), serverClock(server.offset, new Date(now.getTime() - 60_000))].find((t) => t.clock === label.clock)
+    if (!match) return false
+    const [hours, minutes] = match.clock.split(':').map(Number)
+    const expected = (hours * 60 + minutes) / 1440
+    const segment = cycle.segments.find((s) => label.marker >= s.from - 0.002 && label.marker <= s.to + 0.002)
+    markerDetail.push(`${label.name} ${label.clock} @${(label.marker * 24).toFixed(2)}j ${segment?.id}`)
+    return label.name === server.name && Math.abs(label.marker - expected) < 0.004 && segment?.id === periodAt(hours) && label.tabular && label.icon
   })
-  check('Waktu Server: 5 kotak (America, Global, SEA, TW HK MO, Asia) dengan UTC, jam tabular & badge periode ber-ikon', cardsOk, cards.map((c) => `${c.name} ${c.utc} ${c.clock} ${c.period}`).join(' · '))
-  check('Waktu Server: jam besar (≥ 28px)', cards.every((c) => c.clockSize >= 28), `${Math.min(...cards.map((c) => c.clockSize))}px`)
-  const tops = cards.map((c) => c.rect.top)
-  const container = cards[0]?.rect.container
-  let layoutOk
-  let layoutDetail
-  if (width >= 1000) {
-    layoutOk = new Set(tops).size === 1
-    layoutDetail = '5 kolom'
-  } else if (width >= 600) {
-    const rowTwo = cards.slice(3)
-    const firstLeft = cards[0].rect.left
-    const lastRight = cards[2].rect.right
-    const leftGap = rowTwo[0].rect.left - firstLeft
-    const rightGap = lastRight - rowTwo[1].rect.right
-    layoutOk = tops[0] === tops[1] && tops[1] === tops[2] && tops[3] === tops[4] && tops[3] > tops[0] && Math.abs(leftGap - rightGap) < 2
-    layoutDetail = `3 + 2 di tengah (${leftGap.toFixed(1)} / ${rightGap.toFixed(1)})`
-  } else {
-    layoutOk = tops[0] === tops[1] && tops[2] === tops[3] && tops[4] > tops[2] && Math.abs(cards[4].rect.width - (cards[1].rect.right - cards[0].rect.left)) < 2
-    layoutDetail = '2 kolom, kotak ke-5 selebar baris'
-  }
-  check(`Waktu Server: tata letak di ${width}px — ${layoutDetail}`, layoutOk && cards.every((c) => c.rect.right <= innerWidthOf(width)), tops.join(','))
+  check('Waktu Server: penanda America, Global, SEA, TW HK MO, Asia di posisi jamnya & di bagian periode yang benar, label berisi nama & jam (tabular, ikon periode)', markersOk, markerDetail.join(' · '))
+  const overlaps = []
+  cycle.labels.forEach((a, i) => cycle.labels.slice(i + 1).forEach((b) => {
+    if (a.box.left < b.box.right - 0.5 && b.box.left < a.box.right - 0.5 && a.box.top < b.box.bottom - 0.5 && b.box.top < a.box.bottom - 0.5) overlaps.push(`${a.name}/${b.name}`)
+  }))
+  const inCard = cycle.labels.every((l) => l.box.left >= cycle.card.left && l.box.right <= cycle.card.right && l.box.top >= cycle.card.top && l.box.bottom <= cycle.card.bottom)
+  check('Waktu Server: label berdekatan (SEA, TW HK MO, Asia) tidak saling menutupi, tiap label bergaris ke penandanya, semua di dalam kotak',
+    overlaps.length === 0 && cycle.leaders === 5 && inCard && cycle.card.right <= innerWidthOf(width), overlaps.join(', ') || `${cycle.leaders} garis`)
+  check('Waktu Server: label tetap tidak bertumpuk & di dalam pita di setiap jam (simulasi tiap 10 menit, ukuran label asli)', cycle.sweep.length === 0, cycle.sweep.slice(0, 6).join(', '))
+  check(`Waktu Server: pita ${width < 600 ? 'vertikal (ponsel, tidak melebar)' : 'horizontal'} di ${width}px`, cycle.vertical === width < 600, cycle.vertical ? 'vertikal' : 'horizontal')
+  const listOk = cycle.list.length === 5 && cycle.list.every((item, i) => {
+    const label = cycle.labels[i]
+    const hours = Number(label?.clock.split(':')[0])
+    return item.text === `${SERVERS[i].name} (${SERVERS[i].utc}): ${label.clock}, periode ${periodAt(hours)}` && item.time === label.clock
+  })
+  check('Waktu Server: pembaca layar mendapat daftar teks (server, UTC, jam, periode); gambar pita aria-hidden', listOk && cycle.figureHidden && cycle.listHidden, cycle.list.map((item) => item.text).join(' · '))
 
   // ================= 7. Muncul Sekarang =================
   const readNow = () => evaluate(`(async () => {
@@ -898,6 +944,17 @@ async function runSuite(width) {
   check('Muncul Sekarang: gambar tinggi (Black Stork 400×846) tidak mengubah ukuran tile & baris', tiles.heightChange <= 0.5 && tiles.square && tiles.rowSpread <= 1, `perubahan ${tiles.heightChange.toFixed(1)}px`)
   await go('/')
   check('Muncul Sekarang: catatan bahwa cuaca tidak ikut dihitung', /Cuaca di game tidak bisa diketahui dari luar/.test(nowState.note) && /hanya berdasarkan waktu/.test(nowState.note))
+  const rows = await evaluate(`[...document.querySelectorAll('#muncul-sekarang .now-grid')].map((grid) => {
+    const cs = getComputedStyle(grid)
+    const items = [...grid.children]
+    return { flow: cs.gridAutoFlow, overflow: cs.overflowX, snap: cs.scrollSnapType, align: items.every((li) => getComputedStyle(li).scrollSnapAlign.includes('start')), scrolls: grid.scrollWidth > grid.clientWidth + 1, tops: new Set(items.map((li) => Math.round(li.getBoundingClientRect().top))).size }
+  })`)
+  if (width < 640) {
+    check('Muncul Sekarang (ponsel): tiap kategori satu baris geser ke samping dengan snap per tile',
+      rows.length === 3 && rows.every((r) => r.flow.startsWith('column') && r.overflow === 'auto' && r.snap.startsWith('x mandatory') && r.align && r.scrolls && r.tops === 1), JSON.stringify(rows[0]))
+  } else {
+    check('Muncul Sekarang: di layar lebar tile tersusun dalam grid (tanpa baris geser)', rows.every((r) => r.overflow === 'visible' && r.snap === 'none'), JSON.stringify(rows[0]))
+  }
   const fishGroup = nowState.groups[0]
   await evaluate(`document.querySelector('.now-group[data-wildlife="fish"] .now-group__all').click()`); await sleep(1400)
   // Muncul Sekarang hanya menghitung Base Game; daftar ikan juga menampilkan section event di bawahnya, jadi yang
@@ -940,6 +997,8 @@ async function runSuite(width) {
     await Promise.all(imgs.map((i) => (i.complete ? 0 : new Promise((r) => { i.onload = i.onerror = r }))))
     return [...grid.querySelectorAll('.category-card')].map((card) => {
       const catalog = CATALOGS.find((c) => c.slug === card.dataset.wildlife)
+      const r = card.getBoundingClientRect()
+      const art = [...card.querySelectorAll('.category-card__sample')].map((i) => i.getBoundingClientRect())
       return {
         title: card.querySelector('.category-card__title').firstChild.textContent,
         href: card.getAttribute('href'),
@@ -949,27 +1008,50 @@ async function runSuite(width) {
         noun: card.querySelector('.category-card__count').textContent.replace(/[\\d\\s]+/, '').trim(),
         expectedNoun: catalog?.noun,
         icon: !!card.querySelector('.category-card__icon svg'),
-        desc: card.querySelector('.category-card__desc').textContent.trim().length,
+        size: card.dataset.size,
+        desc: card.querySelector('.category-card__desc')?.textContent.trim().length ?? 0,
         samples: [...card.querySelectorAll('.category-card__sample')].filter((i) => i.naturalWidth > 0 && i.getAttribute('src').startsWith('/images/')).length,
-        rect: card.getBoundingClientRect().right,
+        rect: { left: r.left, top: r.top, right: r.right, bottom: r.bottom, area: r.width * r.height },
+        // Seberapa jauh gambar keluar dari tepi atas / kanan kartu
+        overTop: Math.max(0, ...art.map((a) => r.top - a.top)),
+        overRight: Math.max(0, ...art.map((a) => a.right - r.right)),
+        artRight: Math.max(...art.map((a) => a.right)),
       }
     })
   })()`)
-  check('Kategori: kartu Fish, Bugs, Birds, Animals, Recipes, Crops, Collectibles, Ingredients dengan tautan ke daftarnya', categories.map((c) => `${c.title}>${c.href}`).join() === 'Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles,Ingredients>/ingredients', categories.map((c) => c.title).join(', '))
+  const EXPECTED_CARDS = 'Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles,Ingredients>/ingredients'
+  check('Kategori: kartu Fish, Bugs, Birds, Animals, Recipes, Crops, Collectibles, Ingredients dengan tautan ke daftarnya', categories.map((c) => `${c.title}>${c.href}`).sort().join() === EXPECTED_CARDS.split(',').sort().join(), categories.map((c) => c.title).join(', '))
   check('Kategori: jumlah entri dihitung dari data (termasuk entri event: Crops 19, Collectibles 40, Ingredients 32)', categories.every((c) => c.count === c.expectedCount && c.noun === c.expectedNoun) && categories.find((c) => c.title === 'Crops')?.count === 19 && categories.find((c) => c.title === 'Collectibles')?.count === 40 && categories.find((c) => c.title === 'Ingredients')?.count === 32, categories.map((c) => `${c.count} ${c.noun}`).join(', '))
   const titles = await evaluate(`[...document.querySelectorAll('.category-card')].map((card) => card.querySelector('.category-card__title').firstChild.textContent + '/' + card.querySelector('.category-card__label').textContent).join()`)
   check('Kategori: nama Inggris dengan subjudul Indonesia (Crops/Tanaman, Collectibles/Bahan Alam, Ingredients/Bahan Masak)', titles.includes('Crops/Tanaman') && titles.includes('Collectibles/Bahan Alam') && titles.includes('Ingredients/Bahan Masak'), titles)
+  const SIZES = ['xl', 'wide', 'md', 'md', 'sm', 'sm', 'sm', 'sm']
+  check('Kategori (bento): urut dari entri terbanyak — terbanyak besar, kedua lebar, ketiga & keempat sedang, sisanya kecil',
+    categories.every((c, i) => i === 0 || c.count <= categories[i - 1].count) && categories.map((c) => c.size).join() === SIZES.join(),
+    categories.map((c) => `${c.title} ${c.count} ${c.size}`).join(', '))
+  check('Kategori (bento): kartu dengan entri lebih banyak tidak pernah lebih kecil', categories.every((c, i) => i === 0 || c.rect.area <= categories[i - 1].rect.area + 1),
+    categories.map((c) => Math.round(c.rect.area / 1000)).join('/'))
   if (width >= 1080) {
-    const rows = await evaluate(`[...document.querySelectorAll('.category-card')].map((c) => Math.round(c.getBoundingClientRect().top))`)
-    check('Kategori (desktop): baris Wildlife 4 kartu, baris Wiki 4 kartu', rows.length === 8 && new Set(rows.slice(0, 4)).size === 1 && new Set(rows.slice(4)).size === 1 && rows[4] > rows[0], rows.join(','))
+    const [xl, wide, md1, md2, ...small] = categories
+    const near = (a, b) => Math.abs(a - b) <= 1
+    check('Kategori (desktop bento): besar di kiri setinggi dua baris, lebar di kanan atas, dua sedang di bawahnya, empat kecil sebaris di bawah',
+      near(xl.rect.top, wide.rect.top) && near(xl.rect.bottom, md1.rect.bottom) && wide.rect.left > xl.rect.right && near(md1.rect.top, md2.rect.top) && md1.rect.top > wide.rect.bottom &&
+        near(md1.rect.left, wide.rect.left) && near(md2.rect.right, wide.rect.right) && new Set(small.map((c) => Math.round(c.rect.top))).size === 1 && small[0].rect.top > xl.rect.bottom,
+      categories.map((c) => `${c.title} ${Math.round(c.rect.left)},${Math.round(c.rect.top)}`).join(' · '))
   }
-  check('Kategori: ikon, deskripsi singkat, dan 3 contoh gambar termuat', categories.every((c) => c.icon && c.desc > 20 && c.samples === 3), categories.map((c) => c.samples).join('/'))
+  const SAMPLES = { xl: 3, wide: 3, md: 2, sm: 1 }
+  check('Kategori: ikon di semua kartu, deskripsi di kartu besar & lebar, contoh gambar termuat (3/3/2/1 menurut ukuran)',
+    categories.every((c) => c.icon && c.samples === SAMPLES[c.size] && (c.size === 'xl' || c.size === 'wide' ? c.desc > 20 : c.desc === 0)), categories.map((c) => `${c.size}:${c.samples}`).join(' '))
+  // Diukur dari kotak gambar (termasuk rotasi hiasan & area transparan di sekitar gambar), jadi batasnya sedikit longgar.
+  check('Kategori: gambar entri sedikit keluar dari tepi kartu (atas/kanan, kotak gambar maks. 40px) tanpa melebarkan halaman',
+    categories.every((c) => (c.overTop > 0 || c.overRight > 0) && c.overTop <= 40 && c.overRight <= 40 && c.artRight <= innerWidthOf(width)),
+    categories.map((c) => `${c.title} ↑${c.overTop.toFixed(0)} →${c.overRight.toFixed(0)}`).join(', '))
   const sampleBoxes = await evaluate(`(async () => {
     const wait = (ms) => new Promise((r) => setTimeout(r, ms))
-    const read = () => [...document.querySelectorAll('.category-card')].map((card) => {
-      const stage = card.querySelector('.category-card__stage').getBoundingClientRect()
-      return { stage: stage.height, boxes: [...card.querySelectorAll('.category-card__sample')].map((i) => { const r = i.getBoundingClientRect(); return Math.abs(r.width - r.height) <= 1 && getComputedStyle(i).objectFit === 'contain' && r.top >= stage.top - 0.5 && r.bottom <= stage.bottom + 0.5 }) }
-    })
+    // Kotak persegi diukur tanpa rotasi hiasan (lebar & tinggi layout).
+    const read = () => [...document.querySelectorAll('.category-card')].map((card) => ({
+      stage: card.getBoundingClientRect().height,
+      boxes: [...card.querySelectorAll('.category-card__sample')].map((i) => Math.abs(i.offsetWidth - i.offsetHeight) <= 1 && getComputedStyle(i).objectFit === 'contain'),
+    }))
     const before = read()
     const img = document.querySelector('.category-card__sample')
     img.setAttribute('width', '400'); img.setAttribute('height', '846'); img.src = '/images/birds/black-stork.webp'
@@ -977,12 +1059,73 @@ async function runSuite(width) {
     const after = read()
     return { square: before.every((c) => c.boxes.every(Boolean)) && after.every((c) => c.boxes.every(Boolean)), stageChange: Math.max(...after.map((c, i) => Math.abs(c.stage - before[i].stage))) }
   })()`)
-  check('Kategori: contoh gambar berupa kotak persegi (contain) di dalam panggung; gambar tinggi tidak memanjangkannya', sampleBoxes.square && sampleBoxes.stageChange <= 0.5, `perubahan ${sampleBoxes.stageChange.toFixed(1)}px`)
+  check('Kategori: contoh gambar berupa kotak persegi (contain); gambar tinggi tidak mengubah ukuran kartu', sampleBoxes.square && sampleBoxes.stageChange <= 0.5, `perubahan ${sampleBoxes.stageChange.toFixed(1)}px`)
+
+  // ================= 8b. Kartu taktil: garis tepi tipis + bayangan keras, ditekan turun =================
+  await send('DOM.enable'); await send('CSS.enable')
+  // Paksa :hover / :active lewat DevTools, lalu baca transform, bayangan, dan warna garis tepi.
+  const tactile = async (selector) => {
+    const { root } = (await send('DOM.getDocument', { depth: 0 })).result
+    const { nodeId } = (await send('DOM.querySelector', { nodeId: root.nodeId, selector })).result
+    if (!nodeId) return null
+    // Warna hasil color-mix (oklab) diubah ke rgb lewat canvas; bayangan dipisah jadi warna + geometri.
+    const read = () => evaluate(`(() => {
+      const el = document.querySelector(${JSON.stringify(selector)})
+      const cs = getComputedStyle(el)
+      const ctx = document.createElement('canvas').getContext('2d', { willReadFrequently: true })
+      const rgb = (css) => { ctx.clearRect(0, 0, 1, 1); ctx.fillStyle = '#000'; ctx.fillStyle = css; ctx.fillRect(0, 0, 1, 1); const d = ctx.getImageData(0, 0, 1, 1).data; return 'rgb(' + d[0] + ', ' + d[1] + ', ' + d[2] + ')' }
+      const shadow = cs.boxShadow.match(/^(.*\\)) (-?[\\d.]+px -?[\\d.]+px [\\d.]+px -?[\\d.]+px)$/)
+      // Garis 1,5px dibulatkan Chrome ke piksel layar (1px di DPR 1), jadi yang diperiksa tokennya + garis ≥ 1px.
+      const token = getComputedStyle(document.documentElement).getPropertyValue('--card-edge-width').trim()
+      return { border: token === '1.5px' && parseFloat(cs.borderTopWidth) >= 1 ? '1.5px' : cs.borderTopWidth, edge: rgb(cs.borderTopColor), bg: rgb(cs.backgroundColor), shadow: shadow ? rgb(shadow[1]) + ' ' + shadow[2] : cs.boxShadow, transform: cs.transform }
+    })()`)
+    await evaluate(`document.querySelector(${JSON.stringify(selector)}).style.transition = 'none'`)
+    const rest = await read()
+    await send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: ['hover'] }); const hover = await read()
+    await send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: ['hover', 'active'] }); const active = await read()
+    await send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: [] })
+    await evaluate(`document.querySelector(${JSON.stringify(selector)}).style.transition = ''`)
+    return { rest, hover, active }
+  }
+  // "rgb(r, g, b) 0px 3px 0px 0px" → { color, x, y, blur, spread }
+  const hardShadow = (css) => {
+    const m = css.match(/^(rgba?\([^)]*\)) (-?[\d.]+)px (-?[\d.]+)px ([\d.]+)px (-?[\d.]+)px$/)
+    return m && { color: m[1], x: Number(m[2]), y: Number(m[3]), blur: Number(m[4]), spread: Number(m[5]) }
+  }
+  const notBlack = (css) => { const [r, g, b] = css.match(/[\d.]+/g).map(Number); return r + g + b > 120 }
+  const luma = (css) => { const [r, g, b] = css.match(/[\d.]+/g).map(Number); return 0.2126 * r + 0.7152 * g + 0.0722 * b }
+  const tactileRows = []
+  const clickable = [['kartu kategori', '.category-card'], ['tile Muncul Sekarang', '.now-tile']]
+  for (const [name, selector] of clickable) {
+    await evaluate(`document.querySelector('${selector}').scrollIntoView({ block: 'center' })`); await sleep(150)
+    tactileRows.push([name, await tactile(selector), true])
+  }
+  tactileRows.push(['kotak Waktu Server', await tactile('.day-cycle'), false])
+  await go('/wildlife/fish')
+  tactileRows.push(['kartu daftar', await tactile('.entry-grid .entry-card'), true])
+  await go('/wildlife/fish/sea-bass')
+  tactileRows.push(['kotak detail', await tactile('.panel--info'), false])
+  const tactileOk = tactileRows.every(([, t, pressable]) => {
+    if (!t) return false
+    const rest = hardShadow(t.rest.shadow)
+    const pressed = hardShadow(t.active.shadow)
+    const base = rest && rest.x === 0 && rest.y === 3 && rest.blur === 0 && notBlack(rest.color) && t.rest.border === '1.5px' && luma(t.rest.edge) < luma(t.rest.bg)
+    if (!pressable) return base
+    return base && t.hover.transform === 'none' && t.hover.edge !== t.rest.edge && t.active.transform === 'matrix(1, 0, 0, 1, 0, 2)' && pressed?.y === 1 && pressed.blur === 0
+  })
+  check('Kartu taktil (light): garis tepi 1,5px lebih gelap dari permukaan, bayangan keras 3px tanpa blur berwarna tint; hover tidak mengangkat, ditekan turun 2px & bayangan jadi 1px',
+    tactileOk, tactileRows.map(([name, t]) => `${name}: ${t?.rest.border} ${t?.rest.shadow} → ${t?.active.transform} ${t?.active.shadow}`).join(' · '))
+  await go('/')
+  await toggleTheme()
+  const darkCard = await tactile('.category-card')
+  const darkShadow = darkCard && hardShadow(darkCard.rest.shadow)
+  check('Kartu taktil (dark): bayangan keras tetap tanpa blur & bukan hitam', !!darkShadow && darkShadow.y === 3 && darkShadow.blur === 0 && notBlack(darkShadow.color) && darkCard.rest.border === '1.5px', darkCard?.rest.shadow)
+  await evaluate(`localStorage.removeItem('hdx-theme')`)
 
   // ================= 9. Detail wildlife tetap versi daftar =================
   await go('/wildlife/fish/sea-bass')
-  const detailTime = await evaluate(`({ rows: document.querySelectorAll('.panel--time .server-time__list .server-row').length, cards: document.querySelectorAll('.server-card').length })`)
-  check('Detail wildlife: Waktu Server tetap versi daftar (5 baris, tanpa kotak)', detailTime.rows === 5 && detailTime.cards === 0, JSON.stringify(detailTime))
+  const detailTime = await evaluate(`({ rows: document.querySelectorAll('.panel--time .server-time__list .server-row').length, band: document.querySelectorAll('.day-cycle').length })`)
+  check('Detail wildlife: Waktu Server tetap versi daftar (5 baris, tanpa pita siklus hari)', detailTime.rows === 5 && detailTime.band === 0, JSON.stringify(detailTime))
 
   // ================= 10. Kontras AA & tidak melebar, light & dark =================
   await go('/')
@@ -1043,6 +1186,16 @@ async function runSuite(width) {
   check('Footer: tombol unduh App Store, Google Play, Steam ke listing resmi, ikon merek + teks, tab baru dengan rel="noopener"',
     stores.map((store) => `${store.name}>${store.href}`).join() === STORE_LINKS && stores.every((store) => store.target === '_blank' && /\bnoopener\b/.test(store.rel) && store.icon && store.iconHidden && store.newTab && store.visible),
     stores.map((store) => store.name).join(', '))
+  const social = await evaluate(`(() => {
+    const a = document.querySelector('.site-footer__meta a[href="https://x.com/pingkendi"]')
+    if (!a) return null
+    const cs = getComputedStyle(a)
+    const icon = a.querySelector('svg')
+    return { text: a.textContent.replace(/\\s+/g, ' ').trim(), target: a.target, rel: a.rel, color: cs.color, muted: getComputedStyle(document.querySelector('.site-footer')).color, size: parseFloat(cs.fontSize), icon: !!icon?.querySelector('path') && icon.getAttribute('aria-hidden') === 'true', iconSize: icon?.getBoundingClientRect().width, credit: a.closest('.site-footer__bottom') !== null }
+  })()`)
+  check('Footer: tautan X kecil (ikon + "@pingkendi", teks sekunder) di baris kredit, tab baru dengan rel="noopener"',
+    !!social && social.text.startsWith('@pingkendi') && social.text.includes('(membuka tab baru)') && social.target === '_blank' && /\bnoopener\b/.test(social.rel) && social.color === social.muted && social.size <= 13 && social.icon && social.iconSize <= 14 && social.credit,
+    social && `${social.text} · ${social.color} · ${social.size}px`)
   const meta = await evaluate(`(async () => {
     const m = (selector) => document.querySelector(selector)?.getAttribute('content') ?? null
     const image = m('meta[property="og:image"]')
@@ -1124,7 +1277,8 @@ async function runSuite(width) {
     check('Hover kartu saat prefers-reduced-motion: gambar diam', reducedHover.anim === 'none' && reducedHover.transform === 'none', JSON.stringify(reducedHover))
   }
 
-  const problems = tab.logs.filter((line) => !/\[vite\] connect|React DevTools/.test(line))
+  // Log debug Vercel Web Analytics hanya muncul di mode dev (tanpa request ke server), jadi diabaikan.
+  const problems = tab.logs.filter((line) => !/\[vite\] connect|React DevTools|\[Vercel Web Analytics\]/.test(line))
   check('Console bersih selama uji', problems.length === 0, problems.join(' | '))
   await tab.close()
   return results
