@@ -4,9 +4,9 @@
  *
  * Versi Inggris memakai teks asli heartodex (`descriptionOriginal` di file data), tapi salah ketik yang jelas berasal
  * dari sumber dibetulkan dulu: pola y→g ("easilg", "Widelg"), salah baca huruf/angka ("Mid-AIJtumn", "tupe"), huruf
- * besar di tengah kalimat, apostrof, dan tanda hubung yang seharusnya tanda pisah. Daftar pembetulannya ditulis tangan di
- * scripts/translations/english-corrections.json; skrip ini hanya menerapkannya, jadi tidak ada teks yang berubah tanpa
- * tercatat. `descriptionOriginal` sendiri tidak pernah diubah.
+ * besar di tengah kalimat, dan apostrof. Tanda baca lain mengikuti sumber apa adanya (tanda hubung tidak diubah jadi
+ * tanda pisah). Daftar pembetulannya ditulis tangan di scripts/translations/english-corrections.json; skrip ini hanya
+ * menerapkannya, jadi tidak ada teks yang berubah tanpa tercatat. `descriptionOriginal` sendiri tidak pernah diubah.
  *
  * Hasil (ditulis ulang seluruhnya setiap kali dijalankan):
  *   scripts/translations/<kind>.en.json        { "_meta": …, "<slug>": "teks tampilan" }, dimuat situs hanya di /en

@@ -175,14 +175,14 @@ function detailDescription(catalog, entry, i18n) {
 // ---------- meta per halaman ----------
 
 // Nama yang dipakai lebih dari satu entri di katalog berbeda (mis. Egg: resep & bahan masak). Judul halamannya diberi
-// nama katalog, "Egg (Recipes)", supaya tiap halaman punya judul sendiri.
+// nama kategori dalam bahasa halaman, "Egg (Resep)" / "Egg (Recipes)", supaya tiap halaman punya judul sendiri.
 const SHARED_NAMES = (() => {
   const counts = new Map()
   for (const catalog of CATALOGS) for (const entry of catalog.entries) counts.set(entry.name, (counts.get(entry.name) ?? 0) + 1)
   return new Set([...counts].filter(([, count]) => count > 1).map(([name]) => name))
 })()
 
-const entryTitle = (catalog, entry) => (SHARED_NAMES.has(entry.name) ? `${entry.name} (${catalog.name})` : entry.name)
+const entryTitle = (catalog, entry, t) => (SHARED_NAMES.has(entry.name) ? `${entry.name} (${t(`kinds.${catalog.slug}.label`)})` : entry.name)
 
 function createI18n(localeId, messages) {
   const locale = getLocale(localeId)
@@ -225,7 +225,7 @@ export function getPageMeta(path, localeId, messages) {
       description = t(`kinds.${page.catalog.slug}.metaList`, { count: formatNumber(page.catalog.entries.length) })
       break
     case 'detail':
-      title = pageTitle(entryTitle(page.catalog, page.entry))
+      title = pageTitle(entryTitle(page.catalog, page.entry, t))
       description = detailDescription(page.catalog, page.entry, i18n)
       break
     case 'missing':

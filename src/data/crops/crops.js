@@ -316,7 +316,7 @@ export const crops = [
     name: 'Lemon Verbena',
     category: 'Modular Streets',
     section: 'Modular Streets',
-    description: 'Tak ada lemon sama sekali, tapi aroma lemonnya kuat—bahkan lebih segar dan lebih tahan lama.',
+    description: 'Tak ada lemon sama sekali, tapi aroma lemonnya kuat, bahkan lebih segar dan lebih tahan lama.',
     descriptionOriginal: 'No lemons in sight, yet it bursts with a strong lemon fragrance—even fresher and longer-lasting.',
     level: 1,
     seedPrice: 10,

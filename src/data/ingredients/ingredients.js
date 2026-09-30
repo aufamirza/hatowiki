@@ -354,7 +354,7 @@ export const ingredients = [
     name: 'Ace Beef',
     category: 'Burger Bliss',
     section: 'Burger Bliss',
-    description: 'Daging sapi 100% murni—bahan asli, kepuasan sejati.',
+    description: 'Daging sapi 100% murni: bahan asli, kepuasan sejati.',
     descriptionOriginal: '100% pure beef-real ingredients, real satisfaction.',
     buyPrice: 200,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
@@ -369,7 +369,7 @@ export const ingredients = [
     name: 'Fruitwood Charcoal',
     category: 'Echo of Ancients',
     section: 'Echo of Ancients',
-    description: 'Dengan aroma alaminya yang harum, arang ini menguatkan rasa daging panggang, menyamarkan bau prengus, dan menambahkan rasa asap yang kaya dan dalam—berkualitas tanpa menguras kantong.',
+    description: 'Dengan aroma alaminya yang harum, arang ini menguatkan rasa daging panggang, menyamarkan bau prengus, dan menambahkan rasa asap yang kaya dan dalam. Berkualitas tanpa menguras kantong.',
     descriptionOriginal: 'With its natural fragrant notes, it lifts the flavor of grilled meat, cuts through any gamey taste, and adds a rich smoky depth-quality that doesn\'t break the bank.',
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
@@ -459,7 +459,7 @@ export const ingredients = [
     name: 'Condensed Milk',
     category: 'Modular Streets',
     section: 'Modular Streets',
-    description: 'Susu kental manis—"lem" yang menyatukan berbagai macam hidangan penutup.',
+    description: 'Susu kental manis, "lem" yang menyatukan berbagai macam hidangan penutup.',
     descriptionOriginal: 'Sweetened condensed milk—the "glue" that holds all kinds of desserts together.',
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
@@ -489,7 +489,7 @@ export const ingredients = [
     name: 'Salsa Sauce',
     category: 'Dreamlight Cinematics',
     section: 'Dreamlight Cinematics',
-    description: 'Saus klasik serbaguna—salsa cocok dipadukan dengan apa saja.',
+    description: 'Saus klasik serbaguna: salsa cocok dipadukan dengan apa saja.',
     descriptionOriginal: 'A classic, all-purpose condiment—salsa goes with everything.',
     buyPrice: 50,
     sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber

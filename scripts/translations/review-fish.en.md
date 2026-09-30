@@ -4,7 +4,7 @@ Teks tampilan versi Inggris (/en) untuk 111 ikan, dibuat `scripts/english-descri
 heartodex (`descriptionOriginal`). Yang diubah hanya salah ketik yang jelas berasal dari sumber; `descriptionOriginal` di
 file data tetap apa adanya. Daftar pembetulannya ada di `scripts/translations/english-corrections.json`.
 
-- Pembetulan: 28 di 24 entri (y→g: 11, OCR: 5, kapital: 7, tanda pisah: 5).
+- Pembetulan: 23 di 19 entri (y→g: 11, OCR: 5, kapital: 7).
 - Tidak ada teks di sumber (13 entri): Asian Arowana, Blackspot Sergeant, Lionhead, Whale Shark, Mahi-Mahi, Moon Jelly, Angelfish, Pink Betta, Green Sea Turtle, White-Faced Surgeonfish, Lionfish, Blue-and-Yellow Wrasse, Azure Demoiselle.
 - Entri lain memakai teks sumber tanpa perubahan, jadi tidak dicantumkan di tabel.
 
@@ -27,11 +27,6 @@ file data tetap apa adanya. Daftar pembetulannya ada di `scripts/translations/en
 | Moonfish (`moonfish`) | Round like the Mid-AIJtumn Festival moon, it moves in the same cycle—hiding deep by day and rising to shallower waters by night. | Round like the Mid-Autumn Festival moon, it moves in the same cycle—hiding deep by day and rising to shallower waters by night. | "Mid-AIJtumn" → "Mid-Autumn" (OCR) |
 | Smooth Hammerhead (`smooth-hammerhead`) | It has a head shaped like a hammer. With Sharp teeth and swift movements, it's a ferocious hunter in the sea. | It has a head shaped like a hammer. With sharp teeth and swift movements, it's a ferocious hunter in the sea. | "With Sharp teeth" → "With sharp teeth" (kapital) |
 | Arctic Char (`arctic-char`) | Covered in red sparckles, it's a fearless fish that braves cold weather | Covered in red sparkles, it's a fearless fish that braves cold weather | "sparckles" → "sparkles" (OCR) |
-| Golden Garfish (`golden-garfish`) | Golden from head to tail, this garfish is a rare sight-definitely worth showing off if you reel one in. | Golden from head to tail, this garfish is a rare sight—definitely worth showing off if you reel one in. | "sight-definitely" → "sight—definitely" (tanda pisah) |
-| Japanese Flying Squid (`japanese-flying-squid`) | A relentless hustler living life at full speed-eats just about anything. | A relentless hustler living life at full speed—eats just about anything. | "full speed-eats" → "full speed—eats" (tanda pisah) |
-| Firefly Squid (`firefly-squid`) | The bioluminescent firefly squid-like a meteor shower deep in the sea. | The bioluminescent firefly squid—like a meteor shower deep in the sea. | "firefly squid-like" → "firefly squid—like" (tanda pisah) |
-| Sea Slug (`sea-slug`) | Looks soft and squishy like candy, but many types are actually super toxic-better not touch. | Looks soft and squishy like candy, but many types are actually super toxic—better not touch. | "super toxic-better" → "super toxic—better" (tanda pisah) |
-| Oliver Ridley Turtle (`oliver-ridley-turtle`) | The species' survival strategy? Overwhelm everything with sheer numbers-the "turtle-wave tactic." | The species' survival strategy? Overwhelm everything with sheer numbers—the "turtle-wave tactic." | "sheer numbers-the" → "sheer numbers—the" (tanda pisah) |
 | Director Pygmy Octopus w/ Cyan Hat (`director-pygmy-octopus-w-cyan-hat`) | A toy Pygmy Octopus in a cuan director hat. Its shell-hiding nature gives it a unique perspective on filmmaking. | A toy Pygmy Octopus in a cyan director hat. Its shell-hiding nature gives it a unique perspective on filmmaking. | "cuan" → "cyan" (OCR) |
 | Director Pygmy Octopus w/ Brown Hat (`director-pygmy-octopus-w-brown-hat`) | A tog Pygmy Oct0PUS in a brown director hat. Every thriller shoot is a huge challenge for this timid creature. | A toy Pygmy Octopus in a brown director hat. Every thriller shoot is a huge challenge for this timid creature. | "A tog" → "A toy" (y→g); "Oct0PUS" → "Octopus" (OCR) |
 | Frostspore King Crab (`frostspore-king-crab`) | A king crab infected by Frostspore, its Sharp, aloof stance making it even more regal. | A king crab infected by Frostspore, its sharp, aloof stance making it even more regal. | "its Sharp," → "its sharp," (kapital) |
@@ -42,4 +37,3 @@ Jenis pembetulan:
 - **y→g**: huruf y terbaca g (pola salah ketik/OCR di sumber)
 - **OCR**: huruf atau angka lain yang salah terbaca
 - **kapital**: huruf besar di tengah kalimat pada kata biasa (S, U, P, W: bentuk huruf besar dan kecilnya sama)
-- **tanda pisah**: tanda hubung tanpa spasi yang seharusnya tanda pisah (—), seperti entri lain di sumber

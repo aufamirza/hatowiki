@@ -207,7 +207,7 @@ export const animals = [
     name: 'Maltese',
     category: 'Maltese',
     section: 'Maltese',
-    description: 'Dunia seekor Maltese itu sederhana—asal kamu mau bermain denganku, kita sahabat!',
+    description: 'Dunia seekor Maltese itu sederhana: asal kamu mau bermain denganku, kita sahabat!',
     descriptionOriginal: 'A Maltese\'s world is simple—as long as you play with me, we\'re best friends!',
     weather: ['Sunny'],
     locations: [

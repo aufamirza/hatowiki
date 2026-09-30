@@ -55,8 +55,8 @@ const EXPECTED = {
     en: ['Tiramisu | Hatowiki', 'Tiramisu: a level 6 recipe in Heartopia. Energy: +65–130. Ingredients: Coffee Beans, Cheese, Milk, Egg. Sells for 530–4,240 coins.'],
   },
   '/ingredients/egg': {
-    id: ['Egg (Ingredients) | Hatowiki', 'Egg, bahan masak di Heartopia. Harga beli: 100 koin. Didapat dari: Toko Massimo. Dipakai di 46 resep.'],
-    th: ['Egg (Ingredients) | Hatowiki', 'Egg วัตถุดิบทำอาหารใน Heartopia · ราคาซื้อ: 100 เหรียญ · หาได้จาก: ร้าน Massimo · ใช้ในสูตรอาหาร 46 สูตร'],
+    id: ['Egg (Bahan Masak) | Hatowiki', 'Egg, bahan masak di Heartopia. Harga beli: 100 koin. Didapat dari: Toko Massimo. Dipakai di 46 resep.'],
+    th: ['Egg (วัตถุดิบทำอาหาร) | Hatowiki','Egg วัตถุดิบทำอาหารใน Heartopia · ราคาซื้อ: 100 เหรียญ · หาได้จาก: ร้าน Massimo · ใช้ในสูตรอาหาร 46 สูตร'],
     en: ['Egg (Ingredients) | Hatowiki', "Egg: a cooking ingredient in Heartopia. Buy price: 100 coins. Obtained from: Massimo's store. Used in 46 recipes."],
   },
 }

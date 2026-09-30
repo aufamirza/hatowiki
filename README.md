@@ -215,8 +215,8 @@ Warna badge level di kartu (dan badge level di detail resep) diambil dari nomor 
 
 Versi Inggris menampilkan teks asli heartodex, tapi salah ketik yang jelas berasal dari sumber dibetulkan dulu: pola
 y→g ("easilg", "Widelg"), salah baca huruf/angka ("Mid-AIJtumn", "tupe", "Oct0PUS"), huruf besar di tengah kalimat
-("Shell", "Will"), apostrof, dan tanda hubung yang seharusnya tanda pisah. `descriptionOriginal` di file data tidak
-pernah diubah.
+("Shell", "Will"), dan apostrof. Tanda baca lain mengikuti sumber apa adanya (tanda hubung tidak diubah jadi tanda
+pisah). `descriptionOriginal` di file data tidak pernah diubah.
 
 - Daftar pembetulan ditulis tangan di `scripts/translations/english-corrections.json` (`fixes.<kind>.<slug>` = daftar
   `[teks di sumber, pembetulan, jenis]`), termasuk terjemahan Inggris untuk deskripsi yang di sumber berbahasa Spanyol
@@ -278,8 +278,9 @@ Aturan yang dijaga:
   `dist/th/...`, `dist/en/...`), untuk crawler tanpa JavaScript (WhatsApp, Discord, media sosial). Isi halaman tetap
   dirender React; ini bukan SSR. Skrip yang sama menulis `sitemap.xml` (semua halaman × 3 bahasa dengan `hreflang`) dan
   `robots.txt`. Build berhenti kalau ada judul/deskripsi yang sama di satu bahasa atau deskripsi lebih dari 160 karakter.
-- Dua entri yang namanya sama di katalog berbeda (Egg: resep & bahan masak) diberi nama katalog di judulnya,
-  "Egg (Recipes)" dan "Egg (Ingredients)".
+- Dua entri yang namanya sama di katalog berbeda (Egg: resep & bahan masak) diberi nama kategori di judulnya, dalam
+  bahasa halamannya: "Egg (Resep)" dan "Egg (Bahan Masak)", "Egg (สูตรอาหาร)" dan "Egg (วัตถุดิบทำอาหาร)", "Egg (Recipes)" dan
+  "Egg (Ingredients)".
 - Di Vercel berkas statis didahulukan daripada rewrite. `vercel.json` hanya menangani alamat yang tidak punya berkas:
   `/th/...` → `/th/index.html`, `/en/...` → `/en/index.html`, sisanya → `/index.html` (kecuali `/api`).
 
