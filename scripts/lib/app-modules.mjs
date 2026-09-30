@@ -19,6 +19,9 @@ export const DATA_FILES = {
   crops: 'src/data/crops/crops.js',
   collectibles: 'src/data/collectibles/collectibles.js',
   ingredients: 'src/data/ingredients/ingredients.js',
+  items: 'src/data/hobbyItems/hobbyItems.js',
+  npcs: 'src/data/npcs/npcs.js',
+  achievements: 'src/data/achievements/achievements.js',
 }
 
 /** Jalankan `run(load)`; `load('/src/...')` mengembalikan modul aplikasi. Server Vite ditutup setelah selesai. */

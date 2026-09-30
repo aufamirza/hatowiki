@@ -3,7 +3,7 @@
 Wiki komunitas Heartopia (proyek fan, tidak resmi) dalam tiga bahasa: Indonesia (bawaan, alamat tanpa awalan), Thai
 (`/th`), dan Inggris (`/en`). Lihat [Bahasa](#bahasa), [Deskripsi isian manual](#deskripsi-isian-manual), dan [SEO](#seo).
 
-Tahap sekarang: kategori **Wildlife**, dengan **Fish** berisi 124 ikan (97 Base Game + 27 event), **Bugs** berisi 101 serangga (76 + 25), **Birds** berisi 103 burung (77 + 26), dan **Animals** berisi 11 hewan (8 + 3), serta **Recipes** berisi 208 resep (87 Base Game + 121 dari 13 event). Kategori Wiki **Crops** berisi 19 tanaman (14 Base Game + 5 event) dan **Collectibles** berisi 40 bahan alam (33 Base Game + 7 event). Semua entri di halaman daftar Heartodex sudah dimasukkan.
+Tahap sekarang: kategori **Wildlife**, dengan **Fish** berisi 124 ikan (97 Base Game + 27 event), **Bugs** berisi 101 serangga (76 + 25), **Birds** berisi 103 burung (77 + 26), dan **Animals** berisi 11 hewan (8 + 3), serta **Recipes** berisi 208 resep (87 Base Game + 121 dari 13 event). Kategori Wiki **Crops** berisi 19 tanaman (14 Base Game + 5 event) dan **Collectibles** berisi 40 bahan alam (33 Base Game + 7 event), ditambah **Ingredients** (32 bahan masak), **Items** (23 benda pakai per hobi), **NPCs** (19 NPC), dan **Achievements** (70 achievement, 1 tersembunyi). Semua entri di halaman daftar Heartodex sudah dimasukkan.
 
 ## Menjalankan
 
@@ -29,6 +29,9 @@ Uji lain yang ikut `npm run test:ui`:
   pemilih bahasa, aturan notifikasi saran bahasa).
 - `scripts/qa/links.test.mjs`: semua yang berpindah halaman adalah tautan sungguhan (hasil pencarian global bisa dibuka
   di tab baru lewat klik tengah, Ctrl+klik, atau klik kanan; keyboard panah/Enter/Escape tetap jalan).
+- `scripts/qa/new-catalogs.test.mjs`: Achievements, Items, dan NPCs (data, daftar, filter, pencarian, detail, tujuan
+  achievement tersembunyi yang buram sampai diklik, "Dijual oleh" dari data NPC, barang dagangan & hadiah favorit NPC,
+  nama NPC tertaut di "Didapat dari" bahan masak, menu, pencarian global, bento beranda, tiga bahasa).
 - `scripts/qa/seo.test.mjs`: meta tag per halaman & bahasa di browser, lalu HTML statis, `sitemap.xml`, `robots.txt`, dan
   rewrite `vercel.json` di `dist/` (jalankan `npm run build` dulu).
 
@@ -39,11 +42,13 @@ node scripts/qa/wildlife-list.test.mjs bugs 390   # satu kategori / satu lebar (
 node scripts/qa/home.test.mjs 390                 # beranda & toolbar, satu lebar
 node scripts/qa/i18n.test.mjs 1280                # tiga bahasa, satu lebar
 node scripts/qa/links.test.mjs 1280               # tautan sungguhan, satu lebar
+node scripts/qa/new-catalogs.test.mjs 1280        # Achievements, Items, NPCs & tautan NPC, satu lebar
 node scripts/qa/seo.test.mjs 1280                 # SEO (setelah npm run build)
 ```
 
 Semua halaman memakai toolbar global yang menempel di atas: logo, menu Wildlife (dropdown Fish, Bugs, Birds,
-Animals), menu Wiki (dropdown Resep, Crops, Collectibles), pencarian nama di semua kategori, dan tombol tema. Di bawah 760 px menu pindah ke drawer dan
+Animals), menu Wiki (dropdown Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements), pencarian nama di semua
+kategori, dan tombol tema. Di bawah 760 px menu pindah ke drawer dan
 pencarian ke balik tombol ikon.
 
 Situs memakai client-side routing (`react-router-dom`). Saat build, tiap halaman di tiap bahasa juga mendapat berkas HTML
@@ -66,6 +71,33 @@ dibuka langsung. Alamat yang tidak punya berkas diarahkan `vercel.json` ke `inde
 | `/crops/:slug` | Detail: identitas (Common ditandai 🏷️), gambar + badge level + semua deret nilai per bintang (Harga jual, Event Tokens, …), info tanam (harga benih & waktu tumbuh), Dipakai di resep, Makanan favorit hewan |
 | `/collectibles` | Grid kartu (badge kategori, lokasi, nilai jual), pencarian, filter Lokasi/Kategori, urutan default & A–Z |
 | `/collectibles/:slug` | Detail: identitas, gambar + nilai jual + energi (kalau ada), lokasi + peta zona, Dipakai di resep, Makanan favorit hewan |
+| `/ingredients/:slug` | Detail bahan masak; nama NPC di "Didapat dari" (mis. Toko Massimo) tertaut ke halaman NPC-nya |
+| `/items` | Grid kartu (badge kategori hobi, harga, NPC penjual), pencarian, filter Kategori, urutan default & A–Z |
+| `/items/:slug` | Detail: identitas & deskripsi (efek/kegunaan), gambar + harga + Dijual oleh (tautan NPC, dihitung dari data NPC) |
+| `/npcs` | Grid kartu (peran, lokasi), pencarian nama & peran, filter Lokasi, urutan default & A–Z |
+| `/npcs/:slug` | Detail (4 kotak): identitas & gambar (peran), lokasi + peta dengan pin posisi NPC (atau zona), hadiah favorit, barang yang dijual dengan harga (tertaut ke item) |
+| `/achievements` | Grid kartu (badge kategori hobi, title hadiah, tujuan; tujuan & title achievement tersembunyi tidak ditampilkan), pencarian nama & title, filter Kategori, urutan default & A–Z |
+| `/achievements/:slug` | Detail: identitas & tujuan (achievement tersembunyi: buram sampai diklik), gambar + title & kategori hadiah |
+
+Katalog Items, NPCs, dan Achievements:
+
+- Datanya dari halaman Heartodex (`/en/items`, `/en/npcs`, `/en/achievements`) lewat `node scripts/heartodex-sync-extra.mjs
+  --kind items|npcs|achievements [--write]`, yang menulis ulang `src/data/hobbyItems/hobbyItems.js`,
+  `src/data/npcs/npcs.js`, dan `src/data/achievements/achievements.js` seluruhnya (terjemahan Indonesia di
+  `scripts/translations/<kind>.id.json`, jadi ubah terjemahan di sana). Folder data Items bernama `hobbyItems` karena
+  `src/data/items.js` sudah dipakai benda bersama; katalognya tetap `items` (URL `/items`, id benda `items/<slug>`).
+- Tujuan (Objective) achievement disimpan sebagai `description`/`descriptionOriginal`, jadi terjemahan Thai/Inggris dan
+  isian manual memakai jalur yang sama. Bagian "Pro Tips" Heartodex tidak diambil. Achievement yang di sumber bernama
+  "Hidden Achievement N" dengan title "?" ditandai `hidden: true`: tujuannya buram sampai diklik dan tidak masuk meta
+  description.
+- Penjual item tidak disimpan di data item: halaman item, bahan masak, tanaman, dan collectible menampilkan "Dijual oleh"
+  dari daftar "Items for sale" NPC (`src/data/npcSales.js`); tanpa penjual, baris itu tidak tampil (halaman item: "—").
+  Nama NPC di teks "Didapat dari" bahan masak otomatis jadi tautan.
+- Hadiah favorit NPC di sumber berupa jenis benda ("Prepared meals", "Rare insects"). Yang jelas sama dengan satu halaman
+  daftar Hatowiki ditautkan (`src/data/npcs/giftLinks.js`), sisanya teks; labelnya diterjemahkan lewat `giftLabels` di
+  `src/i18n/messages`. Peran NPC ("Cooking mentor") tetap bahasa Inggris seperti istilah game.
+- Barang dagangan NPC dicocokkan ke katalog Items lewat nama (tautan di sumber memakai slug Spanyol). Barang yang belum
+  punya halaman disimpan dengan `item: null` dan tampil tanpa tautan.
 
 Semua halaman daftar dibagi per section: 🎮 Base Game paling atas, lalu satu section per event dari yang paling baru
 dimulai sampai yang paling lama (tanggal mulai di `src/data/events.js`, bersumber dari halaman event Heartodex; tidak
@@ -84,12 +116,16 @@ public/images/animals/        Gambar hewan (diunduh dari Heartodex)
 public/images/recipes/        Gambar resep (diunduh dari Heartodex)
 public/images/crops/          Gambar tanaman (diunduh dari Heartodex; juga dipakai sebagai gambar bahan)
 public/images/collectibles/   Gambar collectible (diunduh dari Heartodex; juga dipakai sebagai gambar bahan)
+public/images/hobby-items/    Gambar item/benda pakai (diunduh dari Heartodex; juga dipakai daftar barang dagangan NPC)
+public/images/npcs/           Gambar NPC (diunduh dari Heartodex)
+public/images/achievements/   Gambar achievement (diunduh dari Heartodex)
 public/images/items/          Gambar benda lain: ingredient, resep, ikan (diunduh dari Heartodex)
 public/images/maps/           Peta dasar Heartopia dan peta bawah laut Whalefall Canyon (diunduh dari Heartodex)
 data/manual/descriptions.json Isian manual: deskripsi dari game untuk entri yang tidak punya deskripsi
 api/geo.js                    Fungsi Vercel: kode negara pengunjung (untuk notifikasi saran bahasa)
 scripts/
 ├── heartodex-sync.mjs        Sinkronisasi data dari Heartodex
+├── heartodex-sync-extra.mjs  Sinkronisasi Items, NPCs, dan Achievements (lib/heartodex-fetch.mjs: ambil dengan jeda + cache)
 ├── english-descriptions.mjs  Teks tampilan bahasa Inggris dari teks asli + pembetulan salah ketik
 ├── manual-descriptions.mjs   Daftar entri tanpa deskripsi (berkas isian manual) & status terjemahannya
 ├── build-seo.mjs             HTML statis per halaman & bahasa, sitemap.xml, robots.txt (dijalankan vite build)
@@ -106,6 +142,10 @@ src/
 │   ├── items.js              Benda bersama (bahan resep, makanan hewan): id, nama, jenis, gambar, sumber (+ validator);
 │   │                         Crop & Collectible diturunkan dari datanya sendiri
 │   ├── itemUsage.js          Resep yang memakai sebuah benda & hewan yang menyukainya (dihitung dari data)
+│   ├── npcSales.js           NPC penjual sebuah benda & nama NPC di dalam teks (dihitung dari data NPC)
+│   ├── hobbyItems/           hobbyItems.js (katalog Items: data + skema), categories.js, validateHobbyItems.js
+│   ├── npcs/                 npcs.js (data + skema), categories.js, giftLinks.js (tautan hadiah favorit), validateNpcs.js
+│   ├── achievements/         achievements.js (data + skema), categories.js, validateAchievements.js
 │   ├── crops/                crops.js (data + skema), categories.js, validateCrops.js
 │   ├── collectibles/         collectibles.js (data + skema), categories.js, validateCollectibles.js
 │   ├── recipes/
@@ -142,10 +182,14 @@ src/
     ├── catalog/              CatalogListPage (daftar generik: pencarian, filter, urutan, section, status di URL), listState.js, sections.js, filterDefs.js
     ├── wildlife/             WildlifeListPage & WildlifeDetailPage, AnimalDetailPanels, wildlifeKinds.js (konfigurasi per kategori)
     ├── recipes/              RecipeListPage, RecipeDetailPage, recipeKind.js, recipeOrder.js (Urutan Default per jenis masakan)
-    └── goods/                GoodsListPage, CropDetailPage, CollectibleDetailPage, UsagePanels, goodsKinds.js (Crops & Collectibles)
+    ├── goods/                GoodsListPage (juga daftar NPCs & Achievements), Crop/Collectible/Ingredient/HobbyItemDetailPage,
+    │                         GoodsDetailParts (identitas, Dijual oleh, tautan NPC), UsagePanels, goodsKinds.js (Crops, Collectibles, Ingredients, Items)
+    ├── npcs/                 NpcDetailPage, NpcCard, npcKind.js
+    └── achievements/         AchievementDetailPage (tujuan tersembunyi buram sampai diklik), AchievementCard, achievementKind.js
 ```
 
-`components/layout/catalogs.js` mengumpulkan semua katalog (Fish, Bugs, Birds, Animals, Recipes, Crops, Collectibles) beserta ikon, teks,
+`components/layout/catalogs.js` mengumpulkan semua katalog (Fish, Bugs, Birds, Animals, Recipes, Crops, Collectibles, Ingredients,
+Items, NPCs, Achievements) beserta ikon, teks,
 data, dan tautannya; toolbar, drawer, pencarian global, dan kartu kategori di beranda memakainya, jadi kategori baru
 cukup ditambahkan di sana. Jumlah entri di mana pun selalu dihitung dari data.
 

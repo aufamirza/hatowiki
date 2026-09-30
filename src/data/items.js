@@ -1,5 +1,6 @@
 import { collectibles } from './collectibles/collectibles'
 import { crops } from './crops/crops'
+import { hobbyItems } from './hobbyItems/hobbyItems'
 import { ingredients } from './ingredients/ingredients'
 
 /**
@@ -8,10 +9,11 @@ import { ingredients } from './ingredients/ingredients'
  * halaman, gambar dari gambar utamanya. Diisi oleh scripts/heartodex-sync.mjs saat resep atau hewan yang memakainya
  * disinkronkan.
  *
- * Crop, Collectible, dan Ingredient tidak ditulis di sini: satu-satunya sumber datanya src/data/crops/crops.js,
- * src/data/collectibles/collectibles.js, dan src/data/ingredients/ingredients.js (gambar di
- * public/images/crops|collectibles|ingredients/). Benda 'crops/<slug>', 'collectibles/<slug>', dan 'ingredients/<slug>'
- * diturunkan dari data itu (lihat ALL_ITEMS), jadi tidak ada data maupun gambar ganda.
+ * Crop, Collectible, Ingredient, dan Item (katalog Items) tidak ditulis di sini: satu-satunya sumber datanya
+ * src/data/crops/crops.js, src/data/collectibles/collectibles.js, src/data/ingredients/ingredients.js, dan
+ * src/data/hobbyItems/hobbyItems.js (gambar di public/images/crops|collectibles|ingredients|hobby-items/). Benda
+ * 'crops/<slug>', 'collectibles/<slug>', 'ingredients/<slug>', dan 'items/<slug>' diturunkan dari data itu (lihat
+ * ALL_ITEMS), jadi tidak ada data maupun gambar ganda.
  * Benda baru yang juga entri Hatowiki sendiri (resep, ikan, serangga, burung) memakai gambar entri itu
  * (mis. '/images/fish/sardine.webp'), jadi gambarnya tidak diunduh dua kali.
  *
@@ -39,6 +41,7 @@ export const ITEM_TYPES = {
   Ingredient: { segment: 'ingredients' },
   Recipe: { segment: 'recipes' },
   Fish: { segment: 'fish' },
+  Item: { segment: 'items' },
 }
 
 // Folder gambar entri Hatowiki per bagian URL: benda yang entrinya ada boleh memakai gambar entri itu.
@@ -49,6 +52,7 @@ const OWN_DATA = {
   crops: { type: 'Crop', entries: crops },
   collectibles: { type: 'Collectible', entries: collectibles },
   ingredients: { type: 'Ingredient', entries: ingredients },
+  items: { type: 'Item', entries: hobbyItems },
 }
 
 /** Benda yang disimpan di file ini (resep, ikan, bahan generik). Crop, Collectible & Ingredient ada di ALL_ITEMS. */
@@ -1104,7 +1108,7 @@ export const items = [
   },
 ]
 
-/** Semua benda: `items` ditambah tanaman, collectible, dan bahan (diturunkan dari datanya sendiri). */
+/** Semua benda: `items` ditambah tanaman, collectible, bahan, dan item (diturunkan dari datanya sendiri). */
 export const ALL_ITEMS = [
   ...items,
   ...Object.entries(OWN_DATA).flatMap(([segment, { type, entries }]) =>
@@ -1145,7 +1149,7 @@ export function findItemProblems(list) {
     const type = ITEM_TYPES[item.type]
     if (!type) problems.push(`type "${item.type}" tidak dikenal`)
     const generic = segment === 'any'
-    if (OWN_DATA[segment]) problems.push(`benda ${segment}/* tidak disimpan di items.js; sumbernya src/data/${segment}/${segment}.js`)
+    if (OWN_DATA[segment]) problems.push(`benda ${segment}/* tidak disimpan di items.js; sumbernya file data katalognya sendiri`)
     if (type && !generic && type.segment !== segment) problems.push(`awalan id "${segment}" tidak cocok dengan type ${item.type}`)
     if (!(item.image === null || isText(item.image))) problems.push('image harus teks atau null')
     const imagePaths = [`/images/items/${segment}-${slug}.webp`, ENTRY_IMAGE_DIRS[segment] && `${ENTRY_IMAGE_DIRS[segment]}/${slug}.webp`]

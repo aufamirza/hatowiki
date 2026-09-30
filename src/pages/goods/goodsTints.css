@@ -1,6 +1,6 @@
-/* Warna halaman Crops (daun muda, panggung padang rumput), Collectibles (tanah & kayu), dan Ingredients (merah muda
-   gula-gula, panggung dapur). Kunci sama dengan kategori wildlife (data-wildlife), dipakai header, panggung gambar,
-   menu toolbar, dan kartu beranda. */
+/* Warna halaman Crops (daun muda, panggung padang rumput), Collectibles (tanah & kayu), Ingredients (merah muda
+   gula-gula, panggung dapur), Items (jingga fajar), NPCs (biru malam), dan Achievements (emas trofi). Kunci sama dengan
+   kategori wildlife (data-wildlife), dipakai header, panggung gambar, menu toolbar, dan kartu beranda. */
 [data-wildlife='crops'] {
   --tint: var(--color-leaf-soft);
   --tint-ink: var(--color-leaf-ink);
@@ -17,4 +17,20 @@
   --tint: var(--color-dusk-soft);
   --tint-ink: var(--color-dusk-ink);
   --stage-top: var(--stage-top-kitchen);
+}
+
+[data-wildlife='items'] {
+  --tint: var(--color-dawn-soft);
+  --tint-ink: var(--color-dawn-ink);
+  --stage-top: var(--stage-top-earth);
+}
+
+[data-wildlife='npcs'] {
+  --tint: var(--color-night-soft);
+  --tint-ink: var(--color-night-ink);
+}
+
+[data-wildlife='achievements'] {
+  --tint: var(--color-day-soft);
+  --tint-ink: var(--color-day-ink);
 }

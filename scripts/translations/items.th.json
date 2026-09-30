@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "language": "th",
+    "machineTranslated": true,
+    "reviewedByNativeSpeaker": false,
+    "translatedFrom": "descriptionOriginal (teks asli Heartodex; sebagian besar deskripsi item di situs EN masih berbahasa Spanyol, diterjemahkan langsung dari teks itu), bukan dari terjemahan Indonesia",
+    "note": "Terjemahan Thai deskripsi item dibuat otomatis (AI) dan belum ditinjau penutur asli bahasa Thai. Entri tanpa teks asli sengaja tidak ada di sini.",
+    "date": "2026-10-01",
+    "review": "scripts/translations/review-items.th.md"
+  },
+  "camouflage-bush": "เมื่อใช้แล้ว จะมีพุ่มไม้ปรากฏขึ้นเพื่ออำพรางตัวคุณจากนก อยู่ได้ 240 วินาที",
+  "bird-food": "ได้รับเป็นการแลกเปลี่ยนเมื่อส่งการ์ดให้ Bailey J",
+  "universal-animal-food": "อาหารที่ให้สารอาหารสมดุลแก่สัตว์ทุกชนิด",
+  "amazing-seasoning": "ใช้สำหรับทำอาหาร ช่วยเพิ่มคุณภาพของอาหาร (อย่างน้อย 2 ดาว) เมื่อทำอาหารสำเร็จ (ไม่มีผลหากล้มเหลว)",
+  "dog-food": "อาหารเม็ดสูตรสมดุลสำหรับสุนัข อย่าปล่อยให้น้องหมาหิวนะ!",
+  "energy-dog-food": "ให้อาหารสุนัขของคุณเพื่อฟื้นฟูพลังชีวิต",
+  "cat-food": "อาหารบำรุงสำหรับแมว อย่าปล่อยให้แมวของคุณหิวนะ!",
+  "universal-ingredient": "ใช้แทนวัตถุดิบใดก็ได้",
+  "drawing-board": "ปลดปล่อยความคิดสร้างสรรค์ของคุณบนกระดานวาดภาพ",
+  "energy-fish-jerky": "ให้อาหารน้องแมวของคุณเพื่อฟื้นฟูพลังชีวิต",
+  "auto-bird-whistle": "เมื่อใช้แล้ว นกที่อยู่ใกล้ ๆ (ยกเว้นนกที่อยู่บนที่เกาะ) จะแสดงท่าทางบ่อยขึ้นเป็นเวลา 3 นาที"
+}

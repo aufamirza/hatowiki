@@ -258,7 +258,8 @@
 }
 
 /* Keterangan kecil di kanan judul kotak (mis. "5 resep") */
-.entry-detail__grid--goods .panel__hint {
+.entry-detail__grid--goods .panel__hint,
+.entry-detail__grid--npc .panel__hint {
   margin-left: auto;
   font-family: var(--font-body);
   font-size: var(--text-xs);
@@ -277,4 +278,28 @@
 .panel--recipes .item-list,
 .panel--animals .item-list {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+}
+
+/*
+ * Item & achievement: hanya identitas dan gambar & angka (tanpa kotak samping, resep, maupun hewan). Desktop identitas (5)
+ * + gambar & angka (7) seperti bahan masak; tablet dan mobile menumpuk.
+ */
+.entry-detail__grid.entry-detail__grid--pair {
+  grid-template-areas:
+    'info'
+    'hero';
+}
+
+@media (min-width: 760px) {
+  .entry-detail__grid.entry-detail__grid--pair {
+    grid-template-areas:
+      'info info info info info info info info info info info info'
+      'hero hero hero hero hero hero hero hero hero hero hero hero';
+  }
+}
+
+@media (min-width: 1080px) {
+  .entry-detail__grid.entry-detail__grid--pair {
+    grid-template-areas: 'info info info info info hero hero hero hero hero hero hero';
+  }
 }

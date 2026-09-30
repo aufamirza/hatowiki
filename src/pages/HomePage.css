@@ -784,35 +784,39 @@
 .category-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Baris kartu besar setinggi isinya; baris lain sama tinggi, jadi kartu sedang & kecil rapi walau panjang teksnya beda */
+  grid-template-rows: auto;
+  grid-auto-rows: 1fr;
   gap: var(--space-6) var(--space-4);
   /* Ruang untuk gambar yang keluar dari tepi atas kartu di baris pertama */
   padding-top: var(--space-3);
 }
 
-.category-grid__item--xl,
-.category-grid__item--wide {
+/* Ponsel: 2 kolom, kartu besar selebar layar; sedang & kecil masing-masing satu kolom */
+.category-grid__item--xl {
   grid-column: 1 / -1;
 }
 
+/* Tablet: 12 kolom; besar selebar layar, sedang 2 per baris, kecil 3 per baris */
 @media (min-width: 640px) {
   .category-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: var(--space-6) var(--space-5);
   }
 
-  .category-grid__item--xl {
-    grid-column: span 2;
-    grid-row: span 2;
+  .category-grid__item--md {
+    grid-column: span 6;
   }
 
-  .category-grid__item--wide {
-    grid-column: span 2;
+  .category-grid__item--sm {
+    grid-column: span 4;
   }
 }
 
+/* Desktop: besar di kiri setinggi dua baris, 2×2 sedang di kanannya (dua baris sama tinggi), lalu 6 kecil sebaris */
 @media (min-width: 1080px) {
   .category-grid {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: 1fr 1fr;
   }
 
   .category-grid__item--xl {
@@ -820,13 +824,12 @@
     grid-row: span 2;
   }
 
-  .category-grid__item--wide {
-    grid-column: span 6;
+  .category-grid__item--md {
+    grid-column: span 3;
   }
 
-  .category-grid__item--md,
   .category-grid__item--sm {
-    grid-column: span 3;
+    grid-column: span 2;
   }
 }
 
@@ -994,6 +997,10 @@
   color: var(--color-text-muted);
 }
 
+.category-card__noun {
+  white-space: nowrap;
+}
+
 .category-card__count strong {
   margin-right: 3px;
   font-family: var(--font-body);
@@ -1055,35 +1062,6 @@
   white-space: nowrap;
 }
 
-/* Desktop: kartu kecil lebih pendek, ikon & nama sebaris (nama boleh turun baris sebelum menyentuh stiker) */
-@media (min-width: 1080px) {
-  .category-card[data-size='sm'] .category-card__head {
-    flex-direction: row;
-    align-items: center;
-    padding-right: calc(var(--art-size) * 0.6);
-  }
-}
-
-/* ---------- Lebar: teks di kiri, tiga stiker di kanan ---------- */
-.category-card[data-size='wide'] {
-  --art-size: clamp(84px, 9vw, 108px);
-  padding-right: calc(var(--art-size) * 2.3);
-}
-
-.category-card[data-size='wide'] .category-card__head {
-  flex-direction: row;
-  align-items: center;
-}
-
-.category-card[data-size='wide'] .category-card__title {
-  font-size: var(--text-2xl);
-}
-
-.category-card[data-size='wide'] .category-card__art {
-  top: -18px;
-  right: -10px;
-}
-
 /* ---------- Besar: judul & angka besar, kolase tiga stiker besar di kanan ---------- */
 .category-card[data-size='xl'] {
   --art-size: clamp(100px, 10.5vw, 136px);
@@ -1105,6 +1083,16 @@
 
 .category-card[data-size='xl'] .category-card__title {
   font-size: var(--text-3xl);
+}
+
+/* Kartu sedang & kecil yang sempit (ponsel, 6 kartu kecil sebaris di desktop): nama kategori mengecil mengikuti lebar
+   kartu, supaya nama panjang seperti "Achievements" tidak keluar dari kartu */
+:is(.category-card[data-size='md'], .category-card[data-size='sm']) {
+  container-type: inline-size;
+}
+
+:is(.category-card[data-size='md'], .category-card[data-size='sm']) .category-card__title {
+  font-size: min(var(--text-xl), 13cqi);
 }
 
 .category-card[data-size='xl'] .category-card__desc {
@@ -1154,26 +1142,12 @@
   grid-area: 3 / 2;
 }
 
-/* Tablet & ponsel: kartu lebar memakai susunan kartu lain (stiker di pojok, teks selebar kartu); jumlah entri kartu
-   sedang & kecil tidak terbungkus */
+/* Tablet & ponsel: jumlah entri kartu sedang & kecil dengan huruf kecil. Kata bendanya tidak pernah terpotong; kalau
+   tidak muat (mis. "achievements"), seluruhnya turun ke bawah angka, jadi tombol panah tidak terdorong keluar kartu */
 @media (max-width: 1079px) {
-  .category-card[data-size='wide'] {
-    --art-size: 88px;
-    padding-right: var(--space-5);
-  }
-
-  .category-card[data-size='wide'] .category-card__head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .category-card[data-size='wide'] .category-card__desc {
-    max-width: 40ch;
-  }
-
   :is(.category-card[data-size='md'], .category-card[data-size='sm']) .category-card__count {
+    min-width: 0;
     font-size: var(--text-xs);
-    white-space: nowrap;
   }
 
   /* Dua stiker di kartu sempit: dikecilkan supaya tidak menutupi ikon */
@@ -1187,15 +1161,6 @@
   .category-card {
     --art-size: 64px;
     padding: var(--space-4);
-  }
-
-  .category-card[data-size='wide'] {
-    --art-size: 80px;
-    padding-right: var(--space-4);
-  }
-
-  .category-card[data-size='wide'] .category-card__desc {
-    max-width: none;
   }
 
   /* Kartu besar di ponsel: stiker berjajar di pojok kanan atas seperti kartu lain, teks selebar kartu di bawahnya */

@@ -13,6 +13,9 @@ import GoodsListPage from './pages/goods/GoodsListPage'
 import CropDetailPage from './pages/goods/CropDetailPage'
 import CollectibleDetailPage from './pages/goods/CollectibleDetailPage'
 import IngredientDetailPage from './pages/goods/IngredientDetailPage'
+import HobbyItemDetailPage from './pages/goods/HobbyItemDetailPage'
+import NpcDetailPage from './pages/npcs/NpcDetailPage'
+import AchievementDetailPage from './pages/achievements/AchievementDetailPage'
 
 // Semua halaman, dipakai sekali per bahasa: tanpa awalan (Indonesia), di bawah /th (Thai), dan di bawah /en (Inggris).
 // Slug sama untuk semua bahasa. Daftar halaman untuk HTML statis & sitemap ada di src/seo/pageMeta.js.
@@ -59,6 +62,27 @@ const pageRoutes = () => [
     children: [
       { index: true, element: <GoodsListPage key="ingredients" kindSlug="ingredients" /> },
       { path: ':slug', element: <IngredientDetailPage /> },
+    ],
+  },
+  {
+    path: 'items',
+    children: [
+      { index: true, element: <GoodsListPage key="items" kindSlug="items" /> },
+      { path: ':slug', element: <HobbyItemDetailPage /> },
+    ],
+  },
+  {
+    path: 'npcs',
+    children: [
+      { index: true, element: <GoodsListPage key="npcs" kindSlug="npcs" /> },
+      { path: ':slug', element: <NpcDetailPage /> },
+    ],
+  },
+  {
+    path: 'achievements',
+    children: [
+      { index: true, element: <GoodsListPage key="achievements" kindSlug="achievements" /> },
+      { path: ':slug', element: <AchievementDetailPage /> },
     ],
   },
   { path: '*', element: <NotFoundPage /> },

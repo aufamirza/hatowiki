@@ -1,0 +1,109 @@
+/*
+ * Detail NPC: 4 kotak dengan pola yang sama dengan hewan (lihat .entry-detail__grid--animal di WildlifeDetailPage.css).
+ * Desktop: kiri identitas & gambar (7) di atas hadiah favorit (7); kanan lokasi & peta (5) setinggi keduanya; barang yang
+ *   dijual selebar layar di bawah (jumlahnya 0–7, jadi tidak dipasangkan).
+ * Tablet: identitas selebar layar; kiri hadiah (7) di atas barang (7), kanan lokasi (5).
+ * Mobile: menumpuk mengikuti urutan baca (nama & gambar → lokasi → hadiah → barang).
+ */
+.entry-detail__grid.entry-detail__grid--npc {
+  grid-template-areas:
+    'ident'
+    'location'
+    'gifts'
+    'shop';
+}
+
+.panel--gifts { grid-area: gifts; }
+.panel--shop { grid-area: shop; }
+
+@media (min-width: 760px) {
+  .entry-detail__grid.entry-detail__grid--npc {
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      'ident ident ident ident ident ident ident ident ident ident ident ident'
+      'gifts gifts gifts gifts gifts gifts gifts location location location location location'
+      'shop shop shop shop shop shop shop location location location location location';
+  }
+
+  .entry-detail__grid--npc .panel--location,
+  .entry-detail__grid--npc .panel--shop {
+    align-self: start;
+  }
+}
+
+@media (min-width: 1080px) {
+  .entry-detail__grid.entry-detail__grid--npc {
+    grid-template-rows: 1fr auto auto;
+    grid-template-areas:
+      'ident ident ident ident ident ident ident location location location location location'
+      'gifts gifts gifts gifts gifts gifts gifts location location location location location'
+      'shop shop shop shop shop shop shop shop shop shop shop shop';
+  }
+
+  .entry-detail__grid--npc .panel--location {
+    align-self: stretch;
+  }
+}
+
+/* Peran di bawah nama: teks kecil berwarna tint kategori, seperti subjudul */
+.npc-role {
+  margin: 0;
+  color: var(--tint-ink);
+  font-weight: 700;
+}
+
+.panel--gifts,
+.panel--shop {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hadiah favorit: chip teks; jenis yang punya halaman daftar di Hatowiki berupa tautan */
+.gift-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gift-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sunken);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.gift-chip--link {
+  gap: 2px;
+  padding-right: var(--space-2);
+  color: var(--color-accent-ink);
+  text-decoration: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.gift-chip--link:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: var(--color-accent-soft);
+}
+
+.gift-chip--link svg {
+  width: 16px;
+  height: 16px;
+}
+
+.gift-chip--link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Barang yang dijual selebar layar: petak dalam beberapa kolom seperti makanan favorit hewan */
+.panel--shop .item-list {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+}

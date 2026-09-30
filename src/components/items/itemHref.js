@@ -1,5 +1,6 @@
 import { getCollectibleBySlug } from '../../data/collectibles/collectibles'
 import { getCropBySlug } from '../../data/crops/crops'
+import { getHobbyItemBySlug } from '../../data/hobbyItems/hobbyItems'
 import { getIngredientBySlug } from '../../data/ingredients/ingredients'
 import { getRecipeBySlug } from '../../data/recipes/recipes'
 import { fish } from '../../data/wildlife/fish'
@@ -19,11 +20,12 @@ const WIKI_SEGMENTS = {
   crops: getCropBySlug,
   collectibles: getCollectibleBySlug,
   ingredients: getIngredientBySlug,
+  items: getHobbyItemBySlug,
 }
 
 /**
- * Tautan internal sebuah benda (bahan resep / makanan hewan), atau null. Recipe, Crop, Collectible, dan Ingredient →
- * halaman detailnya (/recipes|crops|collectibles|ingredients/<slug>); ikan, serangga, dan burung →
+ * Tautan internal sebuah benda (bahan resep / makanan hewan / barang dagangan NPC), atau null. Recipe, Crop, Collectible,
+ * Ingredient, dan Item → halaman detailnya (/recipes|crops|collectibles|ingredients|items/<slug>); ikan, serangga, dan burung →
  * /wildlife/<kategori>/<slug>. Tautan mengikuti awalan id (jenis benda), bukan namanya: Egg si bahan
  * ('ingredients/egg') → /ingredients/egg, Egg si resep ('recipes/egg') → /recipes/egg. Tautan hanya dibuat kalau
  * entrinya ada di data Hatowiki, jadi entri yang ditambahkan nanti otomatis tertaut. Bahan generik seperti "Any Fish"

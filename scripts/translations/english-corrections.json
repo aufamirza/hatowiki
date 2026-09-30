@@ -7,7 +7,8 @@
       "OCR": "huruf atau angka lain yang salah terbaca",
       "kapital": "huruf besar di tengah kalimat pada kata biasa (S, U, P, W: bentuk huruf besar dan kecilnya sama)",
       "apostrof": "apostrof hilang atau memakai aksen (´)",
-      "tanda baca": "tanda baca lain yang salah"
+      "tanda baca": "tanda baca lain yang salah",
+      "ejaan": "kata biasa yang salah eja (huruf kurang atau tertukar)"
     }
   },
   "fixes": {
@@ -96,12 +97,29 @@
     },
     "ingredients": {
       "brick-meat-patty": [["one Will hit", "one will hit", "kapital"]]
+    },
+    "items": {
+      "drawing-board": [["gour creativity", "your creativity", "y→g"]]
+    },
+    "achievements": {
+      "foreman-beaver": [["succesfully", "successfully", "ejaan"]]
     }
   },
   "translations": {
     "recipes": {
       "violet-roll-cake": "A purple cake like soft mist. It's sure to bring you sweet dreams.",
       "yellow-roll-cake": "Yellow cream and cake, with a flavor as warm as the sun."
+    },
+    "items": {
+      "camouflage-bush": "Once used, a bush appears that hides your presence from birds. Lasts 240 s.",
+      "universal-animal-food": "A food that provides balanced nutrition for all animals.",
+      "amazing-seasoning": "Used for cooking. Improves the quality of the dish (at least 2 stars) when cooking succeeds (no effect on failure).",
+      "dog-food": "Balanced kibble for dogs. Don't let your pup go hungry!",
+      "energy-dog-food": "Feed your dog to restore its vitality.",
+      "cat-food": "Nutritious food for cats. Don't let your cat go hungry!",
+      "universal-ingredient": "Can replace any ingredient.",
+      "energy-fish-jerky": "Feed your kitty to restore its vitality.",
+      "auto-bird-whistle": "Once used, nearby birds (except those on the stand) perform actions more often for 3 min."
     }
   }
 }

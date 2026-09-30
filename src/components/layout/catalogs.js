@@ -1,5 +1,7 @@
 import { CookingPot } from 'lucide-react'
-import { COLLECTIBLE_KIND, CROP_KIND, INGREDIENT_KIND } from '../../pages/goods/goodsKinds'
+import { ACHIEVEMENT_KIND } from '../../pages/achievements/achievementKind'
+import { COLLECTIBLE_KIND, CROP_KIND, INGREDIENT_KIND, ITEM_KIND } from '../../pages/goods/goodsKinds'
+import { NPC_KIND } from '../../pages/npcs/npcKind'
 import { RECIPE_KIND } from '../../pages/recipes/recipeKind'
 import { WILDLIFE_KINDS } from '../../pages/wildlife/wildlifeKinds'
 
@@ -36,7 +38,7 @@ export const RECIPE_CATALOG = {
   href: (entry) => (entry ? `/recipes/${entry.slug}` : '/recipes'),
 }
 
-// Tanaman, collectible & bahan masak (grup Wiki bersama resep).
+// Tanaman, collectible, bahan masak, item, NPC & achievement (grup Wiki bersama resep).
 function goodsCatalog(kind) {
   return {
     slug: kind.slug,
@@ -52,8 +54,11 @@ function goodsCatalog(kind) {
 export const CROP_CATALOG = goodsCatalog(CROP_KIND)
 export const COLLECTIBLE_CATALOG = goodsCatalog(COLLECTIBLE_KIND)
 export const INGREDIENT_CATALOG = goodsCatalog(INGREDIENT_KIND)
+export const ITEM_CATALOG = goodsCatalog(ITEM_KIND)
+export const NPC_CATALOG = goodsCatalog(NPC_KIND)
+export const ACHIEVEMENT_CATALOG = goodsCatalog(ACHIEVEMENT_KIND)
 
-// Isi menu "Wiki" di toolbar dan drawer: Resep, Crops, Collectibles, Ingredients.
-export const WIKI_CATALOGS = [RECIPE_CATALOG, CROP_CATALOG, COLLECTIBLE_CATALOG, INGREDIENT_CATALOG]
+// Isi menu "Wiki" di toolbar dan drawer: Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements.
+export const WIKI_CATALOGS = [RECIPE_CATALOG, CROP_CATALOG, COLLECTIBLE_CATALOG, INGREDIENT_CATALOG, ITEM_CATALOG, NPC_CATALOG, ACHIEVEMENT_CATALOG]
 
 export const CATALOGS = [...WILDLIFE_CATALOGS, ...WIKI_CATALOGS]

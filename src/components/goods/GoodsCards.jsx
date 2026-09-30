@@ -1,6 +1,7 @@
 import { Coins, Hourglass, MapPin, Store } from 'lucide-react'
+import { sellersOf } from '../../data/npcSales'
 import { useI18n } from '../../i18n/I18nProvider'
-import { COLLECTIBLE_KIND, CROP_KIND, INGREDIENT_KIND, formatGrowthTime } from '../../pages/goods/goodsKinds'
+import { COLLECTIBLE_KIND, CROP_KIND, INGREDIENT_KIND, ITEM_KIND, formatGrowthTime } from '../../pages/goods/goodsKinds'
 import CatalogCard from '../catalog/CatalogCard'
 import { formatCoins } from '../recipes/starValues'
 
@@ -95,6 +96,32 @@ export function IngredientCard({ item, linkState }) {
       name={item.name}
       category={item.category}
       categoryEmoji={INGREDIENT_KIND.entryCategories[item.category]?.emoji}
+      facts={facts}
+    />
+  )
+}
+
+/**
+ * Kartu item (benda pakai) di halaman daftar: gambar, badge kategori hobi, harga, dan NPC penjualnya (dihitung dari data
+ * NPC).
+ */
+export function HobbyItemCard({ item, linkState }) {
+  const i18n = useI18n()
+  const { t } = i18n
+  const sellers = sellersOf(`items/${item.slug}`).map(({ npc }) => npc.name).join(', ') || '—'
+  const facts = [
+    { key: 'price', label: t('card.price'), Icon: Coins, ...amount(item, 'price', i18n) },
+    { key: 'seller', label: t('card.soldBy'), Icon: Store, short: sellers, full: sellers },
+  ]
+  return (
+    <CatalogCard
+      to={ITEM_KIND.href(item)}
+      linkState={linkState}
+      image={item.image}
+      imageSize={item.imageSize}
+      name={item.name}
+      category={item.category}
+      categoryEmoji={ITEM_KIND.entryCategories[item.category]?.emoji}
       facts={facts}
     />
   )

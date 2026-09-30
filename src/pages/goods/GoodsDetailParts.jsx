@@ -1,5 +1,7 @@
-import { ArrowLeft, ExternalLink } from 'lucide-react'
+import { Fragment } from 'react'
+import { ArrowLeft, ExternalLink, Store } from 'lucide-react'
 import { categoryToneStyle } from '../../components/catalog/categoryTone'
+import { sellersOf, splitNpcMentions } from '../../data/npcSales'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Link } from '../../i18n/LocaleLink'
 
@@ -53,5 +55,49 @@ export function DetailFooter({ kind, entry, listHref }) {
         </a>
       </p>
     </footer>
+  )
+}
+
+/**
+ * Baris "Dijual oleh" di daftar spec halaman detail benda (item, bahan masak, tanaman, collectible): NPC yang menjual
+ * benda ini menurut data NPC, masing-masing tertaut ke halaman NPC-nya. Tidak ditampilkan kalau tidak ada penjual,
+ * kecuali `showEmpty` (halaman item: tampil "—").
+ */
+export function SoldBySpec({ itemId, showEmpty = false }) {
+  const { t } = useI18n()
+  const sellers = sellersOf(itemId)
+  if (!sellers.length && !showEmpty) return null
+  return (
+    <div className="spec spec--wide">
+      <dt className="spec__label">
+        <Store aria-hidden="true" />
+        {t('item.soldBy')}
+      </dt>
+      <dd className={`spec__value spec__value--text${sellers.length ? '' : ' is-missing'}`}>
+        {sellers.length
+          ? sellers.map(({ npc }, index) => (
+              <Fragment key={npc.slug}>
+                {index > 0 && ', '}
+                <Link to={`/npcs/${npc.slug}`} className="spec__link">
+                  {npc.name}
+                </Link>
+              </Fragment>
+            ))
+          : '—'}
+      </dd>
+    </div>
+  )
+}
+
+/** Teks dengan nama NPC di dalamnya tertaut ke halaman NPC itu (mis. "Toko Massimo" di "Didapat dari" bahan masak). */
+export function NpcMentions({ text }) {
+  return splitNpcMentions(text).map((part, index) =>
+    typeof part === 'string' ? (
+      <Fragment key={index}>{part}</Fragment>
+    ) : (
+      <Link key={index} to={`/npcs/${part.npc.slug}`} className="spec__link">
+        {part.text}
+      </Link>
+    ),
   )
 }

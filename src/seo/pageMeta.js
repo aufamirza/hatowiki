@@ -2,6 +2,7 @@ import { CATALOGS } from '../components/layout/catalogs'
 import { PERIODS } from '../data/gameTime'
 import { getItem } from '../data/items'
 import { recipesUsingItem } from '../data/itemUsage'
+import { sellersOf } from '../data/npcSales'
 import { WEATHERS } from '../data/wildlife/attributes'
 import { createTextTranslator, translateDataText } from '../i18n/format'
 import { FALLBACK_LOCALE, LOCALES, getLocale, localizePath } from '../i18n/locales'
@@ -139,6 +140,25 @@ function detailFacts(catalog, entry, { t, formatNumber }) {
         { ...usedIn(), priority: 3 },
       ]
     }
+    case 'items':
+      return [
+        { key: 'seo.price', value: entry.price == null ? null : formatNumber(entry.price), priority: 1 },
+        { key: 'seo.soldBy', value: sellersOf(`items/${entry.slug}`).map(({ npc }) => npc.name).join(', ') || null, priority: 2 },
+      ]
+    case 'npcs':
+      return [
+        { ...location, priority: 1 },
+        { key: 'seo.shop', value: entry.shop.length ? compactList(entry.shop.map((offer) => (offer.item ? itemName(offer.item) : offer.name)), 3) : null, priority: 2 },
+        { key: 'seo.gifts', value: entry.favoriteGifts.length ? entry.favoriteGifts.map((gift) => t.gift(gift)).join(', ') : null, priority: 3 },
+      ]
+    case 'achievements':
+      // Tujuan achievement tidak dimasukkan: teksnya panjang, dan tujuan achievement tersembunyi tidak boleh bocor ke
+      // hasil pencarian.
+      return [
+        entry.hidden
+          ? { key: 'seo.hiddenAchievement', value: true, priority: 1 }
+          : { key: 'seo.rewardTitle', value: entry.rewardTitle, priority: 1 },
+      ]
     default:
       // Ikan, serangga, burung: lokasi, waktu muncul, cuaca, dan rentang harga jual (burung: harga jual Info Card).
       return [
@@ -150,12 +170,21 @@ function detailFacts(catalog, entry, { t, formatNumber }) {
   }
 }
 
+// Kalimat pembuka: nama, jenis, dan level (atau kategori hobi untuk item & achievement, peran untuk NPC).
+function leadOf(catalog, entry, t) {
+  const key = `kinds.${catalog.slug}`
+  if (catalog.slug === 'items' || catalog.slug === 'achievements') {
+    return entry.category == null ? t(`${key}.metaLeadNoCategory`, { name: entry.name }) : t(`${key}.metaLead`, { name: entry.name, category: entry.category })
+  }
+  if (catalog.slug === 'npcs') {
+    return entry.role == null ? t(`${key}.metaLeadNoRole`, { name: entry.name }) : t(`${key}.metaLead`, { name: entry.name, role: entry.role })
+  }
+  return entry.level == null ? t(`${key}.metaLeadNoLevel`, { name: entry.name }) : t(`${key}.metaLead`, { name: entry.name, level: entry.level })
+}
+
 function detailDescription(catalog, entry, i18n) {
   const { t } = i18n
-  const lead =
-    entry.level == null
-      ? t(`kinds.${catalog.slug}.metaLeadNoLevel`, { name: entry.name })
-      : t(`kinds.${catalog.slug}.metaLead`, { name: entry.name, level: entry.level })
+  const lead = leadOf(catalog, entry, t)
   const separator = t('seo.separator')
   const facts = detailFacts(catalog, entry, i18n)
     .filter((fact) => fact.value != null)
@@ -190,6 +219,8 @@ function createI18n(localeId, messages) {
   const t = createTextTranslator(messages, idMessages)
   // Teks data Indonesia (tempat membeli bahan) → bahasa halaman; versi Indonesia tidak punya tabel, jadi apa adanya.
   t.dataText = (text) => translateDataText(text, locale.id === 'id' ? null : messages.dataText)
+  // Label hadiah favorit NPC (bahasa Inggris di data) → bahasa halaman.
+  t.gift = (label) => messages.giftLabels?.[label] ?? idMessages.giftLabels?.[label] ?? label
   return { t, formatNumber: (value) => number.format(value) }
 }
 

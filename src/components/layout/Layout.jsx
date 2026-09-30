@@ -123,7 +123,7 @@ function SiteFooter() {
 }
 
 // Area dengan tint latar sendiri (token --page-bg-<area> di tokens.css), dari segmen pertama URL.
-const TINTED_AREAS = ['wildlife', 'recipes', 'crops', 'collectibles', 'ingredients']
+const TINTED_AREAS = ['wildlife', 'recipes', 'crops', 'collectibles', 'ingredients', 'items', 'npcs', 'achievements']
 
 function SiteShell() {
   const { pathname } = useLocation()

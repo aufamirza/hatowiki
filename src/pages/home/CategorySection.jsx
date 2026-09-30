@@ -14,6 +14,9 @@ const SAMPLE_SLUGS = {
   crops: ['tomato', 'strawberry', 'corn'],
   collectibles: ['apple', 'penny-bun', 'black-truffle'],
   ingredients: ['egg', 'cheese', 'butter'],
+  items: ['mermaid-perfume', 'universal-ingredient', 'rainbow-breeding-powder'],
+  npcs: ['massimo', 'vanya', 'bailey-j'],
+  achievements: ['puzzle-artist', 'shark-frenzy', 'snow-king'],
 }
 
 function samplesOf(catalog, count) {
@@ -25,12 +28,14 @@ function samplesOf(catalog, count) {
 }
 
 /*
- * Susunan bento: ukuran kartu mengikuti jumlah entri (dihitung dari data). Terbanyak → besar (dua baris), kedua →
- * lebar, ketiga & keempat → sedang, sisanya kecil. Kartu diurutkan dari yang terbanyak, jadi urutan baca & fokus
- * keyboard sama dengan urutan tampil. Makin besar kartu, makin banyak contoh gambar; deskripsi hanya di kartu besar & lebar.
+ * Susunan bento: ukuran kartu mengikuti jumlah entri (dihitung dari data). Terbanyak → besar, empat berikutnya →
+ * sedang, sisanya kecil. Kartu diurutkan dari yang terbanyak, jadi urutan baca & fokus keyboard sama dengan urutan
+ * tampil. Dengan 11 katalog setiap baris penuh di semua lebar (lihat .category-grid di HomePage.css): desktop besar
+ * (dua baris) + 2×2 sedang, lalu 6 kecil sebaris; tablet besar selebar layar, sedang 2 per baris, kecil 3 per baris;
+ * ponsel 2 kolom. Makin besar kartu, makin banyak contoh gambar; deskripsi hanya di kartu besar.
  */
-const SIZES = ['xl', 'wide', 'md', 'md']
-const SAMPLE_COUNT = { xl: 3, wide: 3, md: 2, sm: 1 }
+const SIZES = ['xl', 'md', 'md', 'md', 'md']
+const SAMPLE_COUNT = { xl: 3, md: 2, sm: 1 }
 
 // Kartu tiap katalog: ikon, nama, contoh gambar yang sedikit keluar dari kartu, dan jumlah entri dari data.
 function CategorySection() {
@@ -78,10 +83,15 @@ function CategorySection() {
                       </h3>
                     </span>
                   </span>
-                  {(size === 'xl' || size === 'wide') && <span className="category-card__desc">{text.description}</span>}
+                  {size === 'xl' && <span className="category-card__desc">{text.description}</span>}
                   <span className="category-card__footer">
                     <span className="category-card__count">
-                      {t('home.categoryCount', { count: <strong>{catalog.entries.length}</strong>, noun: text.noun, unit: text.unit })}
+                      {/* Kata benda tidak terpotong; kalau tidak muat, seluruhnya turun ke bawah angka */}
+                      {t('home.categoryCount', {
+                        count: <strong>{catalog.entries.length}</strong>,
+                        noun: <span className="category-card__noun">{text.noun}</span>,
+                        unit: <span className="category-card__noun">{text.unit}</span>,
+                      })}
                     </span>
                     {/* Kartu sedang & kecil: hanya tombol panah (teksnya tetap dibaca pembaca layar) */}
                     <span className="category-card__cta">

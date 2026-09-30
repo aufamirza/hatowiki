@@ -330,5 +330,93 @@
     }
   },
   "collectibles": {},
-  "ingredients": {}
+  "ingredients": {},
+  "items": {
+    "inflatable-insect-attractor": {
+      "name": "Inflatable Insect Attractor",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "mermaid-fish-attractor": {
+      "name": "Mermaid Fish Attractor",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "growth-booster": {
+      "name": "Growth Booster",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "quality-growth-booster": {
+      "name": "Quality Growth Booster",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "bait": {
+      "name": "Bait",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "fertilizer": {
+      "name": "Fertilizer",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "quality-fertilizer": {
+      "name": "Quality Fertilizer",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "mermaid-perfume": {
+      "name": "Mermaid Perfume",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "rainbow-breeding-powder": {
+      "name": "Rainbow Breeding Powder",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "sense-booster": {
+      "name": "Sense Booster",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "top-growth-booster": {
+      "name": "Top Growth Booster",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "top-fertilizer": {
+      "name": "Top Fertilizer",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    }
+  },
+  "npcs": {},
+  "achievements": {}
 }

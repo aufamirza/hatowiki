@@ -2,7 +2,7 @@
 /**
  * Uji beranda dan toolbar global di Chrome headless (lewat Chrome DevTools Protocol), untuk lebar 1280, 820, dan 390:
  * - Toolbar: pil melayang (sticky, semi transparan + blur, fallback solid, konten tidak tertutup); menu Wildlife & Wiki
- *   (Resep, Crops, Collectibles, Ingredients) di desktop terbuka saat hover dengan jeda (kursor lewat tidak membuka),
+ *   (Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements) di desktop terbuka saat hover dengan jeda (kursor lewat tidak membuka),
  *   klik, keyboard (Enter, Space, Escape, panah), dan ketuk di layar sentuh; di ponsel menu pindah ke drawer (dialog
  *   modal: fokus terkunci, Escape, klik latar, tautan menutup drawer, scroll terkunci).
  * - Tema: pengunjung pertama selalu light walau sistem dark; pilihan dari tombol diingat.
@@ -14,8 +14,8 @@
  *   periode, penanda tiap server di posisi jamnya dengan nama & jam, label tidak saling menutupi di semua jam, pita
  *   vertikal di ponsel, daftar teks untuk pembaca layar) sementara detail wildlife tetap versi daftar; Muncul Sekarang
  *   (server bawaan SEA, ganti server, isi & urutan dari data, hanya entri section Base Game, "Lihat semua" ke daftar
- *   berfilter waktu, baris geser dengan snap di ponsel); kartu kategori bento (ukuran dari jumlah entri, jumlah dari
- *   data termasuk entri event, gambar sedikit keluar dari kartu).
+ *   berfilter waktu, baris geser dengan snap di ponsel); kartu kategori bento (ukuran dari jumlah entri, tiap baris
+ *   penuh, jumlah dari data termasuk entri event, gambar sedikit keluar dari kartu).
  * - Kartu taktil: kartu beranda, kartu daftar, dan kotak detail memakai garis tepi 1,5px & bayangan keras tanpa blur
  *   berwarna tint (bukan hitam); hover tidak mengangkat kartu, ditekan kartu turun & bayangannya mengecil.
  * - Gambar entri: kotak persegi (object-fit: contain) di Muncul Sekarang, contoh gambar kartu kategori, hiasan hero,
@@ -63,8 +63,8 @@ const serverClock = (offset, date = new Date()) => {
 
 // Kode di halaman: data semua katalog, label & tautan yang diharapkan, dan normalisasi teks pencarian.
 const LOAD_DATA = `
-  const [{ fish }, { bugs }, { birds }, { animals }, { recipes }, { crops }, { collectibles }, { ingredients }] = await Promise.all(
-    ['/src/data/wildlife/fish.js', '/src/data/wildlife/bugs.js', '/src/data/wildlife/birds.js', '/src/data/wildlife/animals.js', '/src/data/recipes/recipes.js', '/src/data/crops/crops.js', '/src/data/collectibles/collectibles.js', '/src/data/ingredients/ingredients.js'].map((p) => import(p)),
+  const [{ fish }, { bugs }, { birds }, { animals }, { recipes }, { crops }, { collectibles }, { ingredients }, { hobbyItems }, { npcs }, { achievements }] = await Promise.all(
+    ['/src/data/wildlife/fish.js', '/src/data/wildlife/bugs.js', '/src/data/wildlife/birds.js', '/src/data/wildlife/animals.js', '/src/data/recipes/recipes.js', '/src/data/crops/crops.js', '/src/data/collectibles/collectibles.js', '/src/data/ingredients/ingredients.js', '/src/data/hobbyItems/hobbyItems.js', '/src/data/npcs/npcs.js', '/src/data/achievements/achievements.js'].map((p) => import(p)),
   )
   const CATALOGS = [
     { slug: 'fish', name: 'Fish', label: 'Ikan', noun: 'ikan', entries: fish, list: '/wildlife/fish' },
@@ -75,6 +75,9 @@ const LOAD_DATA = `
     { slug: 'crops', name: 'Crops', label: 'Tanaman', noun: 'tanaman', entries: crops, list: '/crops' },
     { slug: 'collectibles', name: 'Collectibles', label: 'Bahan Alam', noun: 'bahan alam', entries: collectibles, list: '/collectibles' },
     { slug: 'ingredients', name: 'Ingredients', label: 'Bahan Masak', noun: 'bahan masak', entries: ingredients, list: '/ingredients' },
+    { slug: 'items', name: 'Items', label: 'Benda Pakai', noun: 'benda pakai', entries: hobbyItems, list: '/items' },
+    { slug: 'npcs', name: 'NPCs', label: 'Penduduk Kota', noun: 'NPC', entries: npcs, list: '/npcs' },
+    { slug: 'achievements', name: 'Achievements', label: 'Pencapaian', noun: 'pencapaian', entries: achievements, list: '/achievements' },
   ]
   const ALL = CATALOGS.flatMap((c) => c.entries.map((e) => ({ name: e.name, label: c.label, href: c.list + '/' + e.slug })))
   const norm = (t) => t.normalize('NFD').replace(/\\p{Diacritic}/gu, '').toLowerCase().replace(/['’]/g, '').replace(/[^\\p{L}\\p{N}]+/gu, ' ').trim()
@@ -336,7 +339,8 @@ async function runSuite(width) {
     await mouseClick(outside)
     const outsideState = await evaluate(`({ open: !!document.querySelector('.nav-menu__panel'), path: location.pathname })`)
     check('Menu Wildlife: klik di luar menutup menu (tanpa pindah halaman)', !outsideState.open && outsideState.path === '/wildlife/bugs', outsideState.path)
-    // Menu Wiki: Resep, Crops, Collectibles, Ingredients (tanpa tautan "Semua"); Resep tidak lagi berupa tautan terpisah di toolbar.
+    // Menu Wiki: Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements (tanpa tautan "Semua"); Resep tidak lagi
+    // berupa tautan terpisah di toolbar.
     const buttons = await evaluate(`[...document.querySelectorAll('.site-nav .nav-menu__button')].map((b) => b.textContent.trim())`)
     const plainLinks = await evaluate(`[...document.querySelectorAll('.site-nav > a')].map((a) => a.textContent.trim())`)
     await evaluate(`[...document.querySelectorAll('.nav-menu__button')].find((b) => b.textContent.trim() === 'Wiki').click()`); await sleep(300)
@@ -353,9 +357,9 @@ async function runSuite(width) {
     })()`)
     const counts = await evaluate(`(async () => { ${LOAD_DATA} return Object.fromEntries(CATALOGS.map((c) => [c.slug, c.entries.length])) })()`)
     check(
-      'Toolbar: menu Wildlife & Wiki (tanpa tautan Resep terpisah); Wiki berisi Resep, Crops, Collectibles, Ingredients (nama Inggris + label Indonesia & jumlah entri)',
+      'Toolbar: menu Wildlife & Wiki (tanpa tautan Resep terpisah); Wiki berisi Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements (nama Inggris + label Indonesia & jumlah entri)',
       buttons.join() === 'Wildlife,Wiki' && plainLinks.length === 0 && wiki.expanded === 'true' && !wiki.all && wiki.inView && wiki.items.every((i) => i.icon) &&
-        wiki.items.map((i) => `${i.name}|${i.meta}>${i.href}`).join() === `Recipes|Resep · ${counts.recipes} entri>/recipes,Crops|Tanaman · ${counts.crops} entri>/crops,Collectibles|Bahan Alam · ${counts.collectibles} entri>/collectibles,Ingredients|Bahan Masak · ${counts.ingredients} entri>/ingredients`,
+        wiki.items.map((i) => `${i.name}|${i.meta}>${i.href}`).join() === `Recipes|Resep · ${counts.recipes} entri>/recipes,Crops|Tanaman · ${counts.crops} entri>/crops,Collectibles|Bahan Alam · ${counts.collectibles} entri>/collectibles,Ingredients|Bahan Masak · ${counts.ingredients} entri>/ingredients,Items|Benda Pakai · ${counts.items} entri>/items,NPCs|Penduduk Kota · ${counts.npcs} entri>/npcs,Achievements|Pencapaian · ${counts.achievements} entri>/achievements`,
       wiki.items.map((i) => `${i.name} (${i.meta})`).join(', '),
     )
     // Escape menutup menu dan mengembalikan fokus ke tombol Wiki; panah bawah membuka lagi & fokus ke tautan pertama.
@@ -474,9 +478,9 @@ async function runSuite(width) {
     await evaluate(`document.querySelector('.site-header .menu-button').click()`); await sleep(450)
     let drawer = await readDrawer()
     check('Drawer: tombol menu membuka dialog modal berlabel, fokus ke tombol tutup, scroll halaman terkunci', drawer.open && drawer.modal === 'true' && drawer.label === 'Menu' && drawer.expanded === 'true' && drawer.focusClose && drawer.locked && drawer.inView && drawer.overflow <= 0, JSON.stringify({ label: drawer.label, locked: drawer.locked, overflow: drawer.overflow }))
-    const expectedLinks = 'Beranda>/,Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Semua kategori wildlife>/wildlife,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles,Ingredients>/ingredients'
+    const expectedLinks = 'Beranda>/,Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Semua kategori wildlife>/wildlife,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles,Ingredients>/ingredients,Items>/items,NPCs>/npcs,Achievements>/achievements'
     const drawerGroups = await evaluate(`[...document.querySelectorAll('.drawer__group')].map((g) => g.textContent.trim()).join()`)
-    check('Drawer: tautan Beranda, grup Wildlife (Fish, Bugs, Birds, Animals, Semua kategori), grup Wiki (Resep, Crops, Collectibles, Ingredients), dengan ikon', drawer.links.map((l) => `${l.text}>${l.href}`).join() === expectedLinks && drawer.links.filter((l) => l.href !== '/wildlife').every((l) => l.icon) && drawerGroups === 'Wildlife,Wiki', drawer.links.map((l) => l.text).join(', '))
+    check('Drawer: tautan Beranda, grup Wildlife (Fish, Bugs, Birds, Animals, Semua kategori), grup Wiki (Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements), dengan ikon', drawer.links.map((l) => `${l.text}>${l.href}`).join() === expectedLinks && drawer.links.filter((l) => l.href !== '/wildlife').every((l) => l.icon) && drawerGroups === 'Wildlife,Wiki', drawer.links.map((l) => l.text).join(', '))
     // Tab dari elemen terakhir kembali ke elemen pertama (dan sebaliknya).
     await evaluate(`[...document.querySelectorAll('.drawer__panel a')].at(-1).focus()`)
     await KEY.tab()
@@ -1019,28 +1023,35 @@ async function runSuite(width) {
       }
     })
   })()`)
-  const EXPECTED_CARDS = 'Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles,Ingredients>/ingredients'
-  check('Kategori: kartu Fish, Bugs, Birds, Animals, Recipes, Crops, Collectibles, Ingredients dengan tautan ke daftarnya', categories.map((c) => `${c.title}>${c.href}`).sort().join() === EXPECTED_CARDS.split(',').sort().join(), categories.map((c) => c.title).join(', '))
+  const EXPECTED_CARDS = 'Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles,Ingredients>/ingredients,Items>/items,NPCs>/npcs,Achievements>/achievements'
+  check('Kategori: kartu Fish, Bugs, Birds, Animals, Recipes, Crops, Collectibles, Ingredients, Items, NPCs, Achievements dengan tautan ke daftarnya', categories.map((c) => `${c.title}>${c.href}`).sort().join() === EXPECTED_CARDS.split(',').sort().join(), categories.map((c) => c.title).join(', '))
   check('Kategori: jumlah entri dihitung dari data (termasuk entri event: Crops 19, Collectibles 40, Ingredients 32)', categories.every((c) => c.count === c.expectedCount && c.noun === c.expectedNoun) && categories.find((c) => c.title === 'Crops')?.count === 19 && categories.find((c) => c.title === 'Collectibles')?.count === 40 && categories.find((c) => c.title === 'Ingredients')?.count === 32, categories.map((c) => `${c.count} ${c.noun}`).join(', '))
   const titles = await evaluate(`[...document.querySelectorAll('.category-card')].map((card) => card.querySelector('.category-card__title').firstChild.textContent + '/' + card.querySelector('.category-card__label').textContent).join()`)
   check('Kategori: nama Inggris dengan subjudul Indonesia (Crops/Tanaman, Collectibles/Bahan Alam, Ingredients/Bahan Masak)', titles.includes('Crops/Tanaman') && titles.includes('Collectibles/Bahan Alam') && titles.includes('Ingredients/Bahan Masak'), titles)
-  const SIZES = ['xl', 'wide', 'md', 'md', 'sm', 'sm', 'sm', 'sm']
-  check('Kategori (bento): urut dari entri terbanyak — terbanyak besar, kedua lebar, ketiga & keempat sedang, sisanya kecil',
+  const SIZES = ['xl', 'md', 'md', 'md', 'md', 'sm', 'sm', 'sm', 'sm', 'sm', 'sm']
+  check('Kategori (bento): urut dari entri terbanyak — terbanyak besar, empat berikutnya sedang, sisanya kecil',
     categories.every((c, i) => i === 0 || c.count <= categories[i - 1].count) && categories.map((c) => c.size).join() === SIZES.join(),
     categories.map((c) => `${c.title} ${c.count} ${c.size}`).join(', '))
   check('Kategori (bento): kartu dengan entri lebih banyak tidak pernah lebih kecil', categories.every((c, i) => i === 0 || c.rect.area <= categories[i - 1].rect.area + 1),
     categories.map((c) => Math.round(c.rect.area / 1000)).join('/'))
   if (width >= 1080) {
-    const [xl, wide, md1, md2, ...small] = categories
+    const [xl, md1, md2, md3, md4, ...small] = categories
     const near = (a, b) => Math.abs(a - b) <= 1
-    check('Kategori (desktop bento): besar di kiri setinggi dua baris, lebar di kanan atas, dua sedang di bawahnya, empat kecil sebaris di bawah',
-      near(xl.rect.top, wide.rect.top) && near(xl.rect.bottom, md1.rect.bottom) && wide.rect.left > xl.rect.right && near(md1.rect.top, md2.rect.top) && md1.rect.top > wide.rect.bottom &&
-        near(md1.rect.left, wide.rect.left) && near(md2.rect.right, wide.rect.right) && new Set(small.map((c) => Math.round(c.rect.top))).size === 1 && small[0].rect.top > xl.rect.bottom,
+    check('Kategori (desktop bento): besar di kiri setinggi dua baris, 2×2 sedang di kanannya, enam kecil sebaris di bawah',
+      near(xl.rect.top, md1.rect.top) && near(md1.rect.top, md2.rect.top) && near(md3.rect.top, md4.rect.top) && md3.rect.top > md1.rect.bottom && near(xl.rect.bottom, md3.rect.bottom) &&
+        md1.rect.left > xl.rect.right && near(md1.rect.left, md3.rect.left) && near(md2.rect.right, md4.rect.right) &&
+        small.length === 6 && new Set(small.map((c) => Math.round(c.rect.top))).size === 1 && small[0].rect.top > xl.rect.bottom,
       categories.map((c) => `${c.title} ${Math.round(c.rect.left)},${Math.round(c.rect.top)}`).join(' · '))
   }
-  const SAMPLES = { xl: 3, wide: 3, md: 2, sm: 1 }
-  check('Kategori: ikon di semua kartu, deskripsi di kartu besar & lebar, contoh gambar termuat (3/3/2/1 menurut ukuran)',
-    categories.every((c) => c.icon && c.samples === SAMPLES[c.size] && (c.size === 'xl' || c.size === 'wide' ? c.desc > 20 : c.desc === 0)), categories.map((c) => `${c.size}:${c.samples}`).join(' '))
+  // Setiap baris penuh: kartu paling kanan tiap baris menempel ke tepi kanan grid.
+  const rows = new Map()
+  for (const c of categories) rows.set(Math.round(c.rect.top), Math.max(rows.get(Math.round(c.rect.top)) ?? 0, c.rect.right))
+  const gridRight = Math.max(...categories.map((c) => c.rect.right))
+  check('Kategori (bento): tidak ada baris yang bolong (kartu terakhir tiap baris sampai tepi kanan)', [...rows.values()].every((right) => Math.abs(right - gridRight) <= 1),
+    [...rows.entries()].map(([top, right]) => `${top}:${Math.round(right)}`).join(' '))
+  const SAMPLES = { xl: 3, md: 2, sm: 1 }
+  check('Kategori: ikon di semua kartu, deskripsi hanya di kartu besar, contoh gambar termuat (3/2/1 menurut ukuran)',
+    categories.every((c) => c.icon && c.samples === SAMPLES[c.size] && (c.size === 'xl' ? c.desc > 20 : c.desc === 0)), categories.map((c) => `${c.size}:${c.samples}`).join(' '))
   // Diukur dari kotak gambar (termasuk rotasi hiasan & area transparan di sekitar gambar), jadi batasnya sedikit longgar.
   check('Kategori: gambar entri sedikit keluar dari tepi kartu (atas/kanan, kotak gambar maks. 40px) tanpa melebarkan halaman',
     categories.every((c) => (c.overTop > 0 || c.overRight > 0) && c.overTop <= 40 && c.overRight <= 40 && c.artRight <= innerWidthOf(width)),

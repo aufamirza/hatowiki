@@ -99,6 +99,8 @@ function createI18n(localeId, data) {
      * `dataText` di messages. Kunci boleh memuat {nama} sebagai bagian yang dibiarkan apa adanya.
      */
     dataText: (text) => translateDataText(text, data.descriptions ? data.messages.dataText : null, warnMissingDataText),
+    /** Label hadiah favorit NPC (apa adanya di data, bahasa Inggris) → bahasa ini, lewat `giftLabels` di messages. */
+    gift: (label) => lookup(data.messages, 'giftLabels')?.[label] ?? label,
   }
 }
 

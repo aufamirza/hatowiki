@@ -5,6 +5,7 @@
  * dan bahan masak ke src/data/ingredients/ingredients.js. Bahan resep dan makanan favorit hewan yang bukan
  * Crop/Collectible/Ingredient disimpan sebagai data bersama di src/data/items.js (gambarnya di public/images/items/);
  * Crop, Collectible, dan Ingredient hanya punya satu sumber data, yaitu file datanya sendiri.
+ * Items (benda pakai), NPCs, dan Achievements punya skrip sendiri: scripts/heartodex-sync-extra.mjs.
  *
  * Pemakaian:
  *   node scripts/heartodex-sync.mjs --kind bugs --section "Base Game" --level 1           dry run: ambil, validasi, laporkan

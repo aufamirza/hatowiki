@@ -299,6 +299,9 @@
   --page-bg-crops: #f2f8f4;
   --page-bg-collectibles: #f7f6f2;
   --page-bg-ingredients: #faf5f9;
+  --page-bg-items: #fbf6f3;
+  --page-bg-npcs: #f3f4fb;
+  --page-bg-achievements: #faf7ef;
 }
 
 :root[data-theme='dark'] {
@@ -479,4 +482,7 @@
   --page-bg-crops: #121b28;
   --page-bg-collectibles: #17172b;
   --page-bg-ingredients: #19152f;
+  --page-bg-items: #1a1628;
+  --page-bg-npcs: #121631;
+  --page-bg-achievements: #181727;
 }

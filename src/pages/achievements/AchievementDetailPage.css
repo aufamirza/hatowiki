@@ -1,0 +1,137 @@
+/* Detail achievement: tata letaknya .entry-detail__grid--pair (GoodsDetailPage.css). Di sini hanya isi kotak identitas. */
+
+.achievement-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Penanda achievement tersembunyi: pil netral dengan ikon gembok, di samping badge kategori */
+.achievement-hidden {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sunken);
+  border: 1px dashed var(--color-border-strong);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.achievement-hidden svg {
+  width: 15px;
+  height: 15px;
+}
+
+.achievement-objective__title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.achievement-objective__title svg {
+  width: 16px;
+  height: 16px;
+}
+
+.achievement-objective__title + .entry-detail__description,
+.achievement-objective__title + .spoiler {
+  margin-top: 0;
+}
+
+.achievement-hidden__note {
+  font-size: var(--text-sm);
+  color: var(--color-text-dimmed);
+}
+
+/* Spoiler: teks tujuan buram sampai diklik; tombol menutupi seluruh teks buram */
+.spoiler {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.spoiler__body {
+  position: relative;
+  width: 100%;
+}
+
+.spoiler__text {
+  margin-top: 0;
+  transition: filter var(--duration-fast, 150ms) ease;
+}
+
+.spoiler[data-revealed='false'] .spoiler__text {
+  filter: blur(7px);
+  user-select: none;
+}
+
+.spoiler__cover {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.spoiler__cover:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.spoiler__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--card-shadow);
+  color: var(--color-accent-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.spoiler__cover:hover .spoiler__pill {
+  background: var(--color-accent-soft);
+}
+
+.spoiler__pill svg,
+.spoiler__hide svg {
+  width: 16px;
+  height: 16px;
+}
+
+.spoiler__hide {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-accent-ink);
+}
+
+.spoiler__hide:hover {
+  background: var(--color-accent-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spoiler__text {
+    transition: none;
+  }
+}

@@ -6,7 +6,7 @@ import EntryImage from '../../components/wildlife/EntryImage'
 import { getIngredientBySlug } from '../../data/ingredients/ingredients'
 import { useI18n } from '../../i18n/I18nProvider'
 import NotFoundPage from '../NotFoundPage'
-import { DetailFooter, IdentityPanel } from './GoodsDetailParts'
+import { DetailFooter, IdentityPanel, NpcMentions, SoldBySpec } from './GoodsDetailParts'
 import { AnimalUsagePanel, RecipeUsagePanel, getItemUsage } from './UsagePanels'
 import { INGREDIENT_KIND } from './goodsKinds'
 import '../wildlife/WildlifeDetailPage.css'
@@ -15,7 +15,8 @@ import './GoodsDetailPage.css'
 
 /**
  * Halaman detail satu bahan masak: (1) nama, kategori, deskripsi; (2) gambar dengan harga beli, harga jual, tempat
- * membelinya (Didapat dari), dan info asal kalau sumber mencantumkannya; (3) resep yang memakainya dan (4) hewan yang menyukainya, dihitung dari data
+ * membelinya (Didapat dari; nama NPC di dalamnya tertaut ke halaman NPC), NPC penjualnya menurut data NPC (Dijual oleh,
+ * hanya kalau ada), dan info asal kalau sumber mencantumkannya; (3) resep yang memakainya dan (4) hewan yang menyukainya, dihitung dari data
  * Hatowiki. Bahan tidak punya level, lokasi, maupun peta.
  */
 function IngredientDetailPage() {
@@ -90,10 +91,11 @@ function IngredientDetailPage() {
                   {t('card.obtainedFrom')}
                 </dt>
                 <dd className={`spec__value spec__value--text${obtained ? '' : ' is-missing'}`}>
-                  {obtained ? dataText(obtained.place) : '—'}
+                  {obtained ? <NpcMentions text={dataText(obtained.place)} /> : '—'}
                   {obtained?.when && <span className="spec__note">{dataText(obtained.when)}</span>}
                 </dd>
               </div>
+              <SoldBySpec itemId={`ingredients/${item.slug}`} />
               {item.origin && (
                 <div className="spec">
                   <dt className="spec__label">

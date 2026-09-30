@@ -1,0 +1,40 @@
+{
+  "camouflage-bush": {
+    "text": "Setelah dipakai, muncul semak yang menyamarkan keberadaanmu dari burung. Bertahan 240 detik.",
+    "sourceLang": "es"
+  },
+  "bird-food": "Didapat sebagai imbalan menyerahkan kartu kepada Bailey J.",
+  "universal-animal-food": {
+    "text": "Makanan yang memberikan gizi seimbang untuk semua hewan.",
+    "sourceLang": "es"
+  },
+  "amazing-seasoning": {
+    "text": "Dipakai untuk memasak. Meningkatkan kualitas masakan (minimal bintang 2) saat berhasil memasak (tidak berpengaruh kalau gagal).",
+    "sourceLang": "es"
+  },
+  "dog-food": {
+    "text": "Makanan kering bergizi seimbang untuk anjing. Jangan biarkan anjingmu kelaparan!",
+    "sourceLang": "es"
+  },
+  "energy-dog-food": {
+    "text": "Beri makan anjingmu untuk memulihkan vitalitasnya.",
+    "sourceLang": "es"
+  },
+  "cat-food": {
+    "text": "Makanan bergizi untuk kucing. Jangan biarkan kucingmu kelaparan!",
+    "sourceLang": "es"
+  },
+  "universal-ingredient": {
+    "text": "Bisa menggantikan bahan apa pun.",
+    "sourceLang": "es"
+  },
+  "drawing-board": "Luapkan kreativitasmu di papan gambar.",
+  "energy-fish-jerky": {
+    "text": "Beri makan kucingmu untuk memulihkan vitalitasnya.",
+    "sourceLang": "es"
+  },
+  "auto-bird-whistle": {
+    "text": "Setelah dipakai, burung di sekitar (kecuali yang ada di tempat bertengger) lebih sering beraksi selama 3 menit.",
+    "sourceLang": "es"
+  }
+}

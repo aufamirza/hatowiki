@@ -174,6 +174,47 @@
       "notFoundMessage": "Bahan ini belum ada di database kami, atau alamatnya salah ketik.",
       "metaLeadNoLevel": "{name}, bahan masak di Heartopia.",
       "metaList": "Daftar {count} bahan masak Heartopia beserta harga beli, tempat mendapatkannya, dan resep yang memakainya."
+    },
+    "items": {
+      "label": "Benda Pakai",
+      "noun": "benda pakai",
+      "count": "{count} benda pakai",
+      "hobby": "Alat bantu hobi",
+      "description": "Umpan, pupuk, makanan hewan, dan benda pakai lain per hobi, lengkap dengan harga dan NPC penjualnya.",
+      "intro": "Umpan, pupuk, makanan hewan, dan benda pakai lain untuk tiap hobi. Pilih item untuk melihat kegunaan, harga, dan NPC yang menjualnya.",
+      "notFoundTitle": "Benda pakai tidak ditemukan",
+      "notFoundMessage": "Item ini belum ada di database kami, atau alamatnya salah ketik.",
+      "metaLead": "{name}, item {category} di Heartopia.",
+      "metaLeadNoCategory": "{name}, item di Heartopia.",
+      "metaList": "Daftar {count} item Heartopia per hobi (umpan, pupuk, makanan hewan) beserta harga dan NPC penjualnya."
+    },
+    "npcs": {
+      "label": "Penduduk Kota",
+      "noun": "NPC",
+      "count": "{count} NPC",
+      "hobby": "Warga kota",
+      "description": "Para penduduk kota beserta peran, lokasi, hadiah favorit, dan barang yang mereka jual.",
+      "intro": "Para NPC Heartopia beserta peran, lokasi di peta, hadiah favorit, dan barang yang mereka jual. Pilih NPC untuk melihat detailnya.",
+      "searchLabel": "Cari nama atau peran NPC",
+      "notFoundTitle": "NPC tidak ditemukan",
+      "notFoundMessage": "NPC ini belum ada di database kami, atau alamatnya salah ketik.",
+      "metaLead": "{name}, NPC Heartopia ({role}).",
+      "metaLeadNoRole": "{name}, NPC di Heartopia.",
+      "metaList": "Daftar {count} NPC Heartopia beserta peran, lokasi, hadiah favorit, dan barang yang mereka jual."
+    },
+    "achievements": {
+      "label": "Pencapaian",
+      "noun": "pencapaian",
+      "count": "{count} pencapaian",
+      "hobby": "Title & hadiah",
+      "description": "Semua pencapaian beserta tujuan dan title yang bisa kamu dapatkan dari tiap hobi.",
+      "intro": "Semua pencapaian (achievement) Heartopia beserta tujuan dan title hadiahnya. Pilih pencapaian untuk melihat detailnya. Tujuan pencapaian tersembunyi tampil buram sampai kamu mengkliknya.",
+      "searchLabel": "Cari nama pencapaian atau title",
+      "notFoundTitle": "Pencapaian tidak ditemukan",
+      "notFoundMessage": "Pencapaian ini belum ada di database kami, atau alamatnya salah ketik.",
+      "metaLead": "{name}, achievement {category} di Heartopia.",
+      "metaLeadNoCategory": "{name}, achievement di Heartopia.",
+      "metaList": "Daftar {count} achievement Heartopia beserta tujuan, kategori hobi, dan title hadiahnya."
     }
   },
   "home": {
@@ -260,7 +301,12 @@
     "seedPrice": "Harga benih",
     "sellValue": "Nilai jual",
     "buyPrice": "Harga beli",
-    "obtainedFrom": "Didapat dari"
+    "obtainedFrom": "Didapat dari",
+    "reward": "Title hadiah",
+    "objective": "Tujuan",
+    "price": "Harga",
+    "soldBy": "Dijual oleh",
+    "role": "Peran"
   },
   "detail": {
     "noDescription": "Deskripsi belum tersedia.",
@@ -328,6 +374,51 @@
     "favoredBy": "Makanan favorit hewan",
     "animalsLiking": "Hewan yang menyukai {name}"
   },
+  "achievement": {
+    "objective": "Tujuan",
+    "reward": "Hadiah",
+    "rewardTitle": "Title",
+    "rewardCategory": "Kategori hadiah",
+    "titleHidden": "Dirahasiakan",
+    "hidden": "Pencapaian tersembunyi",
+    "hiddenNote": "Tujuannya disembunyikan supaya tidak jadi spoiler.",
+    "reveal": "Tampilkan tujuan",
+    "hide": "Sembunyikan lagi",
+    "cardHidden": "Tujuan dirahasiakan",
+    "hero": "Gambar dan hadiah {name}"
+  },
+  "item": {
+    "price": "Harga",
+    "soldBy": "Dijual oleh",
+    "noSeller": "Belum ada NPC penjual di data",
+    "hero": "Gambar, harga, dan penjual {name}"
+  },
+  "npc": {
+    "role": "Peran",
+    "gifts": "Hadiah favorit",
+    "noGifts": "Tidak ada hadiah favorit.",
+    "shop": "Barang yang dijual",
+    "shopCount": "{count} barang",
+    "shopLabel": "Barang yang dijual {name}",
+    "noShop": "Sumber tidak mencantumkan barang yang dijual {name}.",
+    "priceMissing": "Harga belum tercantum",
+    "pin": "Posisi {name}",
+    "notLinked": "Belum ada halamannya di Hatowiki"
+  },
+  "giftLabels": {
+    "Any fish": "Ikan apa saja",
+    "Bird photographs": "Foto burung",
+    "Building Materials": "Bahan bangunan",
+    "Fish": "Ikan",
+    "Fishing supplies": "Perlengkapan memancing",
+    "Prepared meals": "Masakan jadi",
+    "Rare flowers": "Bunga langka",
+    "Rare ingredients": "Bahan langka",
+    "Rare insects": "Serangga langka",
+    "Seafood": "Makanan laut",
+    "Seeds": "Benih",
+    "Tools": "Peralatan"
+  },
   "notFound": {
     "title": "Halaman tidak ditemukan",
     "message": "Alamat yang kamu buka tidak ada. Mungkin salah ketik, atau halamannya belum dibuat.",
@@ -349,7 +440,13 @@
     "sellValue": "Nilai jual: {value} koin.",
     "buyPrice": "Harga beli: {value} koin.",
     "obtainedFrom": "Didapat dari: {value}.",
-    "usedIn": "Dipakai di {count} resep."
+    "usedIn": "Dipakai di {count} resep.",
+    "rewardTitle": "Hadiah: title {value}.",
+    "hiddenAchievement": "Pencapaian tersembunyi.",
+    "price": "Harga: {value} koin.",
+    "soldBy": "Dijual oleh: {value}.",
+    "gifts": "Hadiah favorit: {value}.",
+    "shop": "Menjual: {value}."
   },
   "dataText": {}
 }

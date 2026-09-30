@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "language": "en",
+    "source": "Teks asli heartodex (descriptionOriginal di file data) dengan salah ketik yang jelas dibetulkan. descriptionOriginal tetap apa adanya.",
+    "generatedBy": "scripts/english-descriptions.mjs (dari scripts/translations/english-corrections.json); jangan diedit langsung",
+    "corrections": 1,
+    "correctedEntries": 1,
+    "translated": {
+      "camouflage-bush": "es",
+      "universal-animal-food": "es",
+      "amazing-seasoning": "es",
+      "dog-food": "es",
+      "energy-dog-food": "es",
+      "cat-food": "es",
+      "universal-ingredient": "es",
+      "energy-fish-jerky": "es",
+      "auto-bird-whistle": "es"
+    },
+    "translatedNote": "Teks sumber entri ini bukan bahasa Inggris; yang ditampilkan adalah terjemahan Inggris buatan AI yang belum ditinjau.",
+    "review": "scripts/translations/review-items.en.md"
+  },
+  "camouflage-bush": "Once used, a bush appears that hides your presence from birds. Lasts 240 s.",
+  "bird-food": "Obtained in exchange for delivering cards to Bailey J.",
+  "universal-animal-food": "A food that provides balanced nutrition for all animals.",
+  "amazing-seasoning": "Used for cooking. Improves the quality of the dish (at least 2 stars) when cooking succeeds (no effect on failure).",
+  "dog-food": "Balanced kibble for dogs. Don't let your pup go hungry!",
+  "energy-dog-food": "Feed your dog to restore its vitality.",
+  "cat-food": "Nutritious food for cats. Don't let your cat go hungry!",
+  "universal-ingredient": "Can replace any ingredient.",
+  "drawing-board": "Unleash your creativity on the drawing board.",
+  "energy-fish-jerky": "Feed your kitty to restore its vitality.",
+  "auto-bird-whistle": "Once used, nearby birds (except those on the stand) perform actions more often for 3 min."
+}

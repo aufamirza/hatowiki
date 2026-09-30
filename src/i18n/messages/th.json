@@ -182,6 +182,50 @@
       "notFoundMessage": "ยังไม่มีวัตถุดิบนี้ในฐานข้อมูลของเรา หรือที่อยู่อาจพิมพ์ผิด",
       "metaLeadNoLevel": "{name} วัตถุดิบทำอาหารใน Heartopia",
       "metaList": "รวมวัตถุดิบทำอาหารใน Heartopia ทั้ง {count} ชนิด พร้อมราคาซื้อ แหล่งที่หาได้ และสูตรอาหารที่ใช้"
+    },
+    "items": {
+      "label": "ไอเทม",
+      "noun": "ไอเทม",
+      "unit": "ชนิด",
+      "count": "ไอเทม {count} ชนิด",
+      "hobby": "อุปกรณ์งานอดิเรก",
+      "description": "เหยื่อ ปุ๋ย อาหารสัตว์ และไอเทมอื่น ๆ ตามงานอดิเรก พร้อมราคาและ NPC ที่ขาย",
+      "intro": "เหยื่อ ปุ๋ย อาหารสัตว์ และไอเทมอื่น ๆ สำหรับแต่ละงานอดิเรก เลือกไอเทมเพื่อดูการใช้งาน ราคา และ NPC ที่ขาย",
+      "notFoundTitle": "ไม่พบไอเทมนี้",
+      "notFoundMessage": "ยังไม่มีไอเทมนี้ในฐานข้อมูลของเรา หรือที่อยู่อาจพิมพ์ผิด",
+      "metaLead": "{name} ไอเทมหมวด {category} ใน Heartopia",
+      "metaLeadNoCategory": "{name} ไอเทมใน Heartopia",
+      "metaList": "รวมไอเทมใน Heartopia ทั้ง {count} ชนิดตามงานอดิเรก (เหยื่อ ปุ๋ย อาหารสัตว์) พร้อมราคาและ NPC ที่ขาย"
+    },
+    "npcs": {
+      "label": "ชาวเมือง",
+      "noun": "NPC",
+      "unit": "คน",
+      "count": "NPC {count} คน",
+      "hobby": "ผู้อยู่อาศัยในเมือง",
+      "description": "ชาวเมืองพร้อมบทบาท สถานที่ ของขวัญที่ชอบ และสินค้าที่ขาย",
+      "intro": "NPC ใน Heartopia พร้อมบทบาท ตำแหน่งบนแผนที่ ของขวัญที่ชอบ และสินค้าที่ขาย เลือก NPC เพื่อดูรายละเอียด",
+      "searchLabel": "ค้นหาชื่อหรือบทบาทของ NPC",
+      "notFoundTitle": "ไม่พบ NPC นี้",
+      "notFoundMessage": "ยังไม่มี NPC นี้ในฐานข้อมูลของเรา หรือที่อยู่อาจพิมพ์ผิด",
+      "metaLead": "{name} NPC ใน Heartopia ({role})",
+      "metaLeadNoRole": "{name} NPC ใน Heartopia",
+      "metaList": "รวม NPC ใน Heartopia ทั้ง {count} คน พร้อมบทบาท สถานที่ ของขวัญที่ชอบ และสินค้าที่ขาย"
+    },
+    "achievements": {
+      "label": "ความสำเร็จ",
+      "noun": "ความสำเร็จ",
+      "unit": "รายการ",
+      "count": "ความสำเร็จ {count} รายการ",
+      "hobby": "ฉายาและรางวัล",
+      "description": "ความสำเร็จทั้งหมดพร้อมเป้าหมายและฉายาที่ได้รับจากแต่ละงานอดิเรก",
+      "intro": "ความสำเร็จทั้งหมดใน Heartopia พร้อมเป้าหมายและฉายาที่ได้รับ เลือกความสำเร็จเพื่อดูรายละเอียด ส่วนเป้าหมายของความสำเร็จลับจะเบลอไว้จนกว่าคุณจะคลิก",
+      "searchLabel": "ค้นหาชื่อความสำเร็จหรือฉายา",
+      "notFoundTitle": "ไม่พบความสำเร็จนี้",
+      "notFoundMessage": "ยังไม่มีความสำเร็จนี้ในฐานข้อมูลของเรา หรือที่อยู่อาจพิมพ์ผิด",
+      "metaLead": "{name} ความสำเร็จหมวด {category} ใน Heartopia",
+      "metaLeadNoCategory": "{name} ความสำเร็จใน Heartopia",
+      "metaList": "รวมความสำเร็จใน Heartopia ทั้ง {count} รายการ พร้อมเป้าหมาย หมวดงานอดิเรก และฉายาที่ได้รับ"
     }
   },
   "home": {
@@ -268,7 +312,12 @@
     "seedPrice": "ราคาเมล็ดพันธุ์",
     "sellValue": "มูลค่าขาย",
     "buyPrice": "ราคาซื้อ",
-    "obtainedFrom": "หาได้จาก"
+    "obtainedFrom": "หาได้จาก",
+    "reward": "ฉายาที่ได้รับ",
+    "objective": "เป้าหมาย",
+    "price": "ราคา",
+    "soldBy": "ขายโดย",
+    "role": "บทบาท"
   },
   "detail": {
     "noDescription": "ยังไม่มีคำอธิบาย",
@@ -336,6 +385,51 @@
     "favoredBy": "อาหารที่สัตว์ชอบ",
     "animalsLiking": "สัตว์ที่ชอบ {name}"
   },
+  "achievement": {
+    "objective": "เป้าหมาย",
+    "reward": "รางวัล",
+    "rewardTitle": "ฉายา",
+    "rewardCategory": "หมวดรางวัล",
+    "titleHidden": "ถูกซ่อนไว้",
+    "hidden": "ความสำเร็จลับ",
+    "hiddenNote": "ซ่อนเป้าหมายไว้เพื่อไม่ให้สปอยล์",
+    "reveal": "แสดงเป้าหมาย",
+    "hide": "ซ่อนอีกครั้ง",
+    "cardHidden": "เป้าหมายถูกซ่อนไว้",
+    "hero": "ภาพและรางวัลของ {name}"
+  },
+  "item": {
+    "price": "ราคา",
+    "soldBy": "ขายโดย",
+    "noSeller": "ยังไม่มีข้อมูล NPC ที่ขาย",
+    "hero": "ภาพ ราคา และผู้ขาย {name}"
+  },
+  "npc": {
+    "role": "บทบาท",
+    "gifts": "ของขวัญที่ชอบ",
+    "noGifts": "ไม่มีของขวัญที่ชอบ",
+    "shop": "สินค้าที่ขาย",
+    "shopCount": "{count} รายการ",
+    "shopLabel": "สินค้าที่ {name} ขาย",
+    "noShop": "แหล่งข้อมูลไม่ได้ระบุสินค้าที่ {name} ขาย",
+    "priceMissing": "ยังไม่ระบุราคา",
+    "pin": "ตำแหน่งของ {name}",
+    "notLinked": "ยังไม่มีหน้าใน Hatowiki"
+  },
+  "giftLabels": {
+    "Any fish": "ปลาชนิดใดก็ได้",
+    "Bird photographs": "ภาพถ่ายนก",
+    "Building Materials": "วัสดุก่อสร้าง",
+    "Fish": "ปลา",
+    "Fishing supplies": "อุปกรณ์ตกปลา",
+    "Prepared meals": "อาหารปรุงสำเร็จ",
+    "Rare flowers": "ดอกไม้หายาก",
+    "Rare ingredients": "วัตถุดิบหายาก",
+    "Rare insects": "แมลงหายาก",
+    "Seafood": "อาหารทะเล",
+    "Seeds": "เมล็ดพันธุ์",
+    "Tools": "เครื่องมือ"
+  },
   "notFound": {
     "title": "ไม่พบหน้านี้",
     "message": "ไม่มีหน้าที่อยู่นี้ อาจพิมพ์ผิด หรือหน้านี้ยังไม่ได้สร้าง",
@@ -357,7 +451,13 @@
     "sellValue": "มูลค่าขาย: {value} เหรียญ",
     "buyPrice": "ราคาซื้อ: {value} เหรียญ",
     "obtainedFrom": "หาได้จาก: {value}",
-    "usedIn": "ใช้ในสูตรอาหาร {count} สูตร"
+    "usedIn": "ใช้ในสูตรอาหาร {count} สูตร",
+    "rewardTitle": "รางวัล: ฉายา {value}",
+    "hiddenAchievement": "ความสำเร็จลับ",
+    "price": "ราคา: {value} เหรียญ",
+    "soldBy": "ขายโดย: {value}",
+    "gifts": "ของขวัญที่ชอบ: {value}",
+    "shop": "ขาย: {value}"
   },
   "dataText": {
     "Toko Massimo": "ร้าน Massimo",

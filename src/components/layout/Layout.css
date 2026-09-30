@@ -33,6 +33,18 @@
   --color-bg: var(--page-bg-ingredients);
 }
 
+.site[data-area='items'] {
+  --color-bg: var(--page-bg-items);
+}
+
+.site[data-area='npcs'] {
+  --color-bg: var(--page-bg-npcs);
+}
+
+.site[data-area='achievements'] {
+  --color-bg: var(--page-bg-achievements);
+}
+
 .site-main {
   flex: 1;
   padding-top: var(--header-space);

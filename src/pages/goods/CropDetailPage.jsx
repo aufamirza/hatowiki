@@ -9,7 +9,7 @@ import { levelToneStyle } from '../../components/wildlife/levelTone'
 import { getCropBySlug } from '../../data/crops/crops'
 import { useI18n } from '../../i18n/I18nProvider'
 import NotFoundPage from '../NotFoundPage'
-import { DetailFooter, IdentityPanel } from './GoodsDetailParts'
+import { DetailFooter, IdentityPanel, SoldBySpec } from './GoodsDetailParts'
 import { AnimalUsagePanel, RecipeUsagePanel, getItemUsage } from './UsagePanels'
 import { CROP_KIND, formatGrowthTime } from './goodsKinds'
 import '../wildlife/WildlifeDetailPage.css'
@@ -121,6 +121,7 @@ function CropDetailPage() {
               </dt>
               <dd className="spec__value">{formatGrowthTime(crop.growthTime, i18n)}</dd>
             </div>
+            <SoldBySpec itemId={`crops/${crop.slug}`} />
           </dl>
         </section>
 

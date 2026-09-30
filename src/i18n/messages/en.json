@@ -174,6 +174,47 @@
       "notFoundMessage": "This ingredient isn't in our database yet, or the address has a typo.",
       "metaLeadNoLevel": "{name}: a cooking ingredient in Heartopia.",
       "metaList": "All {count} Heartopia cooking ingredients with their buy price, where to get them, and the recipes that use them."
+    },
+    "items": {
+      "label": "Items",
+      "noun": "items",
+      "count": "{count} {count|item|items}",
+      "hobby": "Hobby tools",
+      "description": "Bait, fertilizer, pet food, and other items for each hobby, with their prices and the NPCs who sell them.",
+      "intro": "Bait, fertilizer, pet food, and other usable items for each hobby. Pick an item to see what it does, its price, and the NPC who sells it.",
+      "notFoundTitle": "Item not found",
+      "notFoundMessage": "This item isn't in our database yet, or the address has a typo.",
+      "metaLead": "{name}: an item in Heartopia ({category}).",
+      "metaLeadNoCategory": "{name}: an item in Heartopia.",
+      "metaList": "All {count} Heartopia items by hobby (bait, fertilizer, pet food) with their prices and the NPCs who sell them."
+    },
+    "npcs": {
+      "label": "NPCs",
+      "noun": "NPCs",
+      "count": "{count} {count|NPC|NPCs}",
+      "hobby": "Town residents",
+      "description": "The townsfolk with their roles, locations, favorite gifts, and the items they sell.",
+      "intro": "Heartopia NPCs with their roles, map locations, favorite gifts, and the items they sell. Pick an NPC to see the details.",
+      "searchLabel": "Search NPC names or roles",
+      "notFoundTitle": "NPC not found",
+      "notFoundMessage": "This NPC isn't in our database yet, or the address has a typo.",
+      "metaLead": "{name}: an NPC in Heartopia ({role}).",
+      "metaLeadNoRole": "{name}: an NPC in Heartopia.",
+      "metaList": "All {count} Heartopia NPCs with their roles, locations, favorite gifts, and the items they sell."
+    },
+    "achievements": {
+      "label": "Achievements",
+      "noun": "achievements",
+      "count": "{count} {count|achievement|achievements}",
+      "hobby": "Titles & rewards",
+      "description": "Every achievement with its objective and the title you can earn from each hobby.",
+      "intro": "Every Heartopia achievement with its objective and reward title. Pick an achievement to see the details. Hidden achievements keep their objective blurred until you click it.",
+      "searchLabel": "Search achievement or title names",
+      "notFoundTitle": "Achievement not found",
+      "notFoundMessage": "This achievement isn't in our database yet, or the address has a typo.",
+      "metaLead": "{name}: an achievement in Heartopia ({category}).",
+      "metaLeadNoCategory": "{name}: an achievement in Heartopia.",
+      "metaList": "All {count} Heartopia achievements with their objectives, hobby categories, and reward titles."
     }
   },
   "home": {
@@ -260,7 +301,12 @@
     "seedPrice": "Seed price",
     "sellValue": "Sell value",
     "buyPrice": "Buy price",
-    "obtainedFrom": "Obtained from"
+    "obtainedFrom": "Obtained from",
+    "reward": "Reward title",
+    "objective": "Objective",
+    "price": "Price",
+    "soldBy": "Sold by",
+    "role": "Role"
   },
   "detail": {
     "noDescription": "No description available yet.",
@@ -328,6 +374,51 @@
     "favoredBy": "Favorite food of",
     "animalsLiking": "Animals that like {name}"
   },
+  "achievement": {
+    "objective": "Objective",
+    "reward": "Reward",
+    "rewardTitle": "Title",
+    "rewardCategory": "Reward category",
+    "titleHidden": "Secret",
+    "hidden": "Hidden achievement",
+    "hiddenNote": "The objective is hidden to avoid spoilers.",
+    "reveal": "Show objective",
+    "hide": "Hide again",
+    "cardHidden": "Objective hidden",
+    "hero": "Image and reward of {name}"
+  },
+  "item": {
+    "price": "Price",
+    "soldBy": "Sold by",
+    "noSeller": "No NPC seller in our data yet",
+    "hero": "Image, price, and seller of {name}"
+  },
+  "npc": {
+    "role": "Role",
+    "gifts": "Favorite gifts",
+    "noGifts": "No favorite gifts.",
+    "shop": "Items for sale",
+    "shopCount": "{count} {count|item|items}",
+    "shopLabel": "Items sold by {name}",
+    "noShop": "The source lists no items for sale from {name}.",
+    "priceMissing": "Price not listed",
+    "pin": "Location of {name}",
+    "notLinked": "No page on Hatowiki yet"
+  },
+  "giftLabels": {
+    "Any fish": "Any fish",
+    "Bird photographs": "Bird photographs",
+    "Building Materials": "Building Materials",
+    "Fish": "Fish",
+    "Fishing supplies": "Fishing supplies",
+    "Prepared meals": "Prepared meals",
+    "Rare flowers": "Rare flowers",
+    "Rare ingredients": "Rare ingredients",
+    "Rare insects": "Rare insects",
+    "Seafood": "Seafood",
+    "Seeds": "Seeds",
+    "Tools": "Tools"
+  },
   "notFound": {
     "title": "Page not found",
     "message": "The address you opened doesn't exist. It may have a typo, or the page hasn't been created yet.",
@@ -349,7 +440,13 @@
     "sellValue": "Sell value: {value} coins.",
     "buyPrice": "Buy price: {value} coins.",
     "obtainedFrom": "Obtained from: {value}.",
-    "usedIn": "Used in {count} {count|recipe|recipes}."
+    "usedIn": "Used in {count} {count|recipe|recipes}.",
+    "rewardTitle": "Reward: the {value} title.",
+    "hiddenAchievement": "Hidden achievement.",
+    "price": "Price: {value} coins.",
+    "soldBy": "Sold by {value}.",
+    "gifts": "Favorite gifts: {value}.",
+    "shop": "Sells {value}."
   },
   "dataText": {
     "Toko Massimo": "Massimo's store",

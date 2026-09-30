@@ -8,7 +8,7 @@ import LocationMap from '../../components/wildlife/LocationMap'
 import { getCollectibleBySlug } from '../../data/collectibles/collectibles'
 import { useI18n } from '../../i18n/I18nProvider'
 import NotFoundPage from '../NotFoundPage'
-import { DetailFooter, IdentityPanel } from './GoodsDetailParts'
+import { DetailFooter, IdentityPanel, SoldBySpec } from './GoodsDetailParts'
 import { AnimalUsagePanel, RecipeUsagePanel, getItemUsage } from './UsagePanels'
 import { COLLECTIBLE_KIND } from './goodsKinds'
 import '../wildlife/WildlifeDetailPage.css'
@@ -92,6 +92,7 @@ function CollectibleDetailPage() {
                   </dd>
                 </div>
               )}
+              <SoldBySpec itemId={`collectibles/${item.slug}`} />
             </dl>
           </div>
         </section>

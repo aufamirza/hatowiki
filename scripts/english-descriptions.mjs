@@ -41,6 +41,9 @@ const LABELS = {
   crops: 'tanaman',
   collectibles: 'bahan alam (collectibles)',
   ingredients: 'bahan masak (ingredients)',
+  items: 'item (benda pakai)',
+  npcs: 'NPC',
+  achievements: 'achievement (tujuan)',
 }
 const LANGUAGE_NAMES = { es: 'Spanyol' }
 

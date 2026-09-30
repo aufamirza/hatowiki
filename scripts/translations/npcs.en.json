@@ -1,0 +1,29 @@
+{
+  "_meta": {
+    "language": "en",
+    "source": "Teks asli heartodex (descriptionOriginal di file data) dengan salah ketik yang jelas dibetulkan. descriptionOriginal tetap apa adanya.",
+    "generatedBy": "scripts/english-descriptions.mjs (dari scripts/translations/english-corrections.json); jangan diedit langsung",
+    "corrections": 0,
+    "correctedEntries": 0,
+    "review": "scripts/translations/review-npcs.en.md"
+  },
+  "albert-jr": "Wandering merchant who buys your items. Always on the move!",
+  "andrew": "Sells motorcycles (green, black, white, red, pink), sedans (pink, yellow, blue, black), and mountain bikes. Provides a free starter vehicle.",
+  "annie": "Music and friendship speak to them! Their shop offers instruments, emojis, and animations. Tip: New deals every day—don’t miss out!",
+  "atara": "Mayor of the city, guide to the main story, and great visionary.",
+  "azure": "Sells event tokens by selling specific items",
+  "bailey-j": "The local bird expert! She will support you with rewards for your observations. She also has a shop where you can buy binoculars and bird food.",
+  "bill": "Expert in sea fishing. The sea holds no secrets for him.",
+  "blanc": "Teaches you gardening and sells starter equipment.",
+  "bob": "Our grandfather has a great talent for building. Every Saturday at 6:00 a.m., he renews the furniture display, which will be available for a week. Talk to him if you want to get natural building materials for your land.",
+  "cassie": "A mysterious character who roams the forest under the moonlight.",
+  "doris": "Unique NPC who appears only during special weather events (rain, snowfall, rainbow, meteor shower). Sells exclusive recipes like Roll Cake, rare ingredients, emotes, and meteorite furniture. Uses Star Fragments as currency for meteor items",
+  "dorothee": "A true style icon! You'll find the perfect pair of shoes in their store. The clothing selection is updated daily, so don't forget to stop by and check it out.",
+  "eric": "Friendly resident, manages daily delegations to assist the community.",
+  "ka-ching": "Owner of the general store. If you need it, she has it!",
+  "massimo": "Restaurant chef and culinary mentor. Passion in every dish.",
+  "mrs-joan": "Owner of the pet store. Lover of all animals.",
+  "naniwa": "The entomologist at Heartopia will show you how to create delicate bubbles to capture insects. In his shop, you'll find everything you need for this hobby, including terrariums.",
+  "patti": "Expert guardian of the forests, knowledgeable about hidden trails, creatures, and changes in the environment.",
+  "vanya": "Fishing mentor. Find peace by the river."
+}
