@@ -1,5 +1,4 @@
 import { ArrowLeft, Compass } from 'lucide-react'
-import { usePageTitle } from '../hooks/usePageTitle'
 import { useI18n } from '../i18n/I18nProvider'
 import { Link } from '../i18n/LocaleLink'
 import './NotFoundPage.css'
@@ -13,7 +12,6 @@ function NotFoundPage(props) {
     backTo = '/',
     backLabel = t('notFound.back'),
   } = props
-  usePageTitle(title)
 
   return (
     <div className="container page">

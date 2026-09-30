@@ -5,7 +5,6 @@ import { animals } from '../../data/wildlife/animals'
 import { birds } from '../../data/wildlife/birds'
 import { bugs } from '../../data/wildlife/bugs'
 import { fish } from '../../data/wildlife/fish'
-import { usePageTitle } from '../../hooks/usePageTitle'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Link } from '../../i18n/LocaleLink'
 import { WILDLIFE_ICONS } from './wildlifeIcons'
@@ -17,7 +16,6 @@ const ENTRY_COUNTS = { fish: fish.length, bugs: bugs.length, birds: birds.length
 
 function WildlifePage() {
   const { t, kind } = useI18n()
-  usePageTitle('Wildlife')
 
   return (
     <div className="container page">
@@ -48,7 +46,7 @@ function WildlifePage() {
                   <span className="wildlife-card__hobby">{text.hobby}</span>
                   <span className="wildlife-card__title">
                     {category.name}
-                    <span className="wildlife-card__label">{text.label}</span>
+                    {text.label !== category.name && <span className="wildlife-card__label">{text.label}</span>}
                   </span>
                   <span className="wildlife-card__desc">{text.description}</span>
                 </span>

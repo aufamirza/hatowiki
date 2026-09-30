@@ -4,7 +4,6 @@ import { ArrowUpDown, ChevronDown, RotateCcw, Search, SearchX, SlidersHorizontal
 import Breadcrumbs from '../../components/Breadcrumbs'
 import CategoryHeader from '../../components/CategoryHeader'
 import { categoryToneStyle } from '../../components/catalog/categoryTone'
-import { usePageTitle } from '../../hooks/usePageTitle'
 import { useReplayAnimation } from '../../hooks/useReplayAnimation'
 import { useI18n } from '../../i18n/I18nProvider'
 import FilterDropdown from './FilterDropdown'
@@ -46,7 +45,6 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
   const searchText = kind.searchText
   const searchLabel = text.searchLabel ?? t('list.searchLabel', { noun, unit })
   const filterLabel = (def) => t(def.labelKey)
-  usePageTitle(kind.name)
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const state = useMemo(() => readListState(searchParams, filters, sortOptions), [searchParams, filters, sortOptions])

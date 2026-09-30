@@ -6,7 +6,7 @@ import { LOCALES } from '../../i18n/locales'
 import { useLanguageSwitch } from '../../i18n/useLanguageSwitch'
 
 /**
- * Daftar tautan bahasa ("Indonesia", "ไทย") ke halaman yang sama. Tiap nama ditulis dalam bahasanya sendiri (atribut
+ * Daftar tautan bahasa ("Indonesia", "ไทย", "English") ke halaman yang sama. Tiap nama ditulis dalam bahasanya sendiri (atribut
  * lang & hreflang); bahasa yang sedang dipakai ditandai aria-current dan ikon centang.
  */
 export function LanguageLinks({ className, onChoose }) {

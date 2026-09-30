@@ -1,0 +1,334 @@
+{
+  "_meta": {
+    "petunjuk": "Isi kolom \"en\" dengan teks deskripsi bahasa Inggris yang terlihat langsung di game (apa adanya, tanpa tanda kutip pembuka/penutup). Setelah itu jalankan \"node scripts/manual-descriptions.mjs\" dan minta agent mengisi \"id\" dan \"th\". Cara lengkapnya ada di README, bagian \"Deskripsi isian manual\".",
+    "source": "in-game",
+    "columns": {
+      "name": "Nama entri (hanya untuk memudahkan mencari; diisi skrip).",
+      "reason": "Kenapa entri ini tidak punya deskripsi (dari komentar TODO di file data; diisi skrip).",
+      "en": "Teks bahasa Inggris dari game. Kosong = belum diisi. Kalau diisi, situs memakainya sebagai deskripsi asli (sumber \"in-game\").",
+      "id": "Terjemahan Indonesia dari teks \"en\". Kosong = versi Indonesia masih menampilkan \"Deskripsi belum tersedia.\".",
+      "th": "Terjemahan Thai dari teks \"en\". Kosong = versi Thai masih menampilkan \"ยังไม่มีคำอธิบาย\"."
+    }
+  },
+  "fish": {
+    "asian-arowana": {
+      "name": "Asian Arowana",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "blackspot-sergeant": {
+      "name": "Blackspot Sergeant",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "lionhead": {
+      "name": "Lionhead",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "whale-shark": {
+      "name": "Whale Shark",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "mahi-mahi": {
+      "name": "Mahi-Mahi",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "moon-jelly": {
+      "name": "Moon Jelly",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "angelfish": {
+      "name": "Angelfish",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "pink-betta": {
+      "name": "Pink Betta",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "green-sea-turtle": {
+      "name": "Green Sea Turtle",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "white-faced-surgeonfish": {
+      "name": "White-Faced Surgeonfish",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "lionfish": {
+      "name": "Lionfish",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "blue-and-yellow-wrasse": {
+      "name": "Blue-and-Yellow Wrasse",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "azure-demoiselle": {
+      "name": "Azure Demoiselle",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    }
+  },
+  "bugs": {
+    "atlas-beetle": {
+      "name": "Atlas Beetle",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "queen-alexandras-birdwing": {
+      "name": "Queen Alexandra's Birdwing",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "greater-asian-lady-beetle": {
+      "name": "Greater Asian Lady Beetle",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "goliath-beetle": {
+      "name": "Goliath Beetle",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "red-milkweed-locust": {
+      "name": "Red Milkweed Locust",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "flamer-skimmer": {
+      "name": "Flamer Skimmer",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "purple-spotted-swallowtail": {
+      "name": "Purple Spotted Swallowtail",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "scarce-morpho": {
+      "name": "Scarce Morpho",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "green-metalwing": {
+      "name": "Green Metalwing",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "green-snail": {
+      "name": "Green Snail",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "glasswing-butterfly": {
+      "name": "Glasswing Butterfly",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "colorful-brick-large-red-damselfly": {
+      "name": "Colorful Brick Large Red Damselfly",
+      "reason": "deskripsi di sumber sama persis dengan Pink Brick Large Red Damselfly dan menyebut balok merah muda (\"Pink bricks\"), hampir pasti salah salin di heartodex; disembunyikan sampai sumber diperbaiki",
+      "en": "",
+      "id": "",
+      "th": ""
+    }
+  },
+  "birds": {
+    "baikal-teal": {
+      "name": "Baikal Teal",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "inca-tern": {
+      "name": "Inca Tern",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "chestnut-cheeked-starling": {
+      "name": "Chestnut-Cheeked Starling",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "blue-headed-quail-dove": {
+      "name": "Blue-Headed Quail-Dove",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "white-peafowl": {
+      "name": "White Peafowl",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "snowy-owl": {
+      "name": "Snowy Owl",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "red-browed-finch": {
+      "name": "Red-Browed Finch",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "atlantic-puffin": {
+      "name": "Atlantic Puffin",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "blue-footed-booby": {
+      "name": "Blue-Footed Booby",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "whooper-swan": {
+      "name": "Whooper Swan",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "black-swan": {
+      "name": "Black Swan",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "black-peafowl": {
+      "name": "Black Peafowl",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "black-stork": {
+      "name": "Black Stork",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "spectacled-owl": {
+      "name": "Spectacled Owl",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    }
+  },
+  "animals": {},
+  "recipes": {
+    "mandarin-milkshake": {
+      "name": "Mandarin Milkshake",
+      "reason": "deskripsi di sumber sama persis dengan Apple Milkshake dan menyebut apel, hampir pasti salah salin di heartodex; disembunyikan sampai sumber diperbaiki",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "retriever-canele": {
+      "name": "Retriever Canelé",
+      "reason": "deskripsi di sumber sama persis dengan Maltese Canelé dan menyebut maltese, bukan retriever, hampir pasti salah salin di heartodex; disembunyikan sampai sumber diperbaiki",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "retriever-con-panna": {
+      "name": "Retriever Con Panna",
+      "reason": "deskripsi di sumber menyebut krim berbentuk maltese (sama dengan Maltese Con Panna), bukan retriever, hampir pasti salah salin di heartodex; disembunyikan sampai sumber diperbaiki",
+      "en": "",
+      "id": "",
+      "th": ""
+    }
+  },
+  "crops": {
+    "paddy": {
+      "name": "Paddy",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "avocado": {
+      "name": "Avocado",
+      "reason": "deskripsi tidak ada di sumber (blok About kosong)",
+      "en": "",
+      "id": "",
+      "th": ""
+    }
+  },
+  "collectibles": {},
+  "ingredients": {}
+}

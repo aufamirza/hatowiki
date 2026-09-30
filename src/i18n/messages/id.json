@@ -2,7 +2,7 @@
   "meta": {
     "titleDefault": "Hatowiki | Wiki Komunitas Heartopia",
     "titlePage": "{title} | Hatowiki",
-    "description": "Wiki komunitas Heartopia berbahasa Indonesia: ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak, lengkap dengan jadwal muncul, cuaca, lokasi, bahan, dan harga.",
+    "description": "Wiki komunitas Heartopia berbahasa Indonesia: ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak, dengan jadwal, lokasi, dan harga.",
     "ogDescription": "Ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak Heartopia dalam bahasa Indonesia: jadwal muncul, cuaca, lokasi, bahan, dan harga.",
     "ogImageAlt": "Hatowiki: pemandangan siang Heartopia dengan bukit, laut, ikan, serangga, dan burung"
   },
@@ -80,7 +80,10 @@
       "description": "Ikan yang bisa kamu tangkap lewat hobi fishing, lengkap dengan jadwal, cuaca, dan lokasinya.",
       "intro": "Ikan yang bisa kamu tangkap lewat hobi fishing. Pilih ikan untuk melihat jadwal, cuaca, lokasi, dan harga jualnya.",
       "notFoundTitle": "Ikan tidak ditemukan",
-      "notFoundMessage": "Ikan ini belum ada di database kami, atau alamatnya salah ketik."
+      "notFoundMessage": "Ikan ini belum ada di database kami, atau alamatnya salah ketik.",
+      "metaLead": "{name}, ikan level {level} di Heartopia.",
+      "metaLeadNoLevel": "{name}, ikan di Heartopia.",
+      "metaList": "Daftar {count} ikan Heartopia beserta level, lokasi, waktu muncul, cuaca, dan harga jualnya. Cari dan filter untuk menemukan ikan yang kamu butuhkan."
     },
     "bugs": {
       "label": "Serangga",
@@ -90,7 +93,10 @@
       "description": "Serangga yang bisa kamu tangkap lewat hobi bug hunting, lengkap dengan jadwal, cuaca, dan lokasinya.",
       "intro": "Serangga yang bisa kamu tangkap lewat hobi bug hunting. Pilih serangga untuk melihat jadwal, cuaca, lokasi, dan harga jualnya.",
       "notFoundTitle": "Serangga tidak ditemukan",
-      "notFoundMessage": "Serangga ini belum ada di database kami, atau alamatnya salah ketik."
+      "notFoundMessage": "Serangga ini belum ada di database kami, atau alamatnya salah ketik.",
+      "metaLead": "{name}, serangga level {level} di Heartopia.",
+      "metaLeadNoLevel": "{name}, serangga di Heartopia.",
+      "metaList": "Daftar {count} serangga Heartopia beserta level, lokasi, waktu muncul, cuaca, dan harga jualnya. Cari dan filter untuk menemukan serangga yang kamu butuhkan."
     },
     "birds": {
       "label": "Burung",
@@ -101,7 +107,10 @@
       "intro": "Burung yang bisa kamu potret lewat hobi bird watching. Pilih burung untuk melihat jadwal, cuaca, lokasi, dan harga jual Info Card-nya.",
       "priceLabel": "Harga jual Info Card",
       "notFoundTitle": "Burung tidak ditemukan",
-      "notFoundMessage": "Burung ini belum ada di database kami, atau alamatnya salah ketik."
+      "notFoundMessage": "Burung ini belum ada di database kami, atau alamatnya salah ketik.",
+      "metaLead": "{name}, burung level {level} di Heartopia.",
+      "metaLeadNoLevel": "{name}, burung di Heartopia.",
+      "metaList": "Daftar {count} burung Heartopia beserta level, lokasi, waktu muncul, cuaca, dan harga jual Info Card-nya. Cari dan filter untuk menemukan burung yang kamu butuhkan."
     },
     "animals": {
       "label": "Hewan",
@@ -111,7 +120,9 @@
       "description": "Hewan liar yang berkeliaran di sekitar map dan bisa kamu beri makan.",
       "intro": "Hewan liar yang berkeliaran di sekitar map. Pilih hewan untuk melihat lokasi, titik tempat makan, cuaca favorit, dan makanan favoritnya.",
       "notFoundTitle": "Hewan tidak ditemukan",
-      "notFoundMessage": "Hewan ini belum ada di database kami, atau alamatnya salah ketik."
+      "notFoundMessage": "Hewan ini belum ada di database kami, atau alamatnya salah ketik.",
+      "metaLeadNoLevel": "{name}, hewan liar di Heartopia.",
+      "metaList": "Daftar {count} hewan liar Heartopia beserta lokasi, titik tempat makan, cuaca favorit, dan makanan favoritnya."
     },
     "recipes": {
       "label": "Resep",
@@ -122,7 +133,10 @@
       "intro": "Resep yang bisa kamu masak lewat hobi cooking. Pilih resep untuk melihat bahan, energi, dan harga jualnya.",
       "searchLabel": "Cari nama resep atau bahan",
       "notFoundTitle": "Resep tidak ditemukan",
-      "notFoundMessage": "Resep ini belum ada di database kami, atau alamatnya salah ketik."
+      "notFoundMessage": "Resep ini belum ada di database kami, atau alamatnya salah ketik.",
+      "metaLead": "{name}, resep level {level} di Heartopia.",
+      "metaLeadNoLevel": "{name}, resep di Heartopia.",
+      "metaList": "Daftar {count} resep Heartopia beserta level, bahan, energi, dan harga jualnya. Cari berdasarkan nama resep atau bahan."
     },
     "crops": {
       "label": "Tanaman",
@@ -132,7 +146,10 @@
       "description": "Tanaman yang bisa kamu tanam lewat hobi farming, lengkap dengan harga benih, waktu tumbuh, dan harga jualnya.",
       "intro": "Tanaman yang bisa kamu tanam lewat hobi farming. Pilih tanaman untuk melihat harga benih, waktu tumbuh, harga jual, dan resep yang memakainya.",
       "notFoundTitle": "Tanaman tidak ditemukan",
-      "notFoundMessage": "Tanaman ini belum ada di database kami, atau alamatnya salah ketik."
+      "notFoundMessage": "Tanaman ini belum ada di database kami, atau alamatnya salah ketik.",
+      "metaLead": "{name}, tanaman level {level} di Heartopia.",
+      "metaLeadNoLevel": "{name}, tanaman di Heartopia.",
+      "metaList": "Daftar {count} tanaman Heartopia beserta level, harga benih, waktu tumbuh, harga jual, dan resep yang memakainya."
     },
     "collectibles": {
       "label": "Bahan Alam",
@@ -142,7 +159,9 @@
       "description": "Buah, jamur, kayu, dan bahan lain yang bisa kamu kumpulkan di map, lengkap dengan lokasi dan nilai jualnya.",
       "intro": "Buah, jamur, kayu, batu, dan bahan lain yang bisa kamu kumpulkan di sekitar map. Pilih bahan untuk melihat lokasi, nilai jual, energi, dan resep yang memakainya.",
       "notFoundTitle": "Bahan alam tidak ditemukan",
-      "notFoundMessage": "Bahan ini belum ada di database kami, atau alamatnya salah ketik."
+      "notFoundMessage": "Bahan ini belum ada di database kami, atau alamatnya salah ketik.",
+      "metaLeadNoLevel": "{name}, bahan alam di Heartopia.",
+      "metaList": "Daftar {count} bahan alam Heartopia (buah, jamur, kayu, batu) beserta lokasi, nilai jual, dan resep yang memakainya."
     },
     "ingredients": {
       "label": "Bahan Masak",
@@ -152,7 +171,9 @@
       "description": "Gula, telur, susu, dan bahan masak lain yang bisa kamu beli, lengkap dengan harga dan resep yang memakainya.",
       "intro": "Gula, telur, susu, dan bahan masak lain yang bisa kamu beli untuk hobi cooking. Pilih bahan untuk melihat harga, resep yang memakainya, dan hewan yang menyukainya.",
       "notFoundTitle": "Bahan masak tidak ditemukan",
-      "notFoundMessage": "Bahan ini belum ada di database kami, atau alamatnya salah ketik."
+      "notFoundMessage": "Bahan ini belum ada di database kami, atau alamatnya salah ketik.",
+      "metaLeadNoLevel": "{name}, bahan masak di Heartopia.",
+      "metaList": "Daftar {count} bahan masak Heartopia beserta harga beli, tempat mendapatkannya, dan resep yang memakainya."
     }
   },
   "home": {
@@ -186,7 +207,8 @@
     "soon": "Segera hadir",
     "soonStatus": "Status halaman",
     "soonText": "Halaman {name} sedang disiapkan. Datanya akan ditambahkan setelah diverifikasi dari sumber yang valid.",
-    "backToWildlife": "Kembali ke Wildlife"
+    "backToWildlife": "Kembali ke Wildlife",
+    "metaDescription": "Ensiklopedia wildlife Heartopia: {fish}, {bugs}, {birds}, dan {animals}, lengkap dengan lokasi, waktu muncul, cuaca, dan harga jualnya."
   },
   "list": {
     "eyebrowWildlife": "Wildlife · {hobby}",
@@ -310,6 +332,24 @@
     "title": "Halaman tidak ditemukan",
     "message": "Alamat yang kamu buka tidak ada. Mungkin salah ketik, atau halamannya belum dibuat.",
     "back": "Kembali ke beranda"
+  },
+  "seo": {
+    "separator": " ",
+    "location": "Lokasi: {value}.",
+    "schedule": "Waktu muncul: {value}.",
+    "weather": "Cuaca: {value}.",
+    "favoriteWeather": "Cuaca favorit: {value}.",
+    "favoriteFood": "Makanan favorit: {value}.",
+    "sellPrice": "Harga jual: {value} koin.",
+    "infoCardPrice": "Harga jual Info Card: {value} koin.",
+    "energy": "Energi: {value}.",
+    "ingredients": "Bahan: {value}.",
+    "seedPrice": "Harga benih: {value} koin.",
+    "growthTime": "Waktu tumbuh: {value}.",
+    "sellValue": "Nilai jual: {value} koin.",
+    "buyPrice": "Harga beli: {value} koin.",
+    "obtainedFrom": "Didapat dari: {value}.",
+    "usedIn": "Dipakai di {count} resep."
   },
   "dataText": {}
 }

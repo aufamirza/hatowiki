@@ -1,5 +1,4 @@
 import DayCycle from '../components/DayCycle'
-import { usePageTitle } from '../hooks/usePageTitle'
 import { useI18n } from '../i18n/I18nProvider'
 import CategorySection from './home/CategorySection'
 import HomeHero from './home/HomeHero'
@@ -9,7 +8,6 @@ import './HomePage.css'
 // Beranda: hero, waktu server (pita siklus hari), kartu kategori, dan Muncul Sekarang.
 function HomePage() {
   const { t } = useI18n()
-  usePageTitle()
 
   return (
     <div className="home">

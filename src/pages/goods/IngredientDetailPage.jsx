@@ -4,7 +4,6 @@ import Breadcrumbs from '../../components/Breadcrumbs'
 import { formatCoins } from '../../components/recipes/starValues'
 import EntryImage from '../../components/wildlife/EntryImage'
 import { getIngredientBySlug } from '../../data/ingredients/ingredients'
-import { usePageTitle } from '../../hooks/usePageTitle'
 import { useI18n } from '../../i18n/I18nProvider'
 import NotFoundPage from '../NotFoundPage'
 import { DetailFooter, IdentityPanel } from './GoodsDetailParts'
@@ -27,7 +26,6 @@ function IngredientDetailPage() {
   const { t, formatNumber, dataText } = i18n
   const text = i18n.kind('ingredients')
   const listHref = `/ingredients${location.state?.listSearch ?? ''}`
-  usePageTitle(item ? item.name : text.notFoundTitle)
 
   if (!item) {
     return (

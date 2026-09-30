@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "language": "en",
+    "source": "Teks asli heartodex (descriptionOriginal di file data) dengan salah ketik yang jelas dibetulkan. descriptionOriginal tetap apa adanya.",
+    "generatedBy": "scripts/english-descriptions.mjs (dari scripts/translations/english-corrections.json); jangan diedit langsung",
+    "corrections": 0,
+    "correctedEntries": 0,
+    "review": "scripts/translations/review-crops.en.md"
+  },
+  "potatoes": "Guess what happens when a potato sits on a couch? It becomes a couch potato!",
+  "tomato": "It's small, round, and bursting with sunlight, like nature's little red gem.",
+  "wheat": "It's more than just food, also good for your health and full of wholesome benefits.",
+  "lettuce": "No salad is complete without it!",
+  "pineapple": "Enjoy it fresh or in desserts... but no pineapple pizza!",
+  "carrot": "It may have been a childhood nightmare for some, but it's surprisingly nutritious!",
+  "strawberry": "With the sweet freshness of early spring, it's crowned as the \"Queen of Fruits.\"",
+  "corn": "Easy to grow, with abundant yields. A crop that doesn’t cause any headaches.",
+  "grape": "It has clusters of sweet little orbs, each bursting with sunshine in every bite.",
+  "eggplant": "It's humble on the outside, but a master of soaking up flavor.",
+  "tea-leaf": "From a faraway Eastern land, it serves as the base for many delicious brews.",
+  "cacao-bean": "With its unique rich aroma, it's nature's gift to every sweet tooth.",
+  "prickly-pear": "It can survive the desert and take over your plate. Just watch out for the spikes.",
+  "starfruit": "An ordinary starfruit, when sliced at just the right angle, turns into a sparkling star.",
+  "lemon-verbena": "No lemons in sight, yet it bursts with a strong lemon fragrance—even fresher and longer-lasting.",
+  "romaine-lettuce": "It sounds like a standout in the celtuce family.",
+  "white-radish": "A nutrient-rich \"commoner's ginseng.\""
+}

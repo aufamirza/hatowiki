@@ -1,8 +1,27 @@
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { buildSeo, describeResult } from './scripts/build-seo.mjs'
+
+// Setelah bundel selesai ditulis: HTML statis per halaman & bahasa (meta tag untuk crawler tanpa JavaScript),
+// sitemap.xml, dan robots.txt. Lihat scripts/build-seo.mjs. Hanya saat `vite build`, tidak saat dev.
+function seoPages() {
+  let outDir
+  return {
+    name: 'hatowiki-seo-pages',
+    apply: 'build',
+    configResolved(config) {
+      outDir = path.resolve(config.root, config.build.outDir)
+    },
+    async closeBundle() {
+      const result = await buildSeo({ outDir })
+      console.log(`\n${describeResult(result)}`)
+    },
+  }
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), seoPages()],
   build: {
     rolldownOptions: {
       output: {

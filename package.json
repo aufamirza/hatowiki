@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:ui": "node scripts/qa/wildlife-list.test.mjs && node scripts/qa/home.test.mjs && node scripts/qa/i18n.test.mjs"
+    "test:ui": "node scripts/qa/wildlife-list.test.mjs && node scripts/qa/home.test.mjs && node scripts/qa/i18n.test.mjs && node scripts/qa/links.test.mjs && node scripts/qa/seo.test.mjs"
   },
   "keywords": [],
   "author": "",

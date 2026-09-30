@@ -2,9 +2,11 @@ import { Suspense, useEffect, useRef } from 'react'
 import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
 import { ExternalLink, Globe, Heart } from 'lucide-react'
 import { useReplayAnimation } from '../../hooks/useReplayAnimation'
-import { I18nProvider, useI18n } from '../../i18n/I18nProvider'
+import { I18nProvider, getLoadedMessages, useI18n } from '../../i18n/I18nProvider'
 import { Link } from '../../i18n/LocaleLink'
-import { getLocale, localeFromPath, stripLocale } from '../../i18n/locales'
+import { localeFromPath, stripLocale } from '../../i18n/locales'
+import { applyPageMeta } from '../../seo/applyPageMeta'
+import { getPageMeta } from '../../seo/pageMeta'
 import GlobalSearch from '../search/GlobalSearch'
 import LanguageMenu, { LanguageLinks } from './LanguageMenu'
 import LanguageSuggestion from './LanguageSuggestion'
@@ -108,7 +110,7 @@ function SiteFooter() {
                 <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
               </svg>
             </a>
-            {/* Pemilih bahasa kedua (selain bola dunia di toolbar): dua tautan kecil ke halaman yang sama */}
+            {/* Pemilih bahasa kedua (selain bola dunia di toolbar): tautan kecil per bahasa ke halaman yang sama */}
             <nav className="site-footer__language" aria-label={t('language.label')}>
               <Globe aria-hidden="true" />
               <LanguageLinks className="site-footer__language-list" />
@@ -120,13 +122,8 @@ function SiteFooter() {
   )
 }
 
-const SITE_URL = 'https://www.hatowiki.site'
 // Area dengan tint latar sendiri (token --page-bg-<area> di tokens.css), dari segmen pertama URL.
 const TINTED_AREAS = ['wildlife', 'recipes', 'crops', 'collectibles', 'ingredients']
-
-function setMeta(selector, attribute, value) {
-  document.querySelector(selector)?.setAttribute(attribute, value)
-}
 
 function SiteShell() {
   const { pathname } = useLocation()
@@ -139,24 +136,11 @@ function SiteShell() {
   // Pindah halaman: konten memudar masuk (CSS, lihat .page-enter di base.css).
   useReplayAnimation(mainRef, pathname, 'page-enter')
 
-  // Canonical & og:url mengikuti halaman yang sedang dibuka (index.html hanya berisi versi beranda).
+  // Judul, deskripsi, canonical, Open Graph, dan tautan hreflang mengikuti halaman & bahasa yang sedang dibuka. HTML
+  // statis tiap halaman (scripts/build-seo.mjs) sudah berisi nilai yang sama untuk crawler tanpa JavaScript.
   useEffect(() => {
-    const url = SITE_URL + pathname
-    setMeta('link[rel="canonical"]', 'href', url)
-    setMeta('meta[property="og:url"]', 'content', url)
-  }, [pathname])
-
-  // Judul & deskripsi dasar situs mengikuti bahasa halaman (SEO per halaman menyusul).
-  useEffect(() => {
-    setMeta('meta[name="description"]', 'content', t('meta.description'))
-    setMeta('meta[property="og:locale"]', 'content', getLocale(locale).ogLocale)
-    setMeta('meta[property="og:title"]', 'content', t('meta.titleDefault'))
-    setMeta('meta[name="twitter:title"]', 'content', t('meta.titleDefault'))
-    setMeta('meta[property="og:description"]', 'content', t('meta.ogDescription'))
-    setMeta('meta[name="twitter:description"]', 'content', t('meta.ogDescription'))
-    setMeta('meta[property="og:image:alt"]', 'content', t('meta.ogImageAlt'))
-    setMeta('meta[name="twitter:image:alt"]', 'content', t('meta.ogImageAlt'))
-  }, [t, locale])
+    applyPageMeta(getPageMeta(route, locale, getLoadedMessages(locale)))
+  }, [route, locale])
 
   return (
     <div className="site" data-area={TINTED_AREAS.includes(area) ? area : undefined}>
@@ -175,7 +159,7 @@ function SiteShell() {
   )
 }
 
-// Bahasa halaman dari awalan alamat (/th → Thai, tanpa awalan → Indonesia). Teks bahasa yang belum dimuat ditunggu
+// Bahasa halaman dari awalan alamat (/th → Thai, /en → Inggris, tanpa awalan → Indonesia). Teks bahasa yang belum dimuat ditunggu
 // dulu (main.jsx & pemilih bahasa biasanya sudah memuatnya lebih awal).
 function Layout() {
   const { pathname } = useLocation()

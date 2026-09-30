@@ -1,6 +1,7 @@
 # Hatowiki
 
-Wiki komunitas Heartopia berbahasa Indonesia (proyek fan, tidak resmi).
+Wiki komunitas Heartopia (proyek fan, tidak resmi) dalam tiga bahasa: Indonesia (bawaan, alamat tanpa awalan), Thai
+(`/th`), dan Inggris (`/en`). Lihat [Bahasa](#bahasa), [Deskripsi isian manual](#deskripsi-isian-manual), dan [SEO](#seo).
 
 Tahap sekarang: kategori **Wildlife**, dengan **Fish** berisi 124 ikan (97 Base Game + 27 event), **Bugs** berisi 101 serangga (76 + 25), **Birds** berisi 103 burung (77 + 26), dan **Animals** berisi 11 hewan (8 + 3), serta **Recipes** berisi 208 resep (87 Base Game + 121 dari 13 event). Kategori Wiki **Crops** berisi 19 tanaman (14 Base Game + 5 event) dan **Collectibles** berisi 40 bahan alam (33 Base Game + 7 event). Semua entri di halaman daftar Heartodex sudah dimasukkan.
 
@@ -22,18 +23,32 @@ luar layar, prefers-reduced-motion), Waktu Server 5 kotak, Muncul Sekarang (serv
 jadwal di data, hanya entri Base Game, "Lihat semua" berfilter waktu), kartu kategori, kontras AA light & dark, dan
 halaman tidak melebar.
 
+Uji lain yang ikut `npm run test:ui`:
+
+- `scripts/qa/i18n.test.mjs`: tiga bahasa (routing `/th` & `/en`, teks antarmuka, deskripsi per bahasa, isian manual,
+  pemilih bahasa, aturan notifikasi saran bahasa).
+- `scripts/qa/links.test.mjs`: semua yang berpindah halaman adalah tautan sungguhan (hasil pencarian global bisa dibuka
+  di tab baru lewat klik tengah, Ctrl+klik, atau klik kanan; keyboard panah/Enter/Escape tetap jalan).
+- `scripts/qa/seo.test.mjs`: meta tag per halaman & bahasa di browser, lalu HTML statis, `sitemap.xml`, `robots.txt`, dan
+  rewrite `vercel.json` di `dist/` (jalankan `npm run build` dulu).
+
 ```bash
 npm run dev        # di terminal lain
-npm run test:ui    # butuh Chrome atau Edge; lokasi lain bisa diset lewat CHROME_PATH
+npm run test:ui    # butuh Chrome atau Edge; lokasi lain bisa diset lewat CHROME_PATH (uji SEO butuh dist/ dari npm run build)
 node scripts/qa/wildlife-list.test.mjs bugs 390   # satu kategori / satu lebar (fish, bugs, birds, animals, recipes, crops, collectibles)
 node scripts/qa/home.test.mjs 390                 # beranda & toolbar, satu lebar
+node scripts/qa/i18n.test.mjs 1280                # tiga bahasa, satu lebar
+node scripts/qa/links.test.mjs 1280               # tautan sungguhan, satu lebar
+node scripts/qa/seo.test.mjs 1280                 # SEO (setelah npm run build)
 ```
 
 Semua halaman memakai toolbar global yang menempel di atas: logo, menu Wildlife (dropdown Fish, Bugs, Birds,
 Animals), menu Wiki (dropdown Resep, Crops, Collectibles), pencarian nama di semua kategori, dan tombol tema. Di bawah 760 px menu pindah ke drawer dan
 pencarian ke balik tombol ikon.
 
-Situs memakai client-side routing (`react-router-dom`). Saat di-deploy, server harus mengarahkan semua path ke `index.html` (SPA fallback), supaya URL seperti `/wildlife/fish/sea-bass` bisa dibuka langsung.
+Situs memakai client-side routing (`react-router-dom`). Saat build, tiap halaman di tiap bahasa juga mendapat berkas HTML
+statis sendiri (lihat [SEO](#seo)), jadi URL seperti `/wildlife/fish/sea-bass` atau `/th/wildlife/fish/sea-bass` bisa
+dibuka langsung. Alamat yang tidak punya berkas diarahkan `vercel.json` ke `index.html` bahasanya (SPA fallback).
 
 ## Halaman
 
@@ -71,12 +86,22 @@ public/images/crops/          Gambar tanaman (diunduh dari Heartodex; juga dipak
 public/images/collectibles/   Gambar collectible (diunduh dari Heartodex; juga dipakai sebagai gambar bahan)
 public/images/items/          Gambar benda lain: ingredient, resep, ikan (diunduh dari Heartodex)
 public/images/maps/           Peta dasar Heartopia dan peta bawah laut Whalefall Canyon (diunduh dari Heartodex)
+data/manual/descriptions.json Isian manual: deskripsi dari game untuk entri yang tidak punya deskripsi
+api/geo.js                    Fungsi Vercel: kode negara pengunjung (untuk notifikasi saran bahasa)
+scripts/
+├── heartodex-sync.mjs        Sinkronisasi data dari Heartodex
+├── english-descriptions.mjs  Teks tampilan bahasa Inggris dari teks asli + pembetulan salah ketik
+├── manual-descriptions.mjs   Daftar entri tanpa deskripsi (berkas isian manual) & status terjemahannya
+├── build-seo.mjs             HTML statis per halaman & bahasa, sitemap.xml, robots.txt (dijalankan vite build)
+├── translations/             Terjemahan & review per kategori (<kind>.id|th|en.json, review-*.md, english-corrections.json)
+└── qa/                       Uji UI (Chrome headless)
 src/
 ├── App.jsx                   Definisi route
 ├── styles/tokens.css         Design token: warna (light & dark, termasuk --level-1…14 badge level), font, radius, spacing, bayangan
 ├── styles/base.css           Reset, tipografi, utilitas (.container, .btn, dll)
 ├── data/
 │   ├── gameTime.js           Server + offset UTC, periode Dawn/Day/Dusk/Night
+│   ├── manualDescriptions.js Deskripsi isian manual dari game (data/manual/descriptions.json, sumber "in-game")
 │   ├── events.js             Event (nama, emoji, tanggal mulai + sumbernya) untuk urutan section; Base Game
 │   ├── items.js              Benda bersama (bahan resep, makanan hewan): id, nama, jenis, gambar, sumber (+ validator);
 │   │                         Crop & Collectible diturunkan dari datanya sendiri
@@ -99,6 +124,9 @@ src/
 │       ├── entryLocations.js Lokasi entri sebagai [{ name, zone }] untuk skema mana pun
 │       ├── locationZones.js  Poligon zona lokasi di peta
 │       └── zoneViewBox.js    Potongan peta untuk beberapa zona sekaligus
+├── i18n/                     Bahasa: locales.js (id, th, en), I18nProvider (useI18n), LocaleLink, format.js (teks & bentuk
+│                             jamak), suggestLocale.js (aturan saran bahasa), messages/<bahasa>.json (teks antarmuka)
+├── seo/                      pageMeta.js (judul, deskripsi & alamat tiap halaman per bahasa), applyPageMeta.js (pasang ke <head>)
 ├── components/
 │   ├── catalog/              CatalogCard (kartu generik: gambar, badge kategori & level, baris info)
 │   ├── wildlife/             EntryCard, EntryImage, LocationMap (zona atau pin), MarketValue, dll (dipakai semua kategori)
@@ -161,6 +189,100 @@ badge level blok warna penuh.
 
 Warna badge level di kartu (dan badge level di detail resep) diambil dari nomor level di data: token `--level-N` (latar) dan `--level-N-ink` (teks) di `tokens.css`, versi light dan dark, lewat `components/wildlife/levelTone.js`. Urutannya naik dari hijau, teal, biru, ungu, merah muda, oranye, sampai emas di Lv. 14; level tanpa token (di atas 14) otomatis memakai `--level-fallback`.
 
+## Bahasa
+
+| Bahasa | Alamat | Teks antarmuka | Deskripsi entri |
+| --- | --- | --- | --- |
+| Indonesia (bawaan) | tanpa awalan | `src/i18n/messages/id.json` | `description` di file data (terjemahan dari teks asli) |
+| Thai | `/th/...` | `src/i18n/messages/th.json` | `scripts/translations/<kind>.th.json` (terjemahan AI dari teks asli, belum ditinjau penutur asli) |
+| Inggris | `/en/...` | `src/i18n/messages/en.json` | `scripts/translations/<kind>.en.json` (teks asli dengan salah ketik dibetulkan) |
+
+- Slug sama di semua bahasa. Tidak ada awalan `/id` (dialihkan ke alamat tanpa awalan). Nama entri, nama lokasi, dan
+  istilah game tetap bahasa Inggris di semua bahasa.
+- Komponen mengambil teks lewat `useI18n()` (`src/i18n/I18nProvider.jsx`) dan menaut lewat `Link`/`NavLink` dari
+  `src/i18n/LocaleLink.jsx`, yang menambahkan awalan bahasa sendiri. Teks Thai & Inggris (dan font Thai) baru dimuat di
+  halaman bahasanya, jadi versi Indonesia tidak ikut menanggungnya.
+- Teks boleh memuat `{nama}` dan, untuk bahasa Inggris, bentuk jamak `{count|recipe|recipes}` (`src/i18n/format.js`).
+- Pemilih bahasa ada di toolbar (ikon bola dunia) dan footer; pilihan diingat (`localStorage`), dan pengunjung yang pernah
+  memilih Thai atau Inggris diarahkan ke versi itu saat membuka alamat tanpa awalan.
+- Notifikasi saran bahasa (pojok kiri bawah) mengikuti aturan di `src/i18n/suggestLocale.js`: bahasa browser th/lo atau
+  negara TH/LA → Thai; bahasa browser id atau negara ID → Indonesia; bahasa browser ms → tidak ada saran; bahasa browser
+  en → Inggris hanya kalau negaranya diketahui dan bukan ID; bahasa lain → Inggris kecuali negaranya ID. Bahasa browser
+  didahulukan daripada negara, dan saran hanya muncul kalau berbeda dari bahasa halaman. Negara berasal dari
+  `api/geo.js` (header `x-vercel-ip-country` dari Vercel, tanpa layanan pihak ketiga; tidak tersedia saat development).
+
+### Teks Inggris (`<kind>.en.json`)
+
+Versi Inggris menampilkan teks asli heartodex, tapi salah ketik yang jelas berasal dari sumber dibetulkan dulu: pola
+y→g ("easilg", "Widelg"), salah baca huruf/angka ("Mid-AIJtumn", "tupe", "Oct0PUS"), huruf besar di tengah kalimat
+("Shell", "Will"), apostrof, dan tanda hubung yang seharusnya tanda pisah. `descriptionOriginal` di file data tidak
+pernah diubah.
+
+- Daftar pembetulan ditulis tangan di `scripts/translations/english-corrections.json` (`fixes.<kind>.<slug>` = daftar
+  `[teks di sumber, pembetulan, jenis]`), termasuk terjemahan Inggris untuk deskripsi yang di sumber berbahasa Spanyol
+  (`translations`, mis. Violet Roll Cake & Yellow Roll Cake; ditandai di `_meta.translated`).
+- `node scripts/english-descriptions.mjs` menerapkannya dan menulis ulang `<kind>.en.json` serta tabel review
+  `scripts/translations/review-<kind>.en.md`. Jalankan lagi setelah menambah entri atau pembetulan. Skrip berhenti kalau
+  sebuah pembetulan tidak cocok tepat satu kali, jadi daftar pembetulan tidak bisa diam-diam kedaluwarsa.
+- Deskripsi yang disembunyikan di versi Indonesia (salah salin di sumber) juga tidak ditampilkan di versi Inggris & Thai.
+
+## Deskripsi isian manual
+
+Sebagian entri tidak punya deskripsi: teksnya tidak ada di heartodex, atau ada tapi disembunyikan karena salah salin.
+Semuanya terdaftar di `data/manual/descriptions.json`, dikelompokkan per kategori, dengan kolom kosong untuk diisi sendiri
+dari teks yang terlihat langsung di game:
+
+```json
+"asian-arowana": {
+  "name": "Asian Arowana",
+  "reason": "deskripsi tidak ditemukan di sumber",
+  "en": "",
+  "id": "",
+  "th": ""
+}
+```
+
+Cara mengisi:
+
+1. Buka `data/manual/descriptions.json`, cari entrinya (nama ada di `name`), lalu isi `en` dengan teks bahasa Inggris
+   dari game, apa adanya dan tanpa tanda kutip pembuka/penutup. Kolom `name` dan `reason` tidak perlu diubah.
+2. Begitu `en` terisi, situs memakainya sebagai deskripsi asli entri itu dengan sumber `in-game`
+   (`src/data/manualDescriptions.js`): versi Inggris langsung menampilkannya, dan teks ini mengalahkan apa pun dari
+   heartodex, termasuk teks salah salin yang disembunyikan.
+3. Versi Indonesia dan Thai baru menampilkannya setelah terjemahannya ada di kolom `id` dan `th` berkas yang sama.
+   Jalankan `node scripts/manual-descriptions.mjs` untuk melihat entri mana yang sudah diisi tapi belum diterjemahkan,
+   lalu minta agent (mis. Claude Code) menerjemahkan kolom `en` entri itu ke `id` dan `th`: terjemahan setia pada teks
+   asli, nama dan istilah game tetap bahasa Inggris. Skrip itu tidak menerjemahkan sendiri; selama `id`/`th` kosong,
+   versi bahasa itu tetap menampilkan "Deskripsi belum tersedia".
+4. `npm run build`.
+
+Aturan yang dijaga:
+
+- Skrip sinkronisasi (`heartodex-sync.mjs`) tidak pernah membaca maupun menulis berkas ini, jadi isian tidak bisa
+  tertimpa; data dari heartodex tetap disimpan apa adanya di file data.
+- `node scripts/manual-descriptions.mjs` memperbarui daftarnya (menambahkan entri baru tanpa deskripsi, membuang baris
+  kosong yang entrinya sudah punya deskripsi dari sumber) dan tidak pernah mengubah kolom yang sudah terisi.
+  `--check` hanya melaporkan.
+
+## SEO
+
+- `src/seo/pageMeta.js` adalah satu-satunya sumber judul, deskripsi, dan alamat tiap halaman per bahasa. Deskripsi dibuat
+  dari data dalam bahasa halamannya, paling panjang 160 karakter: mis. ikan = nama, level, lokasi, waktu muncul, cuaca,
+  dan rentang harga jual; resep = level, energi, bahan utama, dan harga jual. Kalimat pembuka selalu ada, keterangan
+  lain ditambahkan menurut prioritas selama masih muat. Teksnya di `src/i18n/messages` (`seo.*`, `kinds.<slug>.meta*`).
+- Di browser, `Layout` memasang judul, meta description, canonical, Open Graph/Twitter, dan `hreflang` (id, th, en, serta
+  `x-default` → versi Inggris) setiap kali pindah halaman atau bahasa (`src/seo/applyPageMeta.js`). Halaman yang tidak ada
+  diberi `noindex`.
+- Saat `vite build`, plugin di `vite.config.js` menjalankan `scripts/build-seo.mjs`: untuk tiap halaman di tiap bahasa
+  ditulis salinan `index.html` dengan meta tag dan atribut `lang` yang sudah diisi (`dist/wildlife/fish/sea-bass/index.html`,
+  `dist/th/...`, `dist/en/...`), untuk crawler tanpa JavaScript (WhatsApp, Discord, media sosial). Isi halaman tetap
+  dirender React; ini bukan SSR. Skrip yang sama menulis `sitemap.xml` (semua halaman × 3 bahasa dengan `hreflang`) dan
+  `robots.txt`. Build berhenti kalau ada judul/deskripsi yang sama di satu bahasa atau deskripsi lebih dari 160 karakter.
+- Dua entri yang namanya sama di katalog berbeda (Egg: resep & bahan masak) diberi nama katalog di judulnya,
+  "Egg (Recipes)" dan "Egg (Ingredients)".
+- Di Vercel berkas statis didahulukan daripada rewrite. `vercel.json` hanya menangani alamat yang tidak punya berkas:
+  `/th/...` → `/th/index.html`, `/en/...` → `/en/index.html`, sisanya → `/index.html` (kecuali `/api`).
+
 ## Aturan data
 
 Semua data game wajib diambil dari sumber valid, utamanya [Heartodex](https://www.heartodex.com/en/fish). Jangan mengarang. Data yang tidak ditemukan diisi `null` dan diberi komentar `TODO`.
@@ -185,7 +307,10 @@ Tidak perlu mengubah komponen. Filter di halaman list juga otomatis mengambil op
    ```
 2. Tulis terjemahan Indonesia yang setia pada teks asli (lihat baris `EN:` di laporan) ke `scripts/translations/<kind>.id.json` (`fish`, `bugs`, `birds`, `animals`, `recipes`, `crops`, `collectibles`), dengan format `{ "slug": "terjemahan" }` (tanaman & collectible: `{ "text": …, "sourceLang": "es" }` kalau teks aslinya di situs EN berbahasa Spanyol).
 3. Jalankan lagi dengan `--write`. Skrip menyisipkan entri baru (dengan `section` dari posisinya di halaman daftar) sesuai urutan section, level, lalu urutan di halaman daftar, menambahkan zona baru di `locationZones.js`, menambahkan benda baru (bahan/makanan) di `items.js`, dan mengunduh gambar ke `public/images/<kind>/` dan `public/images/items/`.
-4. Periksa komentar `TODO` di entri baru, lalu jalankan `npm run build`.
+4. Periksa komentar `TODO` di entri baru. Jalankan `node scripts/english-descriptions.mjs` (teks Inggris; tambahkan dulu
+   pembetulan salah ketik entri baru ke `english-corrections.json` kalau ada) dan `node scripts/manual-descriptions.mjs`
+   (daftar entri tanpa deskripsi), tambahkan terjemahan Thai ke `scripts/translations/<kind>.th.json`, lalu
+   `npm run build`.
 
 Aturan yang dijaga skrip:
 - Ada jeda 2 detik antar request.

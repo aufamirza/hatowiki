@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 /**
- * Uji dua bahasa (Indonesia & Thai) di Chrome headless (lewat Chrome DevTools Protocol):
- * - Routing: versi Indonesia tanpa awalan, versi Thai di /th dengan slug yang sama; semua halaman (beranda, hub, daftar,
+ * Uji tiga bahasa (Indonesia, Thai, Inggris) di Chrome headless (lewat Chrome DevTools Protocol):
+ * - Routing /en: versi Inggris di /en dengan slug yang sama (lang="en", teks antarmuka Inggris tanpa sisa Indonesia/Thai,
+ *   tautan internal tetap di /en, angka en-US, tanpa font Thai); deskripsi dari scripts/translations/<kind>.en.json =
+ *   teks asli yang salah ketiknya dibetulkan (descriptionOriginal tetap apa adanya), deskripsi berbahasa Spanyol
+ *   diterjemahkan & ditandai, yang disembunyikan tetap tersembunyi; isian manual data/manual/descriptions.json dipakai
+ *   sebagai deskripsi asli (sumber "in-game").
+ * - Routing /th: versi Indonesia tanpa awalan, versi Thai di /th dengan slug yang sama; semua halaman (beranda, hub, daftar,
  *   detail, 404) berbahasa Thai (lang="th", judul & deskripsi dasar situs, tanpa teks antarmuka Indonesia, semua tautan
  *   internal tetap di /th); /id/... diarahkan ke alamat tanpa awalan; rewrite vercel.json melayani /th/... tapi tidak
  *   /api; navigasi, tombol kembali, dan pencarian global tetap di /th.
@@ -9,12 +14,15 @@
  *   (lengkap untuk semua entri yang punya deskripsi Indonesia, tercatat sebagai terjemahan otomatis yang belum ditinjau),
  *   deskripsi yang disembunyikan di versi Indonesia juga tersembunyi di Thai; angka th-TH dengan angka Arab; font Thai
  *   (Anuphan) hanya dimuat di /th; teks & font Thai tidak dimuat sama sekali untuk pengunjung biasa di versi Indonesia.
- * - Pemilih bahasa: bola dunia di toolbar (disclosure, keyboard, Escape) dan tautan di footer, membuka halaman yang sama
- *   termasuk filter di URL, pilihan diingat (alamat tanpa awalan diarahkan ke /th untuk yang memilih Thai).
- * - Notifikasi saran bahasa: muncul di versi Indonesia untuk bahasa browser th/lo atau negara TH/LA dari api/geo.js
- *   (dicegat di uji), dan di versi Thai untuk bahasa browser id; isi & atribut lang, dialog non-modal di pojok kiri
- *   bawah yang bisa difokus, Escape & tombol X menutup dan diingat, memilih bahasa (tombol, pemilih) menutupnya,
- *   animasi masuk mengikuti prefers-reduced-motion, footer diberi ruang supaya konten tidak tertutup; console bersih.
+ * - Pemilih bahasa: bola dunia di toolbar (disclosure, keyboard, Escape) dan tautan di footer ("Indonesia", "ไทย",
+ *   "English"), membuka halaman yang sama termasuk filter di URL, pilihan diingat (alamat tanpa awalan diarahkan ke /th
+ *   atau /en untuk yang memilih Thai atau Inggris).
+ * - Notifikasi saran bahasa, aturan di src/i18n/suggestLocale.js (tabel aturan diuji langsung, lalu di halaman): bahasa
+ *   browser th/lo atau negara TH/LA → Thai; id atau negara ID → Indonesia; ms → tidak ada saran; en → Inggris hanya
+ *   kalau negara dari api/geo.js (dicegat di uji) tersedia dan bukan ID; bahasa lain → Inggris kecuali negara ID; saran
+ *   hanya muncul kalau berbeda dari bahasa halaman. Isi & atribut lang, dialog non-modal di pojok kiri bawah yang bisa
+ *   difokus, Escape & tombol X menutup dan diingat, memilih bahasa (tombol, pemilih) menutupnya, animasi masuk mengikuti
+ *   prefers-reduced-motion, footer diberi ruang supaya konten tidak tertutup; console bersih.
  *
  * Pemakaian (dev server harus sudah jalan):
  *   npm run dev
@@ -34,6 +42,7 @@ const ROOT = new URL('../../', import.meta.url)
 // Teks yang diharapkan, ditulis ulang di sini supaya uji tidak memakai kode aplikasi untuk memeriksa dirinya sendiri.
 const TH_TITLE = 'Hatowiki | วิกิชุมชน Heartopia'
 const ID_TITLE = 'Hatowiki | Wiki Komunitas Heartopia'
+const EN_TITLE = 'Hatowiki | Heartopia Community Wiki'
 const SUGGEST_TH = {
   title: 'สวัสดี! 👋',
   text: 'Hatowiki มีเวอร์ชันภาษาไทยด้วยนะ อยากเปลี่ยนเป็นภาษาไทยไหม?',
@@ -47,8 +56,42 @@ const SUGGEST_ID = {
   button: 'Pakai bahasa Indonesia',
   close: 'Tutup',
 }
+const SUGGEST_EN = {
+  title: 'Hello! 👋',
+  text: 'Hatowiki is also available in English. Would you like to switch?',
+  button: 'Switch to English',
+  close: 'Close',
+}
+// Aturan saran bahasa: [bahasa browser, negara (null = tidak tersedia), bahasa yang disarankan].
+const SUGGEST_RULES = [
+  [['th-TH', 'th', 'en'], null, 'th'],
+  [['lo-LA'], null, 'th'],
+  [['en-US', 'en', 'th'], 'US', 'th'],
+  [['en-US', 'en'], 'TH', 'th'],
+  [['ja'], 'LA', 'th'],
+  [['id-ID', 'id'], null, 'id'],
+  [['id'], 'TH', 'id'],
+  [['en-US', 'id'], null, 'id'],
+  [['en-US', 'en'], 'ID', 'id'],
+  [['fr-FR', 'fr'], 'ID', 'id'],
+  [['ms-MY', 'ms'], null, null],
+  [['ms'], 'TH', null],
+  [['en-US', 'ms'], 'US', null],
+  [['en-US', 'en'], null, null],
+  [['en-GB'], 'GB', 'en'],
+  [['en-US', 'en'], 'SG', 'en'],
+  [['en', 'fr'], null, null],
+  [['ja-JP', 'ja'], null, 'en'],
+  [['fr', 'en'], null, 'en'],
+  [['de-DE'], 'DE', 'en'],
+  [['zh-CN', 'zh', 'en'], 'MY', 'en'],
+  [[], null, null],
+  [[], 'US', 'en'],
+]
 // Teks antarmuka Indonesia yang tidak boleh tersisa di halaman Thai (nama entri, lokasi, istilah game tetap Inggris).
 const ID_UI_WORDS = /\b(Beranda|Lihat semua|Lihat daftar|Kembali|Harga jual|Harga beli|Nilai jual|Lokasi|Cuaca|Menampilkan|Deskripsi|Sumber data|dari|membuka tab baru|Bahan|Waktu|Urutan|Filter Lanjutan|Semua|Resep|Ikan|Serangga|Burung|Hewan|Tanaman|koin|energi|Syarat level|Toko)\b/
+// Teks antarmuka Indonesia yang tidak boleh tersisa di halaman Inggris (kata yang juga kata Inggris tidak dimasukkan).
+const ID_WORDS_IN_EN = /\b(Beranda|Lihat semua|Lihat daftar|Kembali|Harga jual|Harga beli|Nilai jual|Lokasi|Cuaca|Menampilkan|Deskripsi|Sumber data|dari|membuka tab baru|Bahan|Waktu|Urutan|Filter Lanjutan|Semua|Resep|Ikan|Serangga|Burung|Hewan|Tanaman|koin|energi|Syarat level|Toko|saat|hanya|selama)\b/
 const THAI = /[฀-๿]/
 const THAI_DIGITS = /[๐-๙]/
 const ROUTES = [
@@ -150,9 +193,183 @@ async function runSuite(width) {
 
   await main.go('/')
   const idHome = await evaluate(`({ lang: document.documentElement.lang, title: document.title, font: !!document.getElementById('font-th'),
-    thaiLoaded: performance.getEntriesByType('resource').some((r) => /messages\\/th\\.json|\\.th\\.json|Anuphan|anuphan/i.test(r.name)) })`)
+    thaiLoaded: performance.getEntriesByType('resource').some((r) => /messages\\/(th|en)\\.json|\\.(th|en)\\.json|Anuphan|anuphan/i.test(r.name)) })`)
   check('Versi Indonesia (/) tetap lang="id" dengan judul dasar Indonesia', idHome.lang === 'id' && idHome.title === ID_TITLE, `${idHome.lang} · ${idHome.title}`)
-  check('Versi Indonesia tidak memuat teks, deskripsi, maupun font Thai (pengunjung dengan bahasa browser lain)', !idHome.font && !idHome.thaiLoaded, JSON.stringify(idHome))
+  check('Versi Indonesia tidak memuat teks & deskripsi Thai/Inggris maupun font Thai (browser berbahasa Inggris tanpa data negara)', !idHome.font && !idHome.thaiLoaded, JSON.stringify(idHome))
+
+  // ================= 1a. Routing /en, teks antarmuka, deskripsi Inggris =================
+  await main.go('/en', 2500)
+  const enHome = await evaluate(`(() => {
+    const m = (s) => document.querySelector(s)?.getAttribute('content')
+    return { lang: document.documentElement.lang, title: document.title, path: location.pathname, font: !!document.getElementById('font-th'),
+      body: getComputedStyle(document.body).fontFamily, badge: document.querySelector('.hero__badge')?.textContent.trim(), description: m('meta[name="description"]'),
+      ogLocale: m('meta[property="og:locale"]'), ogTitle: m('meta[property="og:title"]'), canonical: document.querySelector('link[rel="canonical"]')?.href,
+      thaiLoaded: performance.getEntriesByType('resource').some((r) => /messages\\/th\\.json|\\.th\\.json|Anuphan/i.test(r.name)),
+      labels: [...document.querySelectorAll('.category-card__label, .now-group__label')].length, names: [...document.querySelectorAll('.category-card__title')].map((e) => e.textContent.trim()) }
+  })()`)
+  check('/en: halaman Inggris (lang="en", judul & deskripsi dasar situs Inggris, og:locale en_US, canonical /en)',
+    enHome.lang === 'en' && enHome.path === '/en' && enHome.title === EN_TITLE && enHome.ogTitle === EN_TITLE && /^A community wiki for Heartopia/.test(enHome.description) && enHome.ogLocale === 'en_US' && enHome.canonical?.endsWith('/en') && enHome.badge === 'Unofficial community project',
+    `${enHome.title} · ${enHome.ogLocale} · ${enHome.badge}`)
+  check('/en: tanpa font & teks Thai; nama kategori tidak diulang sebagai label ("Fish", bukan "Fish Fish")',
+    !enHome.font && !enHome.thaiLoaded && !/Anuphan/.test(enHome.body) && enHome.labels === 0 && enHome.names.includes('Fish') && enHome.names.includes('Recipes'), `${enHome.names.join(', ')} · label ${enHome.labels}`)
+
+  const enPages = []
+  for (const route of ROUTES) {
+    await main.go(`/en${route === '/' ? '' : route}`)
+    enPages.push({
+      route,
+      ...(await evaluate(`(() => {
+        const text = document.querySelector('.site').innerText
+        const internal = [...document.querySelectorAll('a[href^="/"]:not([hreflang])')].map((a) => a.getAttribute('href')).filter((href) => !href.startsWith('/images'))
+        const labels = [...document.querySelectorAll('[aria-label], [title], [placeholder], [alt]')].map((el) => [el.getAttribute('aria-label'), el.getAttribute('title'), el.getAttribute('placeholder')].filter(Boolean).join(' ')).join(' | ')
+        // Nama bahasa "ไทย" di pemilih bahasa memang beraksara Thai.
+        const thai = [...document.querySelectorAll('.site *')].filter((el) => !el.closest('[lang="th"]') && [...el.childNodes].some((n) => n.nodeType === 3 && /[฀-๿]/.test(n.textContent))).length
+        return { lang: document.documentElement.lang, path: location.pathname, title: document.title, h1: document.querySelector('h1')?.textContent.trim() ?? '',
+          text, labels, thai, badLinks: internal.filter((href) => href !== '/en' && !href.startsWith('/en/') && !href.startsWith('/en?')) }
+      })()`)),
+    })
+  }
+  const idLeftEn = enPages.map((page) => ({ route: page.route, hit: (page.text + ' ' + page.labels).match(ID_WORDS_IN_EN)?.[0] })).filter((page) => page.hit)
+  check(`/en: ${ROUTES.length} halaman (beranda, hub, daftar, detail, 404) berbahasa Inggris dengan slug yang sama`,
+    enPages.every((page) => page.lang === 'en' && page.path === `/en${page.route === '/' ? '' : page.route}`), enPages.filter((page) => page.lang !== 'en').map((page) => page.route).join(', '))
+  check('/en: tidak ada teks antarmuka Indonesia atau Thai yang tersisa (teks, aria-label, title, placeholder)', idLeftEn.length === 0 && enPages.every((page) => page.thai === 0),
+    [...idLeftEn.map((page) => `${page.route}: "${page.hit}"`), ...enPages.filter((page) => page.thai).map((page) => `${page.route}: ${page.thai} teks Thai`)].join(', '))
+  check('/en: semua tautan internal tetap di /en (toolbar, footer, kartu, breadcrumb, detail; selain pemilih bahasa)', enPages.every((page) => page.badLinks.length === 0),
+    enPages.filter((page) => page.badLinks.length).map((page) => `${page.route}: ${page.badLinks.slice(0, 3).join(' ')}`).join(', '))
+  const enNotFound = enPages.find((page) => page.route === '/nope')
+  const enFishNotFound = enPages.find((page) => page.route === '/wildlife/fish/nope')
+  check('/en: halaman 404 umum & detail tidak ditemukan berbahasa Inggris; judul tab memakai nama entri/katalog',
+    enNotFound.h1 === 'Page not found' && enFishNotFound.h1 === 'Fish not found' && enFishNotFound.title === 'Fish not found | Hatowiki' && enPages.find((page) => page.route === '/wildlife/fish').title === 'Fish | Hatowiki' && enPages.find((page) => page.route === '/wildlife/fish/sea-bass').title === 'Sea Bass | Hatowiki',
+    `${enNotFound.h1} · ${enFishNotFound.h1}`)
+  const enList = enPages.find((page) => page.route === '/wildlife/bugs').text
+  const enRecipes = enPages.find((page) => page.route === '/recipes').text
+  check('/en: teks daftar alami ("Showing 101 of 101 bugs", jumlah per section "entries", tunggal "1 entry")',
+    /Showing 101 of 101 bugs/.test(enList.replace(/\s+/g, ' ')) && /\b\d+ entries\b/.test(enList) && !/\b1 entries\b/.test(enList + enRecipes), enList.replace(/\s+/g, ' ').match(/Showing[^.]{0,40}/)?.[0])
+
+  // Deskripsi Inggris: teks asli dengan salah ketik dibetulkan; descriptionOriginal tidak berubah.
+  const enData = await evaluate(`(async () => {
+    const kinds = ${JSON.stringify(KINDS)}
+    const corrections = (await import('/scripts/translations/english-corrections.json')).default
+    const out = { kinds: {}, fixes: 0, fixedEntries: 0, typosLeft: [], originalChanged: [] }
+    const TYPOS = /\\b(easilg|Widelg|widelg|ferocitg|preg|theg|murkg|highlg|verg|furrg|damselflg|fairg|personalitg|ang|angone|grag|mgsterious|passerbg|meticulouslg|Butterflg|evenlg|silkg|worrg|gour|lagers|spicg|tog|tupe|cuan|wau|sparckles|mandits|appearence|Iost)\\b|Mid-AIJtumn|Oct0PUS|Stag away|´|bUt|(?<=[a-z,] )(Shell|Still|Sharp|Uses|Used|Unique|Will|What|Pink|Plain|Style)\\b/
+    for (const [kind, path] of Object.entries(kinds)) {
+      const entries = Object.values(await import(path)).find((v) => Array.isArray(v) && v[0]?.slug)
+      const { _meta, ...texts } = (await import('/scripts/translations/' + kind + '.en.json')).default
+      const fixes = corrections.fixes[kind] ?? {}
+      const translated = corrections.translations[kind] ?? {}
+      out.kinds[kind] = {
+        entries: entries.length,
+        texts: Object.keys(texts).length,
+        missing: entries.filter((e) => e.description && !texts[e.slug]).map((e) => e.slug),
+        leakedHidden: entries.filter((e) => !e.description && texts[e.slug]).map((e) => e.slug),
+        unknown: Object.keys(texts).filter((slug) => !entries.some((e) => e.slug === slug)),
+        // Entri tanpa pembetulan harus sama persis dengan teks sumber; entri berbahasa lain harus memakai terjemahannya.
+        changedWithoutRecord: entries.filter((e) => texts[e.slug] && !fixes[e.slug] && !translated[e.slug] && texts[e.slug] !== e.descriptionOriginal).map((e) => e.slug),
+        unchangedWithRecord: entries.filter((e) => fixes[e.slug] && texts[e.slug] === e.descriptionOriginal).map((e) => e.slug),
+        foreign: entries.filter((e) => e.descriptionSourceLang).map((e) => ({ slug: e.slug, ok: texts[e.slug] === translated[e.slug] && _meta.translated?.[e.slug] === e.descriptionSourceLang })),
+        meta: _meta && _meta.language === 'en' && _meta.corrections === Object.values(fixes).reduce((n, list) => n + list.length, 0) && _meta.correctedEntries === Object.keys(fixes).length,
+      }
+      out.fixes += Object.values(fixes).reduce((n, list) => n + list.length, 0)
+      out.fixedEntries += Object.keys(fixes).length
+      out.typosLeft.push(...Object.entries(texts).filter(([, text]) => TYPOS.test(text)).map(([slug, text]) => kind + '/' + slug + ': ' + text.match(TYPOS)[0]))
+      // Salah ketiknya harus tetap ada di descriptionOriginal (data tidak diubah).
+      for (const [slug, list] of Object.entries(fixes)) {
+        const original = entries.find((e) => e.slug === slug)?.descriptionOriginal ?? ''
+        if (!list.every(([from]) => original.includes(from) || list.some(([a, b]) => a !== from && original.includes(a)))) out.originalChanged.push(kind + '/' + slug)
+      }
+    }
+    return out
+  })()`)
+  const enRows = Object.entries(enData.kinds)
+  const enTotal = enRows.reduce((sum, [, row]) => sum + row.texts, 0)
+  check(`Deskripsi Inggris: ${enTotal} teks, lengkap untuk semua entri yang punya deskripsi, tidak ada slug asing`,
+    enRows.every(([, row]) => row.missing.length === 0 && row.unknown.length === 0), enRows.map(([kind, row]) => `${kind} ${row.texts}/${row.entries}${row.missing.length ? ` kurang ${row.missing.join(' ')}` : ''}`).join(', '))
+  check(`Deskripsi Inggris: ${enData.fixes} pembetulan salah ketik di ${enData.fixedEntries} entri tercatat di english-corrections.json; teks lain sama persis dengan sumber`,
+    enData.fixes > 100 && enRows.every(([, row]) => row.changedWithoutRecord.length === 0 && row.unchangedWithRecord.length === 0 && row.meta),
+    enRows.flatMap(([kind, row]) => [...row.changedWithoutRecord, ...row.unchangedWithRecord].map((slug) => `${kind}/${slug}`)).join(', '))
+  check('Deskripsi Inggris: tidak ada sisa salah ketik yang dikenal (pola y→g, OCR, huruf besar di tengah kalimat, apostrof aksen)', enData.typosLeft.length === 0, enData.typosLeft.slice(0, 5).join(' | '))
+  check('descriptionOriginal di file data tetap apa adanya (salah ketiknya masih ada di sana)', enData.originalChanged.length === 0, enData.originalChanged.slice(0, 5).join(', '))
+  check('Deskripsi Inggris: yang disembunyikan di versi Indonesia juga tidak ada; teks sumber berbahasa Spanyol diterjemahkan & ditandai di _meta',
+    enRows.every(([, row]) => row.leakedHidden.length === 0) && enData.kinds.recipes.foreign.length === 2 && enRows.every(([, row]) => row.foreign.every((item) => item.ok)),
+    JSON.stringify(enData.kinds.recipes.foreign))
+  const enDetail = async (route) => { await main.go(route); return evaluate(`document.querySelector('.entry-detail__description')?.textContent.trim()`) }
+  const enShown = {
+    whitefish: await enDetail('/en/wildlife/fish/common-whitefish'),
+    moonfish: await enDetail('/en/wildlife/fish/moonfish'),
+    violet: await enDetail('/en/recipes/violet-roll-cake'),
+    hidden: await enDetail('/en/recipes/mandarin-milkshake'),
+    hiddenBug: await enDetail('/en/wildlife/bugs/colorful-brick-large-red-damselfly'),
+    none: await enDetail('/en/wildlife/fish/asian-arowana'),
+  }
+  check('Detail /en: deskripsi dengan salah ketik yang sudah dibetulkan ("easily", "Mid-Autumn")',
+    enShown.whitefish === "It has a slender body and won't move easily once it finds a place it likes." && /Mid-Autumn Festival moon/.test(enShown.moonfish), `${enShown.whitefish} | ${enShown.moonfish}`)
+  check('Detail /en: deskripsi asal Spanyol tampil dalam bahasa Inggris; yang disembunyikan & yang tidak ada di sumber "No description available yet."',
+    enShown.violet === "A purple cake like soft mist. It's sure to bring you sweet dreams." && [enShown.hidden, enShown.hiddenBug, enShown.none].every((text) => text === 'No description available yet.'),
+    `${enShown.violet} | ${enShown.hidden} | ${enShown.none}`)
+  await main.go('/en/recipes/tiramisu')
+  const enNumbers = await evaluate(`({ prices: [...document.querySelectorAll('.panel--hero .market-value__amount')].map((e) => e.firstChild.textContent), text: document.querySelector('.site').innerText })`)
+  await main.go('/en/wildlife/fish/sea-bass')
+  const enHint = await evaluate(`document.querySelector('.availability__hint')?.textContent`)
+  await main.go('/en/ingredients/yellow-sugar')
+  const enObtained = await evaluate(`[...document.querySelectorAll('.spec')].find((s) => s.textContent.includes('Obtained from'))?.querySelector('dd').innerText.replace(/\\n/g, ' ')`)
+  check('/en: angka en-US ("4,240"), jam "06:00–12:00", dan teks data (tempat membeli bahan) berbahasa Inggris',
+    enNumbers.prices.includes('4,240') && enHint === '06:00–12:00' && enObtained === "Doris's store only in Rainbow weather", `${enNumbers.prices.join(' ')} · ${enHint} · ${enObtained}`)
+
+  // Isian manual (data/manual/descriptions.json): daftar lengkap, dan kolom "en" yang terisi dipakai sebagai deskripsi.
+  const manual = await evaluate(`(async () => {
+    const kinds = ${JSON.stringify(KINDS)}
+    const { _meta, ...rows } = (await import('/data/manual/descriptions.json')).default
+    const out = { source: _meta?.source, kinds: {}, wrong: [] }
+    for (const [kind, path] of Object.entries(kinds)) {
+      const entries = Object.values(await import(path)).find((v) => Array.isArray(v) && v[0]?.slug)
+      const expected = entries.filter((e) => !e.description).map((e) => e.slug)
+      const listed = Object.keys(rows[kind] ?? {})
+      out.kinds[kind] = listed.length
+      if (JSON.stringify(expected) !== JSON.stringify(listed)) out.wrong.push(kind)
+      for (const [slug, row] of Object.entries(rows[kind] ?? {})) {
+        if (!row.name || !row.reason || ['en', 'id', 'th'].some((key) => typeof row[key] !== 'string')) out.wrong.push(kind + '/' + slug)
+      }
+    }
+    return out
+  })()`)
+  const manualTotal = Object.values(manual.kinds).reduce((sum, count) => sum + count, 0)
+  check(`Isian manual: data/manual/descriptions.json memuat persis ${manualTotal} entri tanpa deskripsi (nama, alasan, kolom en/id/th), sumber "in-game"`,
+    manual.source === 'in-game' && manual.wrong.length === 0 && manualTotal > 0 && manual.kinds.fish === 13, `${JSON.stringify(manual.kinds)} ${manual.wrong.join(' ')}`)
+  const sync = readFileSync(new URL('scripts/heartodex-sync.mjs', ROOT), 'utf8')
+  check('Skrip sinkron tidak pernah menulis ke data/manual (aturannya tercatat di skrip)', /data\/manual\/descriptions\.json/.test(sync) && !/writeFile\([^\n]*manual/i.test(sync))
+
+  // Isian dicoba tanpa mengubah berkasnya: modul JSON-nya dicegat dan diganti versi yang sebagian kolomnya terisi.
+  const manualTab = await freshTab()
+  const manualRows = JSON.parse(readFileSync(new URL('data/manual/descriptions.json', ROOT), 'utf8'))
+  manualRows.fish['asian-arowana'] = { ...manualRows.fish['asian-arowana'], en: 'A shimmering dragon of the river.', id: 'Naga sungai yang berkilauan.', th: '' }
+  manualRows.recipes['mandarin-milkshake'] = { ...manualRows.recipes['mandarin-milkshake'], en: 'Chunks of fresh mandarin bring zest to this milkshake.' }
+  await manualTab.send('Fetch.enable', { patterns: [{ urlPattern: '*data/manual/descriptions.json*' }] })
+  manualTab.on('Fetch.requestPaused', ({ requestId }) => {
+    manualTab.send('Fetch.fulfillRequest', {
+      requestId,
+      responseCode: 200,
+      responseHeaders: [{ name: 'Content-Type', value: 'text/javascript' }],
+      body: Buffer.from(`export default ${JSON.stringify(manualRows)}`).toString('base64'),
+    })
+  })
+  const manualText = async (route) => { await manualTab.go(route, 2200); return manualTab.evaluate(`document.querySelector('.entry-detail__description')?.textContent.trim()`) }
+  const filled = {
+    en: await manualText('/en/wildlife/fish/asian-arowana'),
+    id: await manualText('/wildlife/fish/asian-arowana'),
+    th: await manualText('/th/wildlife/fish/asian-arowana'),
+    hiddenEn: await manualText('/en/recipes/mandarin-milkshake'),
+    hiddenId: await manualText('/recipes/mandarin-milkshake'),
+    other: await manualText('/en/wildlife/fish/lionhead'),
+  }
+  check('Isian manual: kolom "en" yang terisi tampil sebagai deskripsi di /en (juga untuk entri yang disembunyikan), mengalahkan data sumber',
+    filled.en === 'A shimmering dragon of the river.' && filled.hiddenEn === 'Chunks of fresh mandarin bring zest to this milkshake.' && filled.other === 'No description available yet.', `${filled.en} | ${filled.hiddenEn}`)
+  check('Isian manual: versi Indonesia & Thai memakai terjemahan di berkas yang sama; yang belum diterjemahkan tetap "belum tersedia"',
+    filled.id === 'Naga sungai yang berkilauan.' && filled.th === 'ยังไม่มีคำอธิบาย' && filled.hiddenId === 'Deskripsi belum tersedia.', `${filled.id} | ${filled.th} | ${filled.hiddenId}`)
+
+  // Tab utama kembali ke depan (tab yang tersembunyi tidak menjalankan requestAnimationFrame).
+  await main.send('Page.bringToFront')
+
+  // ================= 1b. Routing /th, teks antarmuka, data =================
 
   await main.go('/th', 2500)
   const thHome = await evaluate(`(async () => {
@@ -199,11 +416,16 @@ async function runSuite(width) {
   // Kunci teks antarmuka sama di kedua bahasa; deskripsi Thai lengkap & sesuai aturan sembunyi.
   const coverage = await evaluate(`(async () => {
     const keys = (o, pre = '') => Object.entries(o).flatMap(([k, v]) => (v && typeof v === 'object' ? keys(v, pre + k + '.') : [pre + k]))
-    const [{ default: id }, { default: th }] = await Promise.all([import('/src/i18n/messages/id.json'), import('/src/i18n/messages/th.json')])
+    const [{ default: id }, { default: th }, { default: en }] = await Promise.all([import('/src/i18n/messages/id.json'), import('/src/i18n/messages/th.json'), import('/src/i18n/messages/en.json')])
     const skip = (k) => k.startsWith('dataText.') || k.endsWith('.unit')
-    const idKeys = keys(id).filter((k) => !skip(k)), thKeys = keys(th).filter((k) => !skip(k))
+    const idKeys = keys(id).filter((k) => !skip(k)), thKeys = keys(th).filter((k) => !skip(k)), enKeys = keys(en).filter((k) => !skip(k))
+    // Saran versi Inggris tidak punya baris Inggris tambahan, jadi kunci itu sengaja kosong di en.json; pemisah
+    // keterangan di deskripsi meta (seo.separator) memang hanya spasi di versi Indonesia & Inggris.
+    const emptyOf = (messages, list, allowed = []) => list.filter((k) => k !== 'seo.separator' && !allowed.includes(k) && !String(k.split('.').reduce((o, p) => o?.[p], messages) ?? '').trim())
     const kinds = ${JSON.stringify(KINDS)}
-    const out = { idKeys: idKeys.length, missingTh: idKeys.filter((k) => !thKeys.includes(k)), extraTh: thKeys.filter((k) => !idKeys.includes(k)), emptyTh: thKeys.filter((k) => !String(k.split('.').reduce((o, p) => o?.[p], th) ?? '').trim()), kinds: {} }
+    const out = { idKeys: idKeys.length, missingTh: idKeys.filter((k) => !thKeys.includes(k)), extraTh: thKeys.filter((k) => !idKeys.includes(k)), emptyTh: emptyOf(th, thKeys),
+      missingEn: idKeys.filter((k) => !enKeys.includes(k)), extraEn: enKeys.filter((k) => !idKeys.includes(k)), emptyEn: emptyOf(en, enKeys, ['suggestion.english']), emptyId: emptyOf(id, idKeys),
+      dataTextEn: Object.keys(th.dataText).filter((k) => !en.dataText[k]), kinds: {} }
     for (const [kind, path] of Object.entries(kinds)) {
       const mod = await import(path)
       const entries = Object.values(mod).find((v) => Array.isArray(v) && v[0]?.slug)
@@ -222,7 +444,9 @@ async function runSuite(width) {
     return out
   })()`)
   check(`Teks antarmuka: ${coverage.idKeys} kunci id punya pasangan th (tidak ada yang kurang, lebih, atau kosong)`,
-    coverage.missingTh.length === 0 && coverage.extraTh.length === 0 && coverage.emptyTh.length === 0, [...coverage.missingTh, ...coverage.extraTh, ...coverage.emptyTh].join(', '))
+    coverage.missingTh.length === 0 && coverage.extraTh.length === 0 && coverage.emptyTh.length === 0 && coverage.emptyId.length === 0, [...coverage.missingTh, ...coverage.extraTh, ...coverage.emptyTh, ...coverage.emptyId].join(', '))
+  check(`Teks antarmuka: ${coverage.idKeys} kunci id punya pasangan en (tidak ada yang kurang, lebih, atau kosong), termasuk teks data (tempat membeli bahan)`,
+    coverage.missingEn.length === 0 && coverage.extraEn.length === 0 && coverage.emptyEn.length === 0 && coverage.dataTextEn.length === 0, [...coverage.missingEn, ...coverage.extraEn, ...coverage.emptyEn, ...coverage.dataTextEn].join(', '))
   const kindRows = Object.entries(coverage.kinds)
   const translatedTotal = kindRows.reduce((sum, [, row]) => sum + row.translated, 0)
   check(`Deskripsi Thai: ${translatedTotal} teks, lengkap untuk semua entri yang punya deskripsi Indonesia, tidak ada slug asing`,
@@ -270,11 +494,13 @@ async function runSuite(width) {
   const fromIdRoot = await main.url()
   check('/id/... diarahkan ke alamat tanpa awalan (dengan query tetap)', fromId === '/wildlife/fish?waktu=Day' && fromIdRoot === '/', `${fromId} · ${fromIdRoot}`)
   const vercel = JSON.parse(readFileSync(new URL('vercel.json', ROOT), 'utf8'))
-  const rewrite = new RegExp(`^${vercel.rewrites[0].source}$`)
+  // Rewrite hanya dipakai kalau tidak ada berkas statis (Vercel mendahulukan berkas); yang pertama cocok yang berlaku.
+  const rewriteOf = (path) => vercel.rewrites.find((rule) => new RegExp(`^${rule.source.replace('/:path*', '(?:/.*)?')}$`).test(path))?.destination ?? null
   const redirects = vercel.redirects.map((r) => `${r.source}>${r.destination}`).join()
-  check('vercel.json: rewrite ke index.html melayani /th/... (bukan /api), /id diarahkan permanen ke alamat tanpa awalan',
-    vercel.rewrites[0].destination === '/index.html' && rewrite.test('/th/wildlife/fish/sea-bass') && rewrite.test('/th') && !rewrite.test('/api/geo') && redirects === '/id>/,/id/:path*>/:path*' && vercel.redirects.every((r) => r.permanent),
-    `${vercel.rewrites[0].source} · ${redirects}`)
+  const fallbacks = ['/th/wildlife/fish/nope', '/th', '/en/recipes/nope', '/en', '/nope/x', '/wildlife/fish/nope', '/api/geo', '/thailand'].map(rewriteOf)
+  check('vercel.json: alamat tanpa berkas statis jatuh ke index.html bahasanya (/th/... → /th/index.html, /en/... → /en/index.html, lainnya → /index.html, bukan /api); /id diarahkan permanen',
+    JSON.stringify(fallbacks) === JSON.stringify(['/th/index.html', '/th/index.html', '/en/index.html', '/en/index.html', '/index.html', '/index.html', null, '/index.html']) && redirects === '/id>/,/id/:path*>/:path*' && vercel.redirects.every((r) => r.permanent),
+    `${fallbacks.join(' ')} · ${redirects}`)
   const { GET } = await import(new URL('api/geo.js', ROOT))
   const geoTh = await (await GET(new Request('https://example.test/api/geo', { headers: { 'x-vercel-ip-country': 'TH' } }))).json()
   const geoNone = await GET(new Request('https://example.test/api/geo'))
@@ -324,10 +550,11 @@ async function runSuite(width) {
   check('Pemilih bahasa toolbar: tombol ikon bola dunia berlabel (bahasa sekarang), disclosure tertutup → terbuka saat diklik',
     closed.label === 'Pilih bahasa (Indonesia)' && closed.title === closed.label && closed.expanded === 'false' && closed.icon && opened.expanded === 'true',
     `${closed.label} · ${closed.expanded} → ${opened.expanded}`)
-  check('Pemilih bahasa: "Indonesia" & "ไทย" (lang & hreflang sesuai, bahasa sekarang aria-current) ke halaman yang sama termasuk filter',
+  check('Pemilih bahasa: "Indonesia", "ไทย" & "English" (lang & hreflang sesuai, bahasa sekarang aria-current) ke halaman yang sama termasuk filter',
     JSON.stringify(opened.links) === JSON.stringify([
       { text: 'Indonesia', href: LIST, lang: 'id', hreflang: 'id', current: 'true' },
       { text: 'ไทย', href: `/th${LIST}`, lang: 'th', hreflang: 'th', current: null },
+      { text: 'English', href: `/en${LIST}`, lang: 'en', hreflang: 'en', current: null },
     ]),
     opened.links.map((link) => `${link.text} ${link.href}`).join(' · '))
   await main.press('Escape', 'Escape', 27)
@@ -345,8 +572,13 @@ async function runSuite(width) {
     switched.url === `/th${LIST}` && switched.lang === 'th' && switched.stored === 'th' && thChips === idChips && idChips === 2 && THAI.test(switched.heading) && switched.label === 'เลือกภาษา (ไทย)',
     `${switched.url} · ${thChips} chip · ${switched.heading}`)
   const footer = await evaluate(`[...document.querySelectorAll('.site-footer__language a')].map((a) => ({ text: a.textContent.trim(), href: a.getAttribute('href'), current: a.getAttribute('aria-current') }))`)
-  check('Pemilih bahasa footer: tautan Indonesia & ไทย ke halaman yang sama, bahasa sekarang ditandai',
-    JSON.stringify(footer) === JSON.stringify([{ text: 'Indonesia', href: LIST, current: null }, { text: 'ไทย', href: `/th${LIST}`, current: 'true' }]), footer.map((link) => `${link.text} ${link.href}`).join(' · '))
+  check('Pemilih bahasa footer: tautan Indonesia, ไทย & English ke halaman yang sama, bahasa sekarang ditandai',
+    JSON.stringify(footer) === JSON.stringify([{ text: 'Indonesia', href: LIST, current: null }, { text: 'ไทย', href: `/th${LIST}`, current: 'true' }, { text: 'English', href: `/en${LIST}`, current: null }]), footer.map((link) => `${link.text} ${link.href}`).join(' · '))
+  await evaluate(`[...document.querySelectorAll('.site-footer__language a')].find((a) => a.lang === 'en').click()`); await sleep(1500)
+  const toEnglish = await evaluate(`({ url: location.pathname + location.search, lang: document.documentElement.lang, stored: localStorage.getItem('hdx-lang'), label: document.querySelector('.language-menu__button').getAttribute('aria-label'), heading: document.querySelector('.list-status__count').textContent, chips: document.querySelectorAll('.active-chip').length })`)
+  check('Pilih "English": halaman yang sama di /en dengan filter URL tetap aktif, pilihan disimpan',
+    toEnglish.url === `/en${LIST}` && toEnglish.lang === 'en' && toEnglish.stored === 'en' && toEnglish.chips === 2 && /^Showing \d+ of 124 fish$/.test(toEnglish.heading.trim()) && toEnglish.label === 'Choose language (English)',
+    `${toEnglish.url} · ${toEnglish.chips} chip · ${toEnglish.heading}`)
   await evaluate(`[...document.querySelectorAll('.site-footer__language a')].find((a) => a.lang === 'id').click()`); await sleep(1500)
   const back = await evaluate(`({ url: location.pathname + location.search, lang: document.documentElement.lang, stored: localStorage.getItem('hdx-lang') })`)
   check('Footer "Indonesia": kembali ke halaman yang sama tanpa awalan, pilihan disimpan', back.url === LIST && back.lang === 'id' && back.stored === 'id', JSON.stringify(back))
@@ -356,10 +588,29 @@ async function runSuite(width) {
   await evaluate(`localStorage.setItem('hdx-lang', 'id')`)
   await main.go('/th/recipes', 2200)
   const explicitTh = await main.url()
-  check('Pilihan diingat: pemilih Thai yang membuka alamat tanpa awalan diarahkan ke /th halaman yang sama; alamat /th tetap dihormati',
-    remembered === '/th/recipes?q=cake' && explicitTh === '/th/recipes', `${remembered} · ${explicitTh}`)
+  await evaluate(`localStorage.setItem('hdx-lang', 'en')`)
+  await main.go('/recipes?q=cake', 2200)
+  const rememberedEn = await main.url()
+  await main.go('/th/recipes', 2200)
+  const explicitThForEn = await main.url()
+  await main.go('/id/crops', 2200)
+  const fromIdForEn = await main.url()
+  await evaluate(`localStorage.setItem('hdx-lang', 'id')`)
+  check('Pilihan diingat: pemilih Thai/Inggris yang membuka alamat tanpa awalan diarahkan ke /th atau /en halaman yang sama; alamat berawalan tetap dihormati',
+    remembered === '/th/recipes?q=cake' && explicitTh === '/th/recipes' && rememberedEn === '/en/recipes?q=cake' && explicitThForEn === '/th/recipes' && fromIdForEn === '/en/crops',
+    `${remembered} · ${explicitTh} · ${rememberedEn} · ${explicitThForEn} · ${fromIdForEn}`)
 
   // ================= 3. Notifikasi saran bahasa =================
+  // Tabel aturan (src/i18n/suggestLocale.js), diuji langsung: bahasa browser + negara → bahasa yang disarankan.
+  const rules = await evaluate(`(async () => {
+    const { suggestLocale, needsCountry } = await import('/src/i18n/suggestLocale.js')
+    return ${JSON.stringify(SUGGEST_RULES)}.map(([languages, country, expected]) => ({ languages, country, expected, got: suggestLocale(languages, country), needs: needsCountry(languages) }))
+  })()`)
+  const wrongRules = rules.filter((rule) => rule.got !== rule.expected)
+  check(`Aturan saran bahasa: ${SUGGEST_RULES.length} kombinasi bahasa browser & negara menghasilkan saran yang benar (th/lo & TH/LA → Thai, id & ID → Indonesia, ms → tidak ada, en → Inggris hanya kalau negara diketahui & bukan ID, bahasa lain → Inggris kecuali ID)`,
+    wrongRules.length === 0, wrongRules.map((rule) => `${rule.languages.join(',') || '(kosong)'} + ${rule.country} → ${rule.got} (harusnya ${rule.expected})`).join(' | '))
+  check('Aturan saran bahasa: negara hanya ditanyakan kalau bahasa browser tidak memuat th, lo, id, atau ms',
+    rules.every((rule) => rule.needs === !rule.languages.some((tag) => /^(th|lo|id|ms)(-|$)/i.test(tag))), rules.filter((rule) => rule.needs === rule.languages.some((tag) => /^(th|lo|id|ms)(-|$)/i.test(tag))).map((rule) => rule.languages.join(',')).join(' | '))
   const toast = (tab) => tab.evaluate(`(() => {
     const el = document.querySelector('.lang-suggest')
     if (!el) return null
@@ -432,7 +683,60 @@ async function runSuite(width) {
   await noHint.go('/', 3500)
   const plain = await freshTab()
   await plain.go('/wildlife', 3500)
-  check('Saran bahasa: tidak muncul untuk bahasa browser & negara lain (termasuk saat api/geo tidak tersedia di dev)', !(await toast(noHint)) && !(await toast(plain)) && noHint.geoRequests === 1)
+  check('Saran bahasa: browser berbahasa Inggris tidak mendapat saran kalau negaranya ID atau data negara tidak tersedia (api/geo tidak ada di dev)', !(await toast(noHint)) && !(await toast(plain)) && noHint.geoRequests === 1)
+
+  // Bahasa Inggris: hanya kalau negara diketahui dan bukan ID.
+  const english = await freshTab({ geo: 'US' })
+  await english.go('/recipes?q=cake', 500)
+  await english.waitFor(`document.querySelector('.lang-suggest')`, 6000)
+  await sleep(500)
+  const sen = await toast(english)
+  const enFontLoaded = await english.evaluate(`!!document.getElementById('font-th')`)
+  check('Saran bahasa Inggris (browser en + negara US): "Hello! 👋", teks & tombol "✓ Switch to English" ke halaman yang sama di /en, tombol X, tanpa baris Inggris tambahan, lang="en"',
+    sen?.lang === 'en' && sen.role === 'dialog' && sen.title === SUGGEST_EN.title && sen.text === SUGGEST_EN.text && sen.action === `✓${SUGGEST_EN.button}` && sen.actionHref === '/en/recipes?q=cake' && sen.close === SUGGEST_EN.close && sen.english === undefined && !enFontLoaded,
+    sen && `${sen.title} · ${sen.text} · ${sen.action} · ${sen.actionHref} · X ${sen.close}`)
+  check('Saran bahasa Inggris: tidak menyebut deteksi lokasi pengunjung', sen && !/location|detect|country|region/i.test(sen.all), sen?.all)
+  await english.evaluate(`document.querySelector('.lang-suggest__action').click()`); await sleep(1500)
+  const acceptedEn = await english.evaluate(`({ url: location.pathname + location.search, lang: document.documentElement.lang, stored: localStorage.getItem('hdx-lang'), gone: !document.querySelector('.lang-suggest') })`)
+  check('Saran bahasa Inggris: tombol pindah membuka halaman yang sama di /en (dengan query) dan pilihan disimpan',
+    acceptedEn.url === '/en/recipes?q=cake' && acceptedEn.lang === 'en' && acceptedEn.stored === 'en' && acceptedEn.gone, JSON.stringify(acceptedEn))
+
+  const japanese = await freshTab({ languages: ['ja-JP', 'ja'] })
+  await japanese.go('/wildlife', 500)
+  const jaShown = await japanese.waitFor(`document.querySelector('.lang-suggest[lang="en"]')`, 6000)
+  const french = await freshTab({ languages: ['fr-FR', 'fr', 'en'] })
+  await french.go('/th/crops', 500)
+  const frShown = await french.waitFor(`document.querySelector('.lang-suggest[lang="en"] .lang-suggest__action[href="/en/crops"]')`, 6000)
+  check('Saran bahasa: bahasa browser lain (ja, fr) mendapat saran Inggris walau data negara tidak tersedia, juga di halaman Thai', jaShown && frShown, `ja ${jaShown} · fr ${frShown}`)
+  const japaneseInId = await freshTab({ languages: ['ja-JP', 'ja'], geo: 'ID' })
+  await japaneseInId.go('/', 3500)
+  const jaIdNone = !(await toast(japaneseInId))
+  await japaneseInId.go('/th', 500)
+  const jaIdOnThai = await japaneseInId.waitFor(`document.querySelector('.lang-suggest[lang="id"]')`, 6000)
+  check('Saran bahasa: bahasa browser lain di negara ID tidak disarankan pindah dari versi Indonesia, dan disarankan Indonesia di halaman Thai', jaIdNone && jaIdOnThai, `${jaIdNone} · ${jaIdOnThai}`)
+
+  const malay = await freshTab({ languages: ['ms-MY', 'ms', 'en'], geo: 'TH' })
+  await malay.go('/', 3500)
+  check('Saran bahasa: bahasa browser Melayu (ms) tidak disarankan pindah dari versi Indonesia (negara tidak ditanyakan)', !(await toast(malay)) && malay.geoRequests === 0, `${malay.geoRequests} request`)
+
+  const sameLanguage = [
+    await freshTab({ languages: ['th-TH', 'th'], geo: 'TH' }),
+    await freshTab({ geo: 'US' }),
+    await freshTab({ languages: ['id-ID', 'id'], geo: 'ID' }),
+  ]
+  await sameLanguage[0].go('/th/wildlife', 3500)
+  await sameLanguage[1].go('/en/wildlife', 3500)
+  await sameLanguage[2].go('/wildlife', 3500)
+  const sameToasts = [await toast(sameLanguage[0]), await toast(sameLanguage[1]), await toast(sameLanguage[2])]
+  check('Saran bahasa: tidak muncul kalau bahasa yang disarankan sama dengan bahasa halaman (Thai di /th, Inggris di /en, Indonesia di /)', sameToasts.every((item) => !item), sameToasts.map((item) => item?.lang ?? '-').join(' '))
+
+  const idOnEnglish = await freshTab({ languages: ['id-ID', 'id'] })
+  await idOnEnglish.go('/en/wildlife', 500)
+  await idOnEnglish.waitFor(`document.querySelector('.lang-suggest')`, 6000)
+  await sleep(400)
+  const sidEn = await toast(idOnEnglish)
+  check('Saran bahasa di versi Inggris untuk bahasa browser id: teks Indonesia (lang="id") + baris Inggris, tombol ke halaman yang sama tanpa awalan',
+    sidEn?.lang === 'id' && sidEn.title === SUGGEST_ID.title && sidEn.english === SUGGEST_ID.english && sidEn.action === `✓${SUGGEST_ID.button}` && sidEn.actionHref === '/wildlife', sidEn && `${sidEn.title} · ${sidEn.action} · ${sidEn.actionHref}`)
 
   const idVisitor = await freshTab({ languages: ['id-ID', 'id'] })
   await idVisitor.go('/th/wildlife', 500)
@@ -477,7 +781,7 @@ async function main() {
   let total = 0
   try {
     for (const width of WIDTHS.length ? WIDTHS : [1280]) {
-      console.log(`\n=== Dua bahasa (Indonesia & Thai) — lebar ${width}px`)
+      console.log(`\n=== Tiga bahasa (Indonesia, Thai, Inggris) — lebar ${width}px`)
       const results = await runSuite(width)
       total += results.length
       failed += results.filter((ok) => !ok).length

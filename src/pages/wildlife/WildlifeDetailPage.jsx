@@ -13,7 +13,6 @@ import { categoryToneStyle } from '../../components/catalog/categoryTone'
 import { PERIODS, formatPeriodRange } from '../../data/gameTime'
 import { WEATHERS } from '../../data/wildlife/attributes'
 import { getEntryLocations } from '../../data/wildlife/entryLocations'
-import { usePageTitle } from '../../hooks/usePageTitle'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Link } from '../../i18n/LocaleLink'
 import NotFoundPage from '../NotFoundPage'
@@ -39,7 +38,6 @@ function WildlifeDetailPage({ kindSlug }) {
   const entry = kind.entries.find((item) => item.slug === slug)
   // Kalau dibuka dari daftar, kembali ke daftar dengan pencarian/filter yang sama.
   const listHref = `/wildlife/${kind.slug}${location.state?.listSearch ?? ''}`
-  usePageTitle(entry ? entry.name : text.notFoundTitle)
 
   if (!entry) {
     return (

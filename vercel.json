@@ -3,5 +3,9 @@
     { "source": "/id", "destination": "/", "permanent": true },
     { "source": "/id/:path*", "destination": "/:path*", "permanent": true }
   ],
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/th/:path*", "destination": "/th/index.html" },
+    { "source": "/en/:path*", "destination": "/en/index.html" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
 }

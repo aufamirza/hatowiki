@@ -149,7 +149,7 @@ function NowAppearing() {
                   <div className="now-group__heading">
                     <h3 id={titleId} className="now-group__title">
                       {catalog.name}
-                      <span className="now-group__label">{text.label}</span>
+                      {text.label !== catalog.name && <span className="now-group__label">{text.label}</span>}
                     </h3>
                     <p className="now-group__count">
                       {t('home.nowCount', {

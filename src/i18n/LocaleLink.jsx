@@ -4,7 +4,8 @@ import { useI18n } from './I18nProvider'
 
 /**
  * Pengganti Link/NavLink/useNavigate react-router: alamat internal ditulis tanpa awalan bahasa ('/wildlife/fish'),
- * lalu diberi awalan bahasa halaman yang sedang dibuka ('/th/wildlife/fish' di versi Thai).
+ * lalu diberi awalan bahasa halaman yang sedang dibuka ('/th/wildlife/fish' di versi Thai, '/en/wildlife/fish' di versi
+ * Inggris).
  */
 function localizeTo(to, path) {
   if (typeof to === 'string') return path(to)

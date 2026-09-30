@@ -6,7 +6,6 @@ import { formatCoins, formatEnergy } from '../../components/recipes/starValues'
 import EntryImage from '../../components/wildlife/EntryImage'
 import LocationMap from '../../components/wildlife/LocationMap'
 import { getCollectibleBySlug } from '../../data/collectibles/collectibles'
-import { usePageTitle } from '../../hooks/usePageTitle'
 import { useI18n } from '../../i18n/I18nProvider'
 import NotFoundPage from '../NotFoundPage'
 import { DetailFooter, IdentityPanel } from './GoodsDetailParts'
@@ -29,7 +28,6 @@ function CollectibleDetailPage() {
   const { t, formatNumber } = i18n
   const text = i18n.kind('collectibles')
   const listHref = `/collectibles${location.state?.listSearch ?? ''}`
-  usePageTitle(item ? item.name : text.notFoundTitle)
 
   if (!item) {
     return (

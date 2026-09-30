@@ -10,7 +10,6 @@ import MarketValue from '../../components/wildlife/MarketValue'
 import { levelToneStyle } from '../../components/wildlife/levelTone'
 import { RECIPE_CATEGORIES } from '../../data/recipes/categories'
 import { getRecipeBySlug } from '../../data/recipes/recipes'
-import { usePageTitle } from '../../hooks/usePageTitle'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Link } from '../../i18n/LocaleLink'
 import NotFoundPage from '../NotFoundPage'
@@ -34,7 +33,6 @@ function RecipeDetailPage() {
   const text = i18n.kind('recipes')
   // Kalau dibuka dari daftar, kembali ke daftar dengan pencarian/filter yang sama.
   const listHref = `/recipes${location.state?.listSearch ?? ''}`
-  usePageTitle(recipe ? recipe.name : text.notFoundTitle)
 
   if (!recipe) {
     return (

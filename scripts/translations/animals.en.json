@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "language": "en",
+    "source": "Teks asli heartodex (descriptionOriginal di file data) dengan salah ketik yang jelas dibetulkan. descriptionOriginal tetap apa adanya.",
+    "generatedBy": "scripts/english-descriptions.mjs (dari scripts/translations/english-corrections.json); jangan diedit langsung",
+    "corrections": 0,
+    "correctedEntries": 0,
+    "review": "scripts/translations/review-animals.en.md"
+  },
+  "alpaca": "The gentle and friendly llama always quietly observes everything around the Flower Field.",
+  "capybara": "The capybara family living in the Onsen Mountain Ruins often gazes at the giant stone statue that resembles themselves. Could this be some mysterious guidance of fate?",
+  "sika-deer": "The deer, elegant and graceful in its idle poses, is surprisingly swift when running through the forest.",
+  "bunny": "The fluffy, adorable bunnies are the grass elves that frequently appear in suburbs",
+  "ferret": "The little ferrets scurrying around near the Home curiously explore every spot suitable for playing, frolicking, and sleeping together.",
+  "sea-otter": "Beyond the town beyond the sea, there's a group of sea otters. They are lively and intelligent, natural gourmets skilled at using tools.",
+  "panda": "Some chubby pandas arrived in the forest, living a simple life of sleeping and eating bamboo every day.",
+  "fox": "The agile and clever fox, an excellent patroller of the territory, now has the mission of guarding the Flower Field.",
+  "dolphin": "Did the dolphins riding the current to Whalefall Canyon just happen to pass by because of nutrients stirring in the clean waters, or were they following some deep, mysterious call from the ocean?",
+  "maltese": "A Maltese's world is simple—as long as you play with me, we're best friends!",
+  "penguin": "Amid the frigid polar climate lives a colony of penguins who rarely venture far from home... but exceptions do happen."
+}

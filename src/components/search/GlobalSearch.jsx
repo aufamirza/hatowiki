@@ -25,6 +25,8 @@ function Highlight({ text, query }) {
  * Pencarian nama di semua katalog, di toolbar. Pola combobox + listbox (WAI-ARIA): fokus tetap di kolom,
  * hasil aktif ditandai lewat aria-activedescendant. Panah atas/bawah pindah hasil, Enter membuka hasil aktif
  * (bawaannya hasil pertama), Escape menutup daftar, lalu mengosongkan kolom, lalu (di ponsel) menutup panel.
+ * Tiap hasil adalah tautan sungguhan (<a href> dengan role="option"), jadi bisa dibuka di tab baru lewat klik tengah,
+ * Ctrl/Cmd+klik, atau menu klik kanan; klik biasa tetap pindah halaman lewat router tanpa memuat ulang.
  * Di ponsel kolomnya tersembunyi di balik tombol ikon dan tampil sebagai baris di bawah toolbar.
  * `variant="hero"`: kolom besar di hero beranda, selalu tampil (tanpa tombol ikon), dengan pencarian yang sama.
  */
@@ -38,7 +40,7 @@ function GlobalSearch({ variant = 'toolbar' }) {
   const inputRef = useRef(null)
   const toggleRef = useRef(null)
   const navigate = useLocaleNavigate()
-  const { t, kind } = useI18n()
+  const { t, kind, path } = useI18n()
   const { pathname } = useLocation()
   const baseId = useId()
   const inputId = `${baseId}-input`
@@ -87,6 +89,14 @@ function GlobalSearch({ variant = 'toolbar' }) {
     document.getElementById('konten')?.focus({ preventScroll: true })
   }
 
+  // Klik biasa pada hasil: pindah lewat router. Klik tengah, klik dengan Ctrl/Cmd/Shift/Alt, dan menu klik kanan
+  // dibiarkan ke browser (tab/jendela baru), dan daftar hasil tetap terbuka.
+  const handleOptionClick = (event, item) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    event.preventDefault()
+    choose(item)
+  }
+
   const handleChange = (event) => {
     setQuery(event.target.value)
     setActiveIndex(0)
@@ -126,8 +136,10 @@ function GlobalSearch({ variant = 'toolbar' }) {
     }
   }
 
-  // Fokus keluar dari pencarian (Tab, klik di tempat lain): daftar hasil ditutup.
+  // Fokus keluar dari pencarian (Tab, klik di tempat lain): daftar hasil ditutup. Kalau yang kehilangan fokus jendelanya
+  // (menu klik kanan pada hasil, pindah tab), daftar dibiarkan terbuka.
   const handleBlur = (event) => {
+    if (!event.relatedTarget && !document.hasFocus()) return
     if (!rootRef.current?.contains(event.relatedTarget)) setListOpen(false)
   }
 
@@ -200,29 +212,33 @@ function GlobalSearch({ variant = 'toolbar' }) {
                 {items.map((item, index) => {
                   const Icon = item.catalog.icon
                   return (
-                    <li
-                      key={item.id}
-                      id={optionId(index)}
-                      role="option"
-                      aria-selected={index === activeIndex}
-                      className="search-option"
-                      data-wildlife={item.catalog.slug}
-                      data-href={item.href}
-                      // Fokus tetap di kolom pencarian saat hasil diklik.
-                      onMouseDown={(event) => event.preventDefault()}
-                      onMouseMove={() => index !== activeIndex && setActiveIndex(index)}
-                      onClick={() => choose(item)}
-                    >
-                      <span className="search-option__thumb">
-                        <EntryImage src={item.image} alt="" size={item.imageSize} loading="eager" />
-                      </span>
-                      <span className="search-option__name">
-                        <Highlight text={item.name} query={query} />
-                      </span>
-                      <span className="search-option__kind">
-                        <Icon aria-hidden="true" />
-                        {kind(item.catalog.slug).label}
-                      </span>
+                    // <li> hanya pembungkus; opsinya tautan, di luar urutan Tab (keyboard memakai panah + Enter di kolom).
+                    <li key={item.id} role="presentation">
+                      <a
+                        id={optionId(index)}
+                        role="option"
+                        aria-selected={index === activeIndex}
+                        href={path(item.href)}
+                        tabIndex={-1}
+                        className="search-option"
+                        data-wildlife={item.catalog.slug}
+                        data-href={item.href}
+                        // Fokus tetap di kolom pencarian saat hasil diklik.
+                        onMouseDown={(event) => event.preventDefault()}
+                        onMouseMove={() => index !== activeIndex && setActiveIndex(index)}
+                        onClick={(event) => handleOptionClick(event, item)}
+                      >
+                        <span className="search-option__thumb">
+                          <EntryImage src={item.image} alt="" size={item.imageSize} loading="eager" />
+                        </span>
+                        <span className="search-option__name">
+                          <Highlight text={item.name} query={query} />
+                        </span>
+                        <span className="search-option__kind">
+                          <Icon aria-hidden="true" />
+                          {kind(item.catalog.slug).label}
+                        </span>
+                      </a>
                     </li>
                   )
                 })}

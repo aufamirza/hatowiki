@@ -3,16 +3,14 @@ import { X } from 'lucide-react'
 import { getTranslator, loadLocale, useI18n } from '../../i18n/I18nProvider'
 import { ensureLocaleFont } from '../../i18n/fonts'
 import { HINT_DISMISSED_KEY, LANGUAGE_CHOSEN_EVENT, readStoredLanguage } from '../../i18n/locales'
+import { needsCountry, suggestLocale } from '../../i18n/suggestLocale'
 import { useLanguageSwitch } from '../../i18n/useLanguageSwitch'
 
 // Muncul sedikit setelah halaman tampil, supaya tidak berebut perhatian dengan konten yang baru dimuat.
 const SHOW_DELAY = 900
-// Negara (kode ISO dari header x-vercel-ip-country, lewat api/geo.js) yang juga mendapat saran versi Thai.
-const THAI_COUNTRIES = ['TH', 'LA']
 const COUNTRY_CACHE_KEY = 'hdx-country'
 
-const browserLanguages = () => (navigator.languages?.length ? navigator.languages : [navigator.language ?? '']).map((tag) => tag.toLowerCase())
-const hasLanguage = (codes) => browserLanguages().some((tag) => codes.some((code) => tag === code || tag.startsWith(`${code}-`)))
+const browserLanguages = () => (navigator.languages?.length ? [...navigator.languages] : [navigator.language ?? ''])
 
 function wasDismissed() {
   try {
@@ -58,20 +56,21 @@ async function fetchCountry() {
   return country
 }
 
-/** Bahasa yang disarankan untuk pengunjung ini, atau null. */
+/**
+ * Bahasa yang disarankan untuk pengunjung halaman berbahasa `locale`, atau null. Aturannya di src/i18n/suggestLocale.js;
+ * negara hanya ditanyakan kalau bahasa browser saja belum cukup, dan saran hanya ada kalau berbeda dari bahasa halaman.
+ */
 async function suggestedLocale(locale) {
-  if (locale === 'id') {
-    if (hasLanguage(['th', 'lo'])) return 'th'
-    return THAI_COUNTRIES.includes(await visitorCountry()) ? 'th' : null
-  }
-  if (locale === 'th') return hasLanguage(['id']) ? 'id' : null
-  return null
+  const languages = browserLanguages()
+  const country = needsCountry(languages) ? await visitorCountry() : null
+  const target = suggestLocale(languages, country)
+  return target && target !== locale ? target : null
 }
 
 /**
- * Notifikasi kecil di pojok kiri bawah yang menyarankan versi bahasa lain: versi Thai untuk pengunjung halaman Indonesia
- * yang bahasa browsernya Thai/Lao (atau, kalau tersedia, yang negaranya TH/LA), dan versi Indonesia untuk pengunjung
- * halaman Thai yang bahasa browsernya Indonesia. Teksnya dalam bahasa tujuan (atribut lang) plus satu baris Inggris.
+ * Notifikasi kecil di pojok kiri bawah yang menyarankan versi bahasa lain (Thai, Indonesia, atau Inggris) kalau bahasa
+ * yang cocok untuk pengunjung, dari bahasa browser dan kalau tersedia negaranya, berbeda dari bahasa halaman. Teksnya
+ * dalam bahasa tujuan (atribut lang); saran Thai & Indonesia ditambah satu baris Inggris.
  * Tidak muncul lagi setelah ditutup (X / Escape) atau setelah pengunjung memilih bahasa (localStorage).
  * Aksesibel: dialog non-modal berlabel yang tidak merebut fokus, bisa difokus lewat Tab, Escape menutupnya. Di layar
  * kecil tampil selebar layar dan footer diberi ruang setinggi notifikasi, jadi tidak ada konten yang tertutup permanen.
@@ -179,9 +178,12 @@ function LanguageSuggestion() {
       <p className="lang-suggest__text" id={textId}>
         {t('suggestion.text')}
       </p>
-      <p className="lang-suggest__english" lang="en">
-        {t('suggestion.english')}
-      </p>
+      {/* Baris Inggris untuk yang tidak membaca bahasa tujuan; saran versi Inggris tidak memerlukannya */}
+      {t('suggestion.english') && (
+        <p className="lang-suggest__english" lang="en">
+          {t('suggestion.english')}
+        </p>
+      )}
       <a
         href={hrefFor(target)}
         hrefLang={target}

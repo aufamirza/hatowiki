@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate, RouterProvider, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import Layout from './components/layout/Layout'
+import { LOCALES } from './i18n/locales'
 import HomePage from './pages/HomePage'
 import NotFoundPage from './pages/NotFoundPage'
 import WildlifePage from './pages/wildlife/WildlifePage'
@@ -13,7 +14,8 @@ import CropDetailPage from './pages/goods/CropDetailPage'
 import CollectibleDetailPage from './pages/goods/CollectibleDetailPage'
 import IngredientDetailPage from './pages/goods/IngredientDetailPage'
 
-// Semua halaman, dipakai dua kali: tanpa awalan (Indonesia) dan di bawah /th (Thai). Slug sama untuk kedua bahasa.
+// Semua halaman, dipakai sekali per bahasa: tanpa awalan (Indonesia), di bawah /th (Thai), dan di bawah /en (Inggris).
+// Slug sama untuk semua bahasa. Daftar halaman untuk HTML statis & sitemap ada di src/seo/pageMeta.js.
 const pageRoutes = () => [
   { index: true, element: <HomePage /> },
   {
@@ -69,14 +71,11 @@ function RedirectFromId() {
   return <Navigate replace to={`${pathname.replace(/^\/id(?=\/|$)/, '') || '/'}${search}${hash}`} />
 }
 
-// Layout tanpa path membungkus kedua bahasa, jadi toolbar & footer tidak dipasang ulang saat bahasa diganti.
+// Layout tanpa path membungkus semua bahasa, jadi toolbar & footer tidak dipasang ulang saat bahasa diganti.
 const router = createBrowserRouter([
   {
     element: <Layout />,
-    children: [
-      { path: '/', children: pageRoutes() },
-      { path: '/th', children: pageRoutes() },
-    ],
+    children: LOCALES.map((locale) => ({ path: locale.prefix || '/', children: pageRoutes() })),
   },
   { path: '/id/*', element: <RedirectFromId /> },
 ])

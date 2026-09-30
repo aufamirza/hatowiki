@@ -5,7 +5,8 @@ import { loadLocale } from './i18n/I18nProvider'
 import { localeFromPath } from './i18n/locales'
 import './index.css'
 
-// Halaman /th: teks & deskripsi Thai dimuat dulu (berkas terpisah), baru aplikasi dirender, supaya tidak sempat kosong.
+// Halaman /th & /en: teks & deskripsi bahasanya dimuat dulu (berkas terpisah), baru aplikasi dirender, supaya tidak
+// sempat kosong.
 // Kalau gagal dimuat, aplikasi tetap dirender dan menunggu lewat Suspense.
 const locale = localeFromPath(window.location.pathname)
 const ready = locale === 'id' ? Promise.resolve() : loadLocale(locale).catch(() => {})

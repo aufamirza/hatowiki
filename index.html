@@ -3,12 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Wiki komunitas Heartopia berbahasa Indonesia: ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak, lengkap dengan jadwal muncul, cuaca, lokasi, bahan, dan harga." />
+  <meta name="description" content="Wiki komunitas Heartopia berbahasa Indonesia: ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak, dengan jadwal, lokasi, dan harga." />
   <meta name="theme-color" content="#f5f7fc" />
   <meta name="application-name" content="Hatowiki" />
   <title>Hatowiki | Wiki Komunitas Heartopia</title>
-  <!-- Canonical & og:url diperbarui per halaman oleh Layout.jsx -->
+  <!-- Judul, deskripsi, canonical, hreflang, Open Graph, dan atribut lang diisi per halaman & bahasa dari
+       src/seo/pageMeta.js: saat build oleh scripts/build-seo.mjs (satu salinan berkas ini per halaman), dan di
+       browser oleh Layout setiap kali pindah halaman. Berkas sumbernya berisi versi beranda Indonesia. -->
   <link rel="canonical" href="https://www.hatowiki.site/" />
+  <link rel="alternate" hreflang="id" href="https://www.hatowiki.site/" />
+  <link rel="alternate" hreflang="th" href="https://www.hatowiki.site/th" />
+  <link rel="alternate" hreflang="en" href="https://www.hatowiki.site/en" />
+  <link rel="alternate" hreflang="x-default" href="https://www.hatowiki.site/en" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Hatowiki" />
   <meta property="og:locale" content="id_ID" />
@@ -37,22 +43,24 @@
       try { theme = localStorage.getItem('hdx-theme') } catch (e) {}
       document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : 'light'
     })();
-    // Bahasa (lihat src/i18n/locales.js): pengunjung yang pernah memilih Thai dan membuka alamat tanpa awalan diarahkan
-    // ke versi /th halaman yang sama. Halaman /th langsung diberi lang="th" dan font Thai (hanya di /th, supaya versi
-    // Indonesia tidak mengunduhnya).
+    // Bahasa (lihat src/i18n/locales.js): pengunjung yang pernah memilih Thai atau Inggris dan membuka alamat tanpa
+    // awalan diarahkan ke versi /th atau /en halaman yang sama; alamat yang sudah berawalan selalu dihormati. Halaman
+    // /th dan /en langsung diberi atribut lang-nya, dan font Thai hanya dimuat di /th (supaya versi lain tidak
+    // mengunduhnya).
     (function () {
       var path = location.pathname
-      var isThai = path === '/th' || path.indexOf('/th/') === 0
+      var prefix = /^\/(th|en)(?=\/|$)/.exec(path)
       var chosen
       try { chosen = localStorage.getItem('hdx-lang') } catch (e) {}
-      if (chosen === 'th' && !isThai) {
+      if (!prefix && (chosen === 'th' || chosen === 'en')) {
         // Awalan /id tidak dipakai: /id/x → /th/x.
         if (path === '/id' || path.indexOf('/id/') === 0) path = path.slice(3) || '/'
-        location.replace('/th' + (path === '/' ? '' : path) + location.search + location.hash)
+        location.replace('/' + chosen + (path === '/' ? '' : path) + location.search + location.hash)
         return
       }
-      if (!isThai) return
-      document.documentElement.lang = 'th'
+      if (!prefix) return
+      document.documentElement.lang = prefix[1]
+      if (prefix[1] !== 'th') return
       var font = document.createElement('link')
       font.id = 'font-th'
       font.rel = 'stylesheet'

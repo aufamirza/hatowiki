@@ -73,7 +73,8 @@ function CategorySection() {
                       <span className="category-card__hobby">{text.hobby}</span>
                       <h3 className="category-card__title">
                         {catalog.name}
-                        <span className="category-card__label">{text.label}</span>
+                        {/* Versi Inggris: labelnya sama dengan nama kategori, jadi tidak diulang */}
+                        {text.label !== catalog.name && <span className="category-card__label">{text.label}</span>}
                       </h3>
                     </span>
                   </span>

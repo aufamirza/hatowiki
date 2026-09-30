@@ -2,7 +2,6 @@ import { ArrowLeft } from 'lucide-react'
 import Breadcrumbs from '../../components/Breadcrumbs'
 import CategoryHeader from '../../components/CategoryHeader'
 import { getWildlifeCategory } from '../../data/wildlife/categories'
-import { usePageTitle } from '../../hooks/usePageTitle'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Link } from '../../i18n/LocaleLink'
 import { WILDLIFE_ICONS } from './wildlifeIcons'
@@ -15,7 +14,6 @@ function ComingSoonPage({ categorySlug }) {
   const category = getWildlifeCategory(categorySlug)
   const { t, kind } = useI18n()
   const text = kind(categorySlug)
-  usePageTitle(category.name)
 
   return (
     <div className="container page">

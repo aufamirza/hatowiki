@@ -7,7 +7,6 @@ import EntryImage from '../../components/wildlife/EntryImage'
 import MarketValue from '../../components/wildlife/MarketValue'
 import { levelToneStyle } from '../../components/wildlife/levelTone'
 import { getCropBySlug } from '../../data/crops/crops'
-import { usePageTitle } from '../../hooks/usePageTitle'
 import { useI18n } from '../../i18n/I18nProvider'
 import NotFoundPage from '../NotFoundPage'
 import { DetailFooter, IdentityPanel } from './GoodsDetailParts'
@@ -33,7 +32,6 @@ function CropDetailPage() {
   const { t, formatNumber } = i18n
   const text = i18n.kind('crops')
   const listHref = `/crops${location.state?.listSearch ?? ''}`
-  usePageTitle(crop ? crop.name : text.notFoundTitle)
 
   if (!crop) {
     return (

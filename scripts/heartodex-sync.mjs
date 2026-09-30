@@ -27,6 +27,10 @@
  * - Hasil divalidasi dengan validator yang sama dengan aplikasi (src/data/wildlife/validateWildlife.js).
  * - Deskripsi Indonesia diambil dari scripts/translations/<kind>.id.json. Yang belum diterjemahkan diisi null
  *   dengan komentar TODO. Data yang tidak ketemu di sumber juga null + TODO, tidak pernah ditebak.
+ * - Deskripsi isian manual (teks dari game, sumber "in-game") ada di data/manual/descriptions.json. Skrip ini tidak
+ *   pernah membaca maupun menulis berkas itu, jadi isiannya tidak bisa tertimpa; situs mendahulukannya daripada teks
+ *   dari heartodex (src/data/manualDescriptions.js). Setelah menulis entri baru: `node scripts/manual-descriptions.mjs`
+ *   (daftar entri tanpa deskripsi) dan `node scripts/english-descriptions.mjs` (teks tampilan bahasa Inggris).
  * - Bugs & Birds: harga jual harus bilangan bulat. Harga desimal di sumber diisi null + TODO berisi nilai
  *   aslinya (tampil "Belum pasti"), tidak dibulatkan.
  * - Resep: energi dan harga jual harus bilangan bulat. Nilai "---" atau bintang yang tidak ada di sumber diisi
@@ -2256,6 +2260,11 @@ async function commitWrites(writes, verify, withImages) {
   } catch (error) {
     for (const [i, { file }] of writes.entries()) await writeFile(file, originals[i])
     throw new Error(`Penulisan dibatalkan dan file dikembalikan: ${error.message}`)
+  }
+  if (changed.length) {
+    console.log('\nData berubah. Perbarui juga berkas turunannya:')
+    console.log('  node scripts/english-descriptions.mjs   teks tampilan bahasa Inggris (scripts/translations/<kind>.en.json)')
+    console.log('  node scripts/manual-descriptions.mjs    daftar entri tanpa deskripsi untuk isian manual dari game')
   }
 }
 

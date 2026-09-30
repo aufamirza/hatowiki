@@ -1,23 +1,28 @@
 /**
- * Bahasa situs. Indonesia (bawaan) di alamat tanpa awalan, Thai di bawah /th; slug halaman sama untuk keduanya.
- * Tidak ada awalan /id: alamat /id/... diarahkan ke versi tanpa awalan (vercel.json dan route di App.jsx).
- * Kunci penyimpanan juga dipakai skrip di index.html (pengalihan & font sebelum React jalan).
+ * Bahasa situs. Indonesia (bawaan) di alamat tanpa awalan, Thai di bawah /th, Inggris di bawah /en; slug halaman sama
+ * untuk semuanya. Tidak ada awalan /id: alamat /id/... diarahkan ke versi tanpa awalan (vercel.json dan route di
+ * App.jsx). Kunci penyimpanan dan daftar awalan juga dipakai skrip di index.html (pengalihan, lang & font sebelum React
+ * jalan) dan skrip build halaman statis (scripts/build-seo.mjs).
  */
 export const LOCALES = [
   // `intl` = locale untuk angka & tanggal. Thai memakai angka Arab (nu-latn), bukan angka Thai.
-  { id: 'id', prefix: '', intl: 'id-ID', name: 'Indonesia', ogLocale: 'id_ID' },
-  { id: 'th', prefix: '/th', intl: 'th-TH-u-nu-latn', name: 'ไทย', ogLocale: 'th_TH' },
+  // `hreflang` = kode bahasa di <link rel="alternate" hreflang>, atribut lang, dan sitemap.
+  { id: 'id', prefix: '', intl: 'id-ID', name: 'Indonesia', ogLocale: 'id_ID', hreflang: 'id' },
+  { id: 'th', prefix: '/th', intl: 'th-TH-u-nu-latn', name: 'ไทย', ogLocale: 'th_TH', hreflang: 'th' },
+  { id: 'en', prefix: '/en', intl: 'en-US', name: 'English', ogLocale: 'en_US', hreflang: 'en' },
 ]
 
 export const DEFAULT_LOCALE = 'id'
-// Pilihan bahasa pengunjung ('id' / 'th'), disimpan saat memilih lewat pemilih bahasa atau notifikasi saran.
+// Versi untuk pengunjung berbahasa lain (hreflang x-default): Inggris.
+export const FALLBACK_LOCALE = 'en'
+// Pilihan bahasa pengunjung ('id' / 'th' / 'en'), disimpan saat memilih lewat pemilih bahasa atau notifikasi saran.
 export const LANGUAGE_STORAGE_KEY = 'hdx-lang'
 // Notifikasi saran bahasa sudah ditutup (tombol X / Escape).
 export const HINT_DISMISSED_KEY = 'hdx-lang-hint-dismissed'
 
 export const getLocale = (id) => LOCALES.find((locale) => locale.id === id) ?? LOCALES[0]
 
-/** Bahasa dari alamat: '/th' atau '/th/...' → 'th', selain itu bahasa bawaan. */
+/** Bahasa dari alamat: '/th' atau '/th/...' → 'th', '/en/...' → 'en', selain itu bahasa bawaan. */
 export function localeFromPath(pathname) {
   const match = LOCALES.find((locale) => locale.prefix && (pathname === locale.prefix || pathname.startsWith(`${locale.prefix}/`)))
   return match ? match.id : DEFAULT_LOCALE
