@@ -2,6 +2,7 @@ import { Clock, Cloud, MapPin } from 'lucide-react'
 import { PERIODS } from '../../data/gameTime'
 import { WEATHERS } from '../../data/wildlife/attributes'
 import { getEntryLocations } from '../../data/wildlife/entryLocations'
+import { useI18n } from '../../i18n/I18nProvider'
 import CatalogCard from '../catalog/CatalogCard'
 
 // Nilai yang berlaku dalam urutan kanonik (Dawn, Day, Dusk, Night / Rainbow, Sunny, Rainy).
@@ -22,12 +23,13 @@ function summarize(options, active, allLabel) {
  * Lokasi jamak ditulis "lokasi pertama +N"; daftar lengkap ada di atribut title.
  */
 function EntryCard({ entry, category, linkState }) {
+  const { t } = useI18n()
   const locations = getEntryLocations(category, entry).map((location) => location.name)
   const locationFull = locations.length ? locations.join(', ') : '—'
   const facts = [
-    { key: 'location', label: 'Lokasi', Icon: MapPin, short: locations[0] ?? '—', more: locations.length - 1, full: locationFull },
-    category.hasSchedule && { key: 'schedule', label: 'Waktu', Icon: Clock, ...summarize(PERIODS, entry.schedule, 'Semua waktu') },
-    { key: 'weather', label: category.weatherLabel, Icon: Cloud, ...summarize(WEATHERS, entry.weather, 'Semua cuaca') },
+    { key: 'location', label: t('common.location'), Icon: MapPin, short: locations[0] ?? '—', more: locations.length - 1, full: locationFull },
+    category.hasSchedule && { key: 'schedule', label: t('card.time'), Icon: Clock, ...summarize(PERIODS, entry.schedule, t('card.allTimes')) },
+    { key: 'weather', label: t(`filter.${category.weatherKey}`), Icon: Cloud, ...summarize(WEATHERS, entry.weather, t('card.allWeather')) },
   ].filter(Boolean)
 
   return (

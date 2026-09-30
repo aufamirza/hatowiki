@@ -1,16 +1,21 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { ArrowRight, House, Menu, X } from 'lucide-react'
+import { useI18n } from '../../i18n/I18nProvider'
+import { Link, NavLink } from '../../i18n/LocaleLink'
 import { WIKI_CATALOGS, WILDLIFE_CATALOGS } from './catalogs'
 
 // Lebar mulai toolbar desktop (sama dengan breakpoint di Layout.css): drawer otomatis ditutup.
 const DESKTOP_QUERY = '(min-width: 760px)'
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
-// Nama Inggris + label Indonesia & jumlah entri, sama dengan menu dropdown di toolbar desktop.
-function DrawerLink({ catalog, name = catalog.name, meta = `${catalog.label} · ${catalog.entries.length} entri` }) {
+// Nama Inggris + label per bahasa & jumlah entri, sama dengan menu dropdown di toolbar desktop.
+function DrawerLink({ catalog }) {
+  const { t, kind } = useI18n()
   const Icon = catalog.icon
+  const name = catalog.name
+  const meta = t('layout.menuMeta', { label: kind(catalog.slug).label, count: catalog.entries.length })
   return (
     <NavLink to={catalog.href()} className="drawer__link" data-wildlife={catalog.slug}>
       <span className="drawer__icon" aria-hidden="true">
@@ -37,6 +42,7 @@ function MobileMenu() {
   const panelRef = useRef(null)
   const panelId = useId()
   const titleId = useId()
+  const { t } = useI18n()
   const { pathname } = useLocation()
 
   useEffect(() => setOpen(false), [pathname])
@@ -84,7 +90,7 @@ function MobileMenu() {
         ref={buttonRef}
         type="button"
         className="icon-button menu-button"
-        aria-label="Buka menu"
+        aria-label={t('layout.openMenu')}
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
         onClick={() => setOpen(true)}
@@ -109,9 +115,9 @@ function MobileMenu() {
             >
               <div className="drawer__head">
                 <span className="drawer__title" id={titleId}>
-                  Menu
+                  {t('layout.menuTitle')}
                 </span>
-                <button type="button" className="icon-button drawer__close" aria-label="Tutup menu" onClick={close}>
+                <button type="button" className="icon-button drawer__close" aria-label={t('layout.closeMenu')} onClick={close}>
                   <X aria-hidden="true" />
                 </button>
               </div>
@@ -119,14 +125,14 @@ function MobileMenu() {
               {/* Tautan yang dipilih menutup drawer, juga kalau tujuannya halaman yang sedang dibuka. */}
               <nav
                 className="drawer__nav"
-                aria-label="Navigasi utama"
+                aria-label={t('layout.mainNav')}
                 onClick={(event) => event.target.closest('a') && setOpen(false)}
               >
                 <NavLink to="/" end className="drawer__link drawer__link--plain">
                   <span className="drawer__icon" aria-hidden="true">
                     <House />
                   </span>
-                  <span className="drawer__name">Beranda</span>
+                  <span className="drawer__name">{t('common.home')}</span>
                 </NavLink>
 
                 <p className="drawer__group">Wildlife</p>
@@ -138,7 +144,7 @@ function MobileMenu() {
                   ))}
                 </ul>
                 <Link to="/wildlife" className="drawer__all">
-                  Semua kategori wildlife
+                  {t('layout.allWildlife')}
                   <ArrowRight aria-hidden="true" />
                 </Link>
 

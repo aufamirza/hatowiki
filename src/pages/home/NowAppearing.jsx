@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { ArrowRight, CloudSun } from 'lucide-react'
 import { WILDLIFE_CATALOGS } from '../../components/layout/catalogs'
 import { PERIOD_ICONS } from '../../components/ServerTime'
@@ -7,6 +6,8 @@ import EntryImage from '../../components/wildlife/EntryImage'
 import { levelToneStyle } from '../../components/wildlife/levelTone'
 import { PERIODS, SERVERS, formatClock, formatPeriodRange, formatUtcOffset, getPeriod, getServerTime } from '../../data/gameTime'
 import { useNow } from '../../hooks/useNow'
+import { useI18n } from '../../i18n/I18nProvider'
+import { Link } from '../../i18n/LocaleLink'
 import { isBaseGame } from '../catalog/sections'
 // Badge level memakai gaya badge kartu di halaman daftar (.card-badge), supaya tampilannya sama.
 import '../../components/catalog/CatalogCard.css'
@@ -44,11 +45,11 @@ export function entriesInPeriod(entries, periodId) {
     .map(({ entry }) => entry)
 }
 
-function formatDuration(totalMinutes) {
+function formatDuration(totalMinutes, t) {
   const hours = Math.floor(totalMinutes / 60)
   const minutes = totalMinutes % 60
-  if (!hours) return `${minutes} menit`
-  return minutes ? `${hours} jam ${minutes} menit` : `${hours} jam`
+  if (!hours) return t('home.minutes', { minutes })
+  return minutes ? t('home.hoursMinutes', { hours, minutes }) : t('home.hours', { hours })
 }
 
 /**
@@ -57,6 +58,7 @@ function formatDuration(totalMinutes) {
  * Base Game, supaya entri event yang sudah tidak bisa didapat tidak pernah muncul.
  */
 function NowAppearing() {
+  const { t, kind } = useI18n()
   const now = useNow()
   const [serverId, setServerId] = useState(readStoredServer)
   const server = SERVERS.find((item) => item.id === serverId)
@@ -80,14 +82,14 @@ function NowAppearing() {
     <section className="home-section now" id="muncul-sekarang" aria-labelledby="now-title">
       <div className="container">
         <header className="section-head">
-          <p className="eyebrow">Berdasarkan jam server</p>
-          <h2 id="now-title">Muncul Sekarang</h2>
-          <p>Ikan, serangga, dan burung yang jadwalnya mencakup periode waktu saat ini di server pilihanmu.</p>
+          <p className="eyebrow">{t('home.nowEyebrow')}</p>
+          <h2 id="now-title">{t('home.nowTitle')}</h2>
+          <p>{t('home.nowIntro')}</p>
         </header>
 
         <div className="now-controls">
           <fieldset className="server-picker">
-            <legend className="server-picker__legend">Server</legend>
+            <legend className="server-picker__legend">{t('home.server')}</legend>
             <div className="server-picker__options">
               {SERVERS.map((item) => (
                 <label key={item.id} className="server-picker__option">
@@ -110,21 +112,25 @@ function NowAppearing() {
               {period.id}
             </span>
             <span className="now-status__text">
-              {server.name} ({formatUtcOffset(server.utcOffset)}) pukul{' '}
-              <time className="now-status__clock" dateTime={clock}>
-                {clock}
-              </time>{' '}
-              · periode {formatPeriodRange(period)}, berganti ke {nextPeriod.id} dalam {formatDuration(minutesLeft)}
+              {t('home.nowStatus', {
+                server: server.name,
+                utc: formatUtcOffset(server.utcOffset),
+                clock: (
+                  <time className="now-status__clock" dateTime={clock}>
+                    {clock}
+                  </time>
+                ),
+                range: formatPeriodRange(period, (hour) => t('common.hour', { hour })),
+                next: nextPeriod.id,
+                duration: formatDuration(minutesLeft, t),
+              })}
             </span>
           </p>
         </div>
 
         <p className="now-note">
           <CloudSun aria-hidden="true" />
-          <span>
-            Cuaca di game tidak bisa diketahui dari luar, jadi daftar ini hanya berdasarkan waktu. Cek syarat cuacanya di
-            halaman detail.
-          </span>
+          <span>{t('home.nowNote')}</span>
         </p>
 
         <div className="now-groups">
@@ -133,6 +139,7 @@ function NowAppearing() {
             const list = entriesInPeriod(baseGame, period.id)
             const Icon = catalog.icon
             const titleId = `now-${catalog.slug}`
+            const text = kind(catalog.slug)
             return (
               <section key={catalog.slug} className="now-group" data-wildlife={catalog.slug} aria-labelledby={titleId}>
                 <div className="now-group__head">
@@ -142,18 +149,21 @@ function NowAppearing() {
                   <div className="now-group__heading">
                     <h3 id={titleId} className="now-group__title">
                       {catalog.name}
-                      <span className="now-group__label">{catalog.label}</span>
+                      <span className="now-group__label">{text.label}</span>
                     </h3>
                     <p className="now-group__count">
-                      <strong>{list.length}</strong> dari {baseGame.length} {catalog.noun} muncul saat {period.id}
+                      {t('home.nowCount', {
+                        count: <strong>{list.length}</strong>,
+                        total: baseGame.length,
+                        noun: text.noun,
+                        unit: text.unit,
+                        period: period.id,
+                      })}
                     </p>
                   </div>
                   <Link to={`${catalog.href()}?waktu=${period.id}`} className="btn btn--ghost now-group__all">
-                    Lihat semua
-                    <span className="visually-hidden">
-                      {' '}
-                      {catalog.noun} yang muncul saat {period.id}
-                    </span>
+                    {t('common.seeAll')}
+                    <span className="visually-hidden">{t('home.nowAllHidden', { noun: text.noun, period: period.id })}</span>
                     <ArrowRight aria-hidden="true" />
                   </Link>
                 </div>
@@ -174,18 +184,18 @@ function NowAppearing() {
                           <span className="now-tile__badges">
                             {entry.level != null && (
                               <span className="card-badge card-badge--level" style={levelToneStyle(entry.level)}>
-                                <span aria-hidden="true">Lv. {entry.level}</span>
-                                <span className="visually-hidden">Level {entry.level}</span>
+                                <span aria-hidden="true">{t('common.levelShort', { level: entry.level })}</span>
+                                <span className="visually-hidden">{t('common.level', { level: entry.level })}</span>
                               </span>
                             )}
                             {entry.schedule.length === 1 && (
                               <span
                                 className="period-badge now-tile__only"
                                 data-period={period.id}
-                                title={`Hanya muncul saat ${period.id}`}
+                                title={t('home.nowOnly', { period: period.id })}
                               >
                                 <PeriodIcon aria-hidden="true" />
-                                <span className="visually-hidden">Hanya muncul saat {period.id}</span>
+                                <span className="visually-hidden">{t('home.nowOnly', { period: period.id })}</span>
                               </span>
                             )}
                           </span>
@@ -194,9 +204,7 @@ function NowAppearing() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="now-empty">
-                    Tidak ada {catalog.noun} yang muncul di periode {period.id}.
-                  </p>
+                  <p className="now-empty">{t('home.nowEmpty', { noun: text.noun, unit: text.unit, period: period.id })}</p>
                 )}
               </section>
             )

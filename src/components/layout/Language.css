@@ -1,0 +1,241 @@
+/* ---------- Pemilih bahasa di toolbar (ikon bola dunia + daftar) ---------- */
+.language-menu {
+  position: relative;
+}
+
+.site-header .language-menu__button[aria-expanded='true'] {
+  background: var(--color-surface-sunken);
+}
+
+/* Panel rata kanan dengan tombol, muncul di bawah pil toolbar seperti menu Wildlife/Wiki */
+.language-menu__panel {
+  position: absolute;
+  top: calc(100% + var(--space-4));
+  right: 0;
+  z-index: 120;
+  min-width: 11rem;
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  animation: nav-pop var(--duration) var(--ease-out);
+}
+
+.language-menu__list {
+  display: grid;
+  gap: 2px;
+}
+
+.language-menu .language-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 42px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+  transition: background-color var(--duration-fast) ease;
+}
+
+.language-menu .language-link:hover,
+.language-menu .language-link:focus-visible {
+  background: var(--color-surface-sunken);
+}
+
+.language-menu .language-link.is-current {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-ink);
+}
+
+.language-link__check {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- Pemilih bahasa kecil di footer (baris hak cipta) ---------- */
+.site-footer__language {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.site-footer__language > svg {
+  width: 13px;
+  height: 13px;
+}
+
+.site-footer__language-list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Pemisah titik tengah antar-bahasa */
+.site-footer__language-list li + li::before {
+  content: '·';
+  margin-right: var(--space-2);
+}
+
+.site-footer__language .language-link {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-footer__language .language-link:hover {
+  text-decoration: underline;
+}
+
+.site-footer__language .language-link.is-current {
+  color: var(--color-text);
+}
+
+.site-footer__language .language-link__check {
+  display: none;
+}
+
+/* Footer diberi ruang setinggi notifikasi saran bahasa (variabel dipasang LanguageSuggestion), supaya akhir halaman
+   tidak tertutup notifikasi. */
+.site-footer {
+  padding-bottom: calc(var(--space-8) + var(--suggest-space, 0px));
+}
+
+/* ---------- Notifikasi saran bahasa (pojok kiri bawah) ---------- */
+.lang-suggest {
+  position: fixed;
+  left: max(var(--space-4), env(safe-area-inset-left));
+  bottom: max(var(--space-4), env(safe-area-inset-bottom));
+  z-index: 110;
+  width: min(22rem, calc(100vw - 2 * var(--space-4)));
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  border: var(--card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--card-shadow), var(--shadow-lg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  animation: lang-suggest-in 380ms var(--ease-out) both;
+}
+
+.lang-suggest:focus {
+  outline: none;
+}
+
+.lang-suggest:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.lang-suggest.is-closing {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+@keyframes lang-suggest-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+}
+
+@keyframes lang-suggest-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lang-suggest {
+    animation-name: lang-suggest-fade;
+  }
+
+  .lang-suggest.is-closing {
+    transform: none;
+  }
+}
+
+.lang-suggest__close {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.lang-suggest__close:hover {
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+}
+
+.lang-suggest__close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.lang-suggest__title {
+  padding-right: var(--space-8);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.lang-suggest__text {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.lang-suggest__english {
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.lang-suggest__action {
+  margin-top: var(--space-3);
+}
+
+/* Ponsel: selebar layar dan lebih rapat, supaya hanya menutupi sedikit bagian bawah layar */
+@media (max-width: 559px) {
+  .lang-suggest {
+    right: max(var(--space-3), env(safe-area-inset-right));
+    left: max(var(--space-3), env(safe-area-inset-left));
+    bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    width: auto;
+    padding: var(--space-3) var(--space-4) var(--space-4);
+  }
+
+  .lang-suggest__title {
+    font-size: 1.0625rem;
+  }
+
+  .lang-suggest__text {
+    line-height: 1.5;
+  }
+
+  .lang-suggest__action {
+    width: 100%;
+    min-height: 40px;
+    margin-top: var(--space-2);
+  }
+}

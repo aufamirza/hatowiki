@@ -36,6 +36,28 @@
       var theme
       try { theme = localStorage.getItem('hdx-theme') } catch (e) {}
       document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : 'light'
+    })();
+    // Bahasa (lihat src/i18n/locales.js): pengunjung yang pernah memilih Thai dan membuka alamat tanpa awalan diarahkan
+    // ke versi /th halaman yang sama. Halaman /th langsung diberi lang="th" dan font Thai (hanya di /th, supaya versi
+    // Indonesia tidak mengunduhnya).
+    (function () {
+      var path = location.pathname
+      var isThai = path === '/th' || path.indexOf('/th/') === 0
+      var chosen
+      try { chosen = localStorage.getItem('hdx-lang') } catch (e) {}
+      if (chosen === 'th' && !isThai) {
+        // Awalan /id tidak dipakai: /id/x → /th/x.
+        if (path === '/id' || path.indexOf('/id/') === 0) path = path.slice(3) || '/'
+        location.replace('/th' + (path === '/' ? '' : path) + location.search + location.hash)
+        return
+      }
+      if (!isThai) return
+      document.documentElement.lang = 'th'
+      var font = document.createElement('link')
+      font.id = 'font-th'
+      font.rel = 'stylesheet'
+      font.href = 'https://fonts.googleapis.com/css2?family=Anuphan:wght@400..700&display=swap'
+      document.head.appendChild(font)
     })()
   </script>
 </head>

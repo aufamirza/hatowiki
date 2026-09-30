@@ -11,7 +11,7 @@ export const recipeItemIds = (recipe) =>
 
 /**
  * Konfigurasi halaman daftar resep untuk CatalogListPage. Filter mengikuti heartodex (Level, Kategori);
- * pencarian mencocokkan nama resep dan nama bahannya.
+ * pencarian mencocokkan nama resep dan nama bahannya. Teksnya ada di src/i18n/messages (`kinds.recipes`).
  */
 // Posisi tiap resep di Urutan Default: satu jenis masakan (field family) selalu berdampingan.
 const RECIPE_ORDER = buildRecipeOrder(recipes)
@@ -19,32 +19,27 @@ const RECIPE_ORDER = buildRecipeOrder(recipes)
 export const RECIPE_KIND = {
   slug: 'recipes',
   name: 'Recipes',
-  label: 'Resep',
-  noun: 'resep',
   icon: CookingPot,
-  hobby: 'Hobi cooking',
-  intro: 'Resep yang bisa kamu masak lewat hobi cooking. Pilih resep untuk melihat bahan, energi, dan harga jualnya.',
   entries: recipes,
   totalInGame: RECIPES_TOTAL_IN_GAME,
   entryCategories: RECIPE_CATEGORIES,
   sortOptions: SORT_OPTIONS,
   sortRank: (recipe) => RECIPE_ORDER.get(recipe.slug),
-  searchLabel: 'Cari nama resep atau bahan',
   searchText: (recipe) => [recipe.name, ...recipeItemIds(recipe).map((id) => getItem(id)?.name ?? '')],
   filters: [
     {
       id: 'level',
       param: 'level',
-      label: 'Level',
+      labelKey: 'filter.level',
       values: (recipe) => (recipe.level == null ? [] : [String(recipe.level)]),
       compare: (a, b) => Number(a) - Number(b),
-      optionLabel: (value) => `Level ${value}`,
-      chipLabel: (value) => `Level ${value}`,
+      optionKey: 'filter.levelOption',
+      chipKey: 'filter.levelOption',
     },
     {
       id: 'category',
       param: 'kategori',
-      label: 'Kategori',
+      labelKey: 'filter.category',
       values: (recipe) => (recipe.category == null ? [] : [recipe.category]),
       compare: (a, b) => {
         const order = Object.keys(RECIPE_CATEGORIES)
@@ -54,5 +49,4 @@ export const RECIPE_KIND = {
       emoji: (value) => RECIPE_CATEGORIES[value]?.emoji,
     },
   ],
-  priceLabel: 'Harga jual',
 }

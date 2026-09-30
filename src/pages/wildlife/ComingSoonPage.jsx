@@ -1,9 +1,10 @@
-import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import Breadcrumbs from '../../components/Breadcrumbs'
 import CategoryHeader from '../../components/CategoryHeader'
 import { getWildlifeCategory } from '../../data/wildlife/categories'
 import { usePageTitle } from '../../hooks/usePageTitle'
+import { useI18n } from '../../i18n/I18nProvider'
+import { Link } from '../../i18n/LocaleLink'
 import { WILDLIFE_ICONS } from './wildlifeIcons'
 import './wildlifeTints.css'
 import './ComingSoonPage.css'
@@ -12,6 +13,8 @@ import './ComingSoonPage.css'
 // Header-nya sama dengan halaman Fish, jadi polanya sudah siap saat kategori ini diisi.
 function ComingSoonPage({ categorySlug }) {
   const category = getWildlifeCategory(categorySlug)
+  const { t, kind } = useI18n()
+  const text = kind(categorySlug)
   usePageTitle(category.name)
 
   return (
@@ -21,20 +24,17 @@ function ComingSoonPage({ categorySlug }) {
       <CategoryHeader
         icon={WILDLIFE_ICONS[categorySlug]}
         tint={category.slug}
-        eyebrow={`Wildlife · ${category.hobby}`}
+        eyebrow={t('list.eyebrowWildlife', { hobby: text.hobby })}
         title={category.name}
-        description={category.description}
+        description={text.description}
       />
 
-      <section className="coming-soon" aria-label="Status halaman">
-        <p className="coming-soon__badge">Segera hadir</p>
-        <p className="coming-soon__text">
-          Halaman {category.name} sedang disiapkan. Datanya akan ditambahkan setelah diverifikasi dari sumber yang
-          valid.
-        </p>
+      <section className="coming-soon" aria-label={t('wildlifeHub.soonStatus')}>
+        <p className="coming-soon__badge">{t('wildlifeHub.soon')}</p>
+        <p className="coming-soon__text">{t('wildlifeHub.soonText', { name: category.name })}</p>
         <Link to="/wildlife" className="btn btn--ghost">
           <ArrowLeft aria-hidden="true" />
-          Kembali ke Wildlife
+          {t('wildlifeHub.backToWildlife')}
         </Link>
       </section>
     </div>

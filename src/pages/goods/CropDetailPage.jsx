@@ -8,6 +8,7 @@ import MarketValue from '../../components/wildlife/MarketValue'
 import { levelToneStyle } from '../../components/wildlife/levelTone'
 import { getCropBySlug } from '../../data/crops/crops'
 import { usePageTitle } from '../../hooks/usePageTitle'
+import { useI18n } from '../../i18n/I18nProvider'
 import NotFoundPage from '../NotFoundPage'
 import { DetailFooter, IdentityPanel } from './GoodsDetailParts'
 import { AnimalUsagePanel, RecipeUsagePanel, getItemUsage } from './UsagePanels'
@@ -28,28 +29,32 @@ function CropDetailPage() {
   const { slug } = useParams()
   const location = useLocation()
   const crop = getCropBySlug(slug)
+  const i18n = useI18n()
+  const { t, formatNumber } = i18n
+  const text = i18n.kind('crops')
   const listHref = `/crops${location.state?.listSearch ?? ''}`
-  usePageTitle(crop ? crop.name : 'Tanaman tidak ditemukan')
+  usePageTitle(crop ? crop.name : text.notFoundTitle)
 
   if (!crop) {
     return (
       <NotFoundPage
-        title="Tanaman tidak ditemukan"
-        message="Tanaman ini belum ada di database kami, atau alamatnya salah ketik."
+        title={text.notFoundTitle}
+        message={text.notFoundMessage}
         backTo="/crops"
-        backLabel={`Lihat daftar ${CROP_KIND.name}`}
+        backLabel={t('detail.seeList', { name: CROP_KIND.name })}
       />
     )
   }
 
   const usage = getItemUsage(`crops/${crop.slug}`)
-  const seedPrice = crop.seedPrice != null ? formatCoins(crop.seedPrice) : crop.uncertain?.includes('seedPrice') ? 'Belum pasti' : '—'
+  const seedPrice =
+    crop.seedPrice != null ? formatCoins(crop.seedPrice, formatNumber) : crop.uncertain?.includes('seedPrice') ? t('common.uncertain') : '—'
 
   return (
     <div className="container page entry-detail" data-wildlife="crops">
       <Breadcrumbs
         items={[
-          { label: 'Beranda', to: '/' },
+          { label: t('common.home'), to: '/' },
           { label: CROP_KIND.name, to: listHref },
           { label: crop.name },
         ]}
@@ -60,13 +65,15 @@ function CropDetailPage() {
         <IdentityPanel kind={CROP_KIND} entry={crop} />
 
         {/* Kotak 2 — gambar dengan badge level | nilai jual per kualitas (semua deret dari sumber) */}
-        <section className="panel panel--hero" aria-label={`Gambar, level, dan nilai jual ${crop.name}`}>
+        <section className="panel panel--hero" aria-label={t('goods.cropHero', { name: crop.name })}>
           <div className="hero-layout hero-layout--split">
             <div className="entry-stage">
               <EntryImage src={crop.image} alt={crop.name} className="entry-stage__image" loading="eager" size={crop.imageSize} />
               <p className="stage-level" style={levelToneStyle(crop.level)}>
-                <span aria-hidden="true">Lv. {crop.level ?? '—'}</span>
-                <span className="visually-hidden">Syarat level {crop.level ?? 'belum diketahui'}</span>
+                <span aria-hidden="true">{t('common.levelShort', { level: crop.level ?? '—' })}</span>
+                <span className="visually-hidden">
+                  {crop.level != null ? t('common.levelRequired', { level: crop.level }) : t('common.levelRequiredUnknown')}
+                </span>
               </p>
             </div>
             <div className="market-stack">
@@ -76,19 +83,19 @@ function CropDetailPage() {
                   <div key={row.label} className="market">
                     <h2 className={`market__title${market ? '' : ' market__title--token'}`}>
                       {market ? <Coins aria-hidden="true" /> : <Ticket aria-hidden="true" />}
-                      {market ? 'Harga jual' : row.label}
-                      <span className="market__hint">per kualitas</span>
+                      {market ? t('common.sellPrice') : row.label}
+                      <span className="market__hint">{t('common.perQuality')}</span>
                     </h2>
                     <MarketValue
                       values={row.values}
                       uncertain={row.uncertain}
-                      unit={market ? 'koin' : row.label}
+                      unit={market ? t('common.coins') : row.label}
                       {...(market ? {} : { icon: Ticket, iconClassName: 'market-value__token' })}
                     />
                   </div>
                 )
               })}
-              {crop.starValues.length === 0 && <p className="entry-detail__description is-missing">Nilai jual belum tercantum di sumber.</p>}
+              {crop.starValues.length === 0 && <p className="entry-detail__description is-missing">{t('goods.noSellValue')}</p>}
             </div>
           </div>
         </section>
@@ -96,25 +103,25 @@ function CropDetailPage() {
         {/* Kotak 3 — info tanam */}
         <section className="panel panel--aside panel--facts" aria-labelledby="entry-planting">
           <PanelTitle icon={Sprout} id="entry-planting">
-            Info tanam
+            {t('goods.planting')}
           </PanelTitle>
           <dl className="spec-list goods-specs">
             <div className="spec">
               <dt className="spec__label">
                 <Coins aria-hidden="true" />
-                Harga benih
+                {t('card.seedPrice')}
               </dt>
               <dd className="spec__value">
                 {seedPrice}
-                {crop.seedPrice != null && <span className="spec__unit">koin</span>}
+                {crop.seedPrice != null && <span className="spec__unit">{t('common.coins')}</span>}
               </dd>
             </div>
             <div className="spec">
               <dt className="spec__label">
                 <Hourglass aria-hidden="true" />
-                Waktu tumbuh
+                {t('card.growthTime')}
               </dt>
-              <dd className="spec__value">{formatGrowthTime(crop.growthTime)}</dd>
+              <dd className="spec__value">{formatGrowthTime(crop.growthTime, i18n)}</dd>
             </div>
           </dl>
         </section>

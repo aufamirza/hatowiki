@@ -6,6 +6,7 @@ import CategoryHeader from '../../components/CategoryHeader'
 import { categoryToneStyle } from '../../components/catalog/categoryTone'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import { useReplayAnimation } from '../../hooks/useReplayAnimation'
+import { useI18n } from '../../i18n/I18nProvider'
 import FilterDropdown from './FilterDropdown'
 import {
   SORT_OPTIONS,
@@ -30,17 +31,21 @@ const URL_UPDATE = { replace: true, preventScrollReset: true }
  * Halaman daftar satu katalog (Fish, Bugs, Birds, Animals, Resep, Crops, Collectibles): pencarian, filter, urutan, dan
  * statusnya di URL. Hasilnya dibagi per section (Base Game, lalu event terbaru → terlama; lihat sections.js): pencarian,
  * filter, dan urutan berlaku di dalam tiap section, section tanpa hasil disembunyikan, dan jumlah hasil dihitung total.
- * `kind` berisi data dan teks: { name, noun, icon, intro, entries, totalInGame, filters, sortOptions?, searchText?,
- * searchLabel?, sortRank? }. `searchLabel` = label kolom pencarian (bawaan "Cari nama <noun>"). `sortRank(entry)` =
- * posisi di Urutan Default kalau bukan urutan data (lihat sortEntries).
+ * `kind` berisi data: { slug, name, icon, entries, totalInGame, filters, sortOptions?, searchText?, sortRank? }; teksnya
+ * (noun, intro, searchLabel) dari src/i18n/messages `kinds.<slug>`. `searchLabel` = label kolom pencarian (bawaan
+ * "Cari nama <noun>"). `sortRank(entry)` = posisi di Urutan Default kalau bukan urutan data (lihat sortEntries).
  * `tint` = kunci warna (lihat wildlifeTints.css), `breadcrumbs` & `eyebrow` untuk kepala halaman,
  * `renderCard(entry, linkState)` menggambar satu kartu.
  */
 function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
-  const { entries, filters, noun } = kind
+  const { t, kind: kindText } = useI18n()
+  const text = kindText(kind.slug)
+  const { entries, filters } = kind
+  const { noun, unit } = text
   const sortOptions = kind.sortOptions ?? SORT_OPTIONS
   const searchText = kind.searchText
-  const searchLabel = kind.searchLabel ?? `Cari nama ${noun}`
+  const searchLabel = text.searchLabel ?? t('list.searchLabel', { noun, unit })
+  const filterLabel = (def) => t(def.labelKey)
   usePageTitle(kind.name)
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -90,11 +95,11 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
   const hasActive = activeFilterCount > 0 || state.query !== ''
 
   const activeChips = [
-    ...(state.query ? [{ key: 'q', label: `Nama: “${state.query}”`, onRemove: () => setSearchParams((prev) => withQuery(prev, ''), URL_UPDATE) }] : []),
+    ...(state.query ? [{ key: 'q', label: t('list.chipName', { query: state.query }), onRemove: () => setSearchParams((prev) => withQuery(prev, ''), URL_UPDATE) }] : []),
     ...filters.flatMap((def) =>
       state.filters[def.id].map((value) => ({
         key: `${def.id}:${value}`,
-        label: def.chipLabel ? def.chipLabel(value) : `${def.label}: ${value}`,
+        label: def.chipKey ? t(def.chipKey, { value }) : t('list.chip', { label: filterLabel(def), value }),
         onRemove: () => setSearchParams((prev) => withToggledValue(prev, def, value), URL_UPDATE),
       })),
     ),
@@ -120,14 +125,13 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
         tint={tint}
         eyebrow={eyebrow}
         title={kind.name}
-        description={kind.intro}
+        description={text.intro}
       >
         <p className="entry-progress">
           <span className="entry-progress__bar" aria-hidden="true">
             <span style={{ width: `${(entries.length / kind.totalInGame) * 100}%` }} />
           </span>
-          {entries.length} dari {kind.totalInGame}
-          {` ${noun} sudah didokumentasikan`}
+          {t('list.progress', { count: entries.length, total: kind.totalInGame, noun, unit })}
         </p>
       </CategoryHeader>
 
@@ -150,7 +154,7 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
         </div>
         <div className="list-sort">
           <label htmlFor={sortId} className="visually-hidden">
-            Urutkan
+            {t('list.sort')}
           </label>
           <ArrowUpDown aria-hidden="true" className="list-sort__icon" />
           <select
@@ -160,7 +164,7 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
           >
             {sortOptions.map((option) => (
               <option key={option.id} value={option.id}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -174,11 +178,11 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
           onClick={toggleAdvanced}
         >
           <SlidersHorizontal aria-hidden="true" />
-          Filter
+          {t('list.filter')}
           {activeFilterCount > 0 && (
             <span className="count-badge">
               {activeFilterCount}
-              <span className="visually-hidden"> aktif</span>
+              <span className="visually-hidden">{t('list.activeSuffix')}</span>
             </span>
           )}
           <ChevronDown aria-hidden="true" className="list-filter-toggle__chevron" />
@@ -188,8 +192,8 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
           className="icon-button list-reset"
           onClick={resetAll}
           disabled={!hasActive}
-          aria-label="Reset pencarian dan filter"
-          title="Reset pencarian dan filter"
+          aria-label={t('list.reset')}
+          title={t('list.reset')}
         >
           <RotateCcw aria-hidden="true" />
         </button>
@@ -202,13 +206,14 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
         hidden={!advancedOpen}
       >
         <h2 id={`${advancedId}-title`} className="filter-advanced__title">
-          Filter Lanjutan
+          {t('list.advanced')}
         </h2>
         <div className="filter-advanced__list">
           {groups.map((group) => (
             <FilterDropdown
               key={group.def.id}
               group={group}
+              label={filterLabel(group.def)}
               open={openGroupId === group.def.id}
               onOpenChange={(open) =>
                 setOpenGroupId((current) => (open ? group.def.id : current === group.def.id ? null : current))
@@ -221,19 +226,18 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
 
       <section className="list-results" aria-labelledby="list-results-heading">
         <h2 id="list-results-heading" className="visually-hidden">
-          {`Daftar ${noun}`}
+          {t('list.heading', { noun, unit })}
         </h2>
         <div className="list-status">
           <p className="list-status__count" role="status">
-            Menampilkan <strong>{results.length}</strong> dari {entries.length}
-            {` ${noun}`}
+            {t('list.showing', { shown: <strong>{results.length}</strong>, total: entries.length, noun, unit })}
           </p>
           {hasActive && (
             <div className="active-filters">
-              <ul className="active-filters__list" aria-label="Filter aktif">
+              <ul className="active-filters__list" aria-label={t('list.activeFilters')}>
                 {activeChips.map((chip) => (
                   <li key={chip.key}>
-                    <button type="button" className="active-chip" onClick={chip.onRemove} aria-label={`Hapus ${chip.label}`}>
+                    <button type="button" className="active-chip" onClick={chip.onRemove} aria-label={t('list.remove', { label: chip.label })}>
                       {chip.label}
                       <X aria-hidden="true" />
                     </button>
@@ -242,7 +246,7 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
               </ul>
               <button type="button" className="text-button" onClick={resetAll}>
                 <RotateCcw aria-hidden="true" />
-                Reset semua
+                {t('list.resetAll')}
               </button>
             </div>
           )}
@@ -261,7 +265,7 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
                     <span aria-hidden="true">{section.emoji}</span>
                     {section.name}
                   </span>
-                  <span className="list-section__count">{`${section.entries.length} ${noun}`}</span>
+                  <span className="list-section__count">{t('list.sectionCount', { count: section.entries.length, noun, unit })}</span>
                 </h3>
                 <ul className="entry-grid">
                   {section.entries.map((item) => (
@@ -276,11 +280,11 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
             <span className="list-empty__icon" aria-hidden="true">
               <SearchX />
             </span>
-            <h3>{`Tidak ada ${noun} yang cocok`}</h3>
-            <p>Coba kata kunci lain atau kurangi filter yang dipilih.</p>
+            <h3>{t('list.emptyTitle', { noun, unit })}</h3>
+            <p>{t('list.emptyText')}</p>
             <button type="button" className="btn btn--primary" onClick={resetAll}>
               <RotateCcw aria-hidden="true" />
-              Reset pencarian &amp; filter
+              {t('list.emptyReset')}
             </button>
           </div>
         )}

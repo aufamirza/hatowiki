@@ -3,11 +3,12 @@
  * Kelompok filter tiap katalog didefinisikan di tempat lain (mis. buildListFilters untuk wildlife);
  * setiap kelompok punya `values(entry)` yang mengambil nilainya dari data.
  */
+// `labelKey` = kunci teks di src/i18n/messages.
 export const SORT_OPTIONS = [
-  { id: 'default', label: 'Urutan Default' },
-  { id: 'level', label: 'Level terendah' },
-  { id: 'level-desc', label: 'Level tertinggi' },
-  { id: 'az', label: 'Nama A–Z' },
+  { id: 'default', labelKey: 'list.sortDefault' },
+  { id: 'level', labelKey: 'list.sortLevel' },
+  { id: 'level-desc', labelKey: 'list.sortLevelDesc' },
+  { id: 'az', labelKey: 'list.sortAz' },
 ]
 
 const SEARCH_PARAM = 'q'
@@ -121,7 +122,6 @@ export function buildFilterGroups(list, state, filters, { searchText = nameOnly 
     }
     const options = [...counts.keys()].sort(def.compare).map((value) => ({
       value,
-      label: def.optionLabel ? def.optionLabel(value) : value,
       count: counts.get(value),
       emoji: def.emoji?.(value),
       selected: state.filters[def.id].includes(value),

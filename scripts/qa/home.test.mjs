@@ -21,8 +21,8 @@
  * - Gambar entri: kotak persegi (object-fit: contain) di Muncul Sekarang, contoh gambar kartu kategori, hiasan hero,
  *   dan thumbnail pencarian; gambar tinggi (Black Stork 400×846) tidak mengubah ukuran kotak; tile Muncul Sekarang
  *   sebaris sama tinggi, nama maks. 2 baris (teks lengkap di title), badge level di pojok gambar.
- * - Footer: tombol unduh App Store, Google Play, Steam (listing resmi, tab baru, noopener); tautan X @pingkendi kecil
- *   di baris kredit (teks sekunder, tab baru, noopener); meta Open Graph & Twitter
+ * - Footer: tombol unduh App Store, Google Play, Steam (listing resmi, tab baru, noopener); tautan X (hanya ikon kecil,
+ *   aria-label & title, teks sekunder, tab baru, noopener) di baris kredit; meta Open Graph & Twitter
  *   Card dengan gambar preview 1200×630, canonical per halaman.
  * - Animasi: transisi halaman & hasil filter, gerak gambar kartu per jenis saat hover (hanya opacity/transform, mati
  *   saat prefers-reduced-motion).
@@ -1191,11 +1191,11 @@ async function runSuite(width) {
     if (!a) return null
     const cs = getComputedStyle(a)
     const icon = a.querySelector('svg')
-    return { text: a.textContent.replace(/\\s+/g, ' ').trim(), target: a.target, rel: a.rel, color: cs.color, muted: getComputedStyle(document.querySelector('.site-footer')).color, size: parseFloat(cs.fontSize), icon: !!icon?.querySelector('path') && icon.getAttribute('aria-hidden') === 'true', iconSize: icon?.getBoundingClientRect().width, credit: a.closest('.site-footer__bottom') !== null }
+    return { text: a.textContent.replace(/\\s+/g, ' ').trim(), label: a.getAttribute('aria-label'), title: a.title, target: a.target, rel: a.rel, color: cs.color, muted: getComputedStyle(document.querySelector('.site-footer')).color, icon: !!icon?.querySelector('path') && icon.getAttribute('aria-hidden') === 'true', iconSize: icon?.getBoundingClientRect().width, credit: a.closest('.site-footer__bottom') !== null }
   })()`)
-  check('Footer: tautan X kecil (ikon + "@pingkendi", teks sekunder) di baris kredit, tab baru dengan rel="noopener"',
-    !!social && social.text.startsWith('@pingkendi') && social.text.includes('(membuka tab baru)') && social.target === '_blank' && /\bnoopener\b/.test(social.rel) && social.color === social.muted && social.size <= 13 && social.icon && social.iconSize <= 14 && social.credit,
-    social && `${social.text} · ${social.color} · ${social.size}px`)
+  check('Footer: tautan X hanya ikon kecil (teks sekunder) di baris kredit, aria-label & title "X (Twitter)", tab baru dengan rel="noopener"',
+    !!social && social.text === '' && social.label?.startsWith('X (Twitter)') && social.title === 'X (Twitter)' && social.target === '_blank' && /\bnoopener\b/.test(social.rel) && social.color === social.muted && social.icon && social.iconSize <= 14 && social.credit,
+    social && `${social.label} · ${social.color} · ${social.iconSize}px`)
   const meta = await evaluate(`(async () => {
     const m = (selector) => document.querySelector(selector)?.getAttribute('content') ?? null
     const image = m('meta[property="og:image"]')

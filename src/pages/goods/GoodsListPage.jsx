@@ -1,5 +1,6 @@
 import CatalogListPage from '../catalog/CatalogListPage'
 import { CollectibleCard, CropCard, IngredientCard } from '../../components/goods/GoodsCards'
+import { useI18n } from '../../i18n/I18nProvider'
 import { GOODS_KINDS } from './goodsKinds'
 import './goodsTints.css'
 
@@ -9,12 +10,13 @@ import './goodsTints.css'
  */
 function GoodsListPage({ kindSlug }) {
   const kind = GOODS_KINDS[kindSlug]
+  const { t, kind: kindText } = useI18n()
   return (
     <CatalogListPage
       kind={kind}
       tint={kind.slug}
-      breadcrumbs={[{ label: 'Beranda', to: '/' }, { label: kind.name }]}
-      eyebrow={`Koleksi · ${kind.hobby}`}
+      breadcrumbs={[{ label: t('common.home'), to: '/' }, { label: kind.name }]}
+      eyebrow={t('list.eyebrowCollection', { hobby: kindText(kind.slug).hobby })}
       renderCard={(entry, linkState) =>
         kindSlug === 'crops' ? (
           <CropCard crop={entry} linkState={linkState} />

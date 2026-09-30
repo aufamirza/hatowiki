@@ -1,4 +1,4 @@
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { ArrowLeft, Award, CloudSun, Coins, ExternalLink, Globe, MapPin, Sunrise, Waves } from 'lucide-react'
 import Breadcrumbs from '../../components/Breadcrumbs'
 import PanelTitle from '../../components/PanelTitle'
@@ -14,13 +14,14 @@ import { PERIODS, formatPeriodRange } from '../../data/gameTime'
 import { WEATHERS } from '../../data/wildlife/attributes'
 import { getEntryLocations } from '../../data/wildlife/entryLocations'
 import { usePageTitle } from '../../hooks/usePageTitle'
+import { useI18n } from '../../i18n/I18nProvider'
+import { Link } from '../../i18n/LocaleLink'
 import NotFoundPage from '../NotFoundPage'
 import AnimalDetailPanels from './AnimalDetailPanels'
 import { WILDLIFE_KINDS } from './wildlifeKinds'
 import './wildlifeTints.css'
 import './WildlifeDetailPage.css'
 
-const SCHEDULE_OPTIONS = PERIODS.map((period) => ({ ...period, hint: formatPeriodRange(period) }))
 
 /**
  * Halaman detail satu entri wildlife (ikan, serangga, burung) dengan lima kotak: identitas, gambar & statistik,
@@ -30,27 +31,33 @@ const SCHEDULE_OPTIONS = PERIODS.map((period) => ({ ...period, hint: formatPerio
  */
 function WildlifeDetailPage({ kindSlug }) {
   const kind = WILDLIFE_KINDS[kindSlug]
+  const i18n = useI18n()
+  const { t } = i18n
+  const text = i18n.kind(kind.slug)
   const { slug } = useParams()
   const location = useLocation()
   const entry = kind.entries.find((item) => item.slug === slug)
   // Kalau dibuka dari daftar, kembali ke daftar dengan pencarian/filter yang sama.
   const listHref = `/wildlife/${kind.slug}${location.state?.listSearch ?? ''}`
-  const notFoundTitle = `${kind.label} tidak ditemukan`
-  usePageTitle(entry ? entry.name : notFoundTitle)
+  usePageTitle(entry ? entry.name : text.notFoundTitle)
 
   if (!entry) {
     return (
       <NotFoundPage
-        title={notFoundTitle}
-        message={`${kind.label} ini belum ada di database kami, atau alamatnya salah ketik.`}
+        title={text.notFoundTitle}
+        message={text.notFoundMessage}
         backTo={`/wildlife/${kind.slug}`}
-        backLabel={`Lihat daftar ${kind.name}`}
+        backLabel={t('detail.seeList', { name: kind.name })}
       />
     )
   }
 
   const category = kind.entryCategories[entry.category]
   const locations = getEntryLocations(kind, entry)
+  const description = i18n.description(kind.slug, entry)
+  const priceLabel = text.priceLabel ?? t('common.sellPrice')
+  const missingPrice = kind.missingPrice === 'uncertain' ? t('common.uncertain') : '—'
+  const scheduleOptions = PERIODS.map((period) => ({ ...period, hint: formatPeriodRange(period, (hour) => t('common.hour', { hour })) }))
 
   return (
     <div className="container page entry-detail" data-wildlife={kind.slug}>
@@ -74,22 +81,22 @@ function WildlifeDetailPage({ kindSlug }) {
             </h1>
             {entry.category && (
               <p className="category-tag" style={categoryToneStyle(entry.category)}>
-                <span className="visually-hidden">Kategori: </span>
+                <span className="visually-hidden">{t('common.categoryPrefix')}</span>
                 {category && <span aria-hidden="true">{category.emoji}</span>}
                 {entry.category}
               </p>
             )}
-            {entry.description ? (
-              <p className="entry-detail__description">{entry.description}</p>
+            {description ? (
+              <p className="entry-detail__description">{description}</p>
             ) : (
-              <p className="entry-detail__description is-missing">Deskripsi belum tersedia.</p>
+              <p className="entry-detail__description is-missing">{t('detail.noDescription')}</p>
             )}
           </section>
 
           {/* Kotak 1 — gambar, level, shadow, harga jual. Kategori dengan shadow (ikan): tiga kolom gambar | level &
               shadow | harga. Tanpa shadow (serangga, burung): dua bagian seimbang, gambar dengan badge level di
               pojoknya | harga jual (burung: harga jual Info Card), seperti detail resep. */}
-          <section className="panel panel--hero" aria-label={`Gambar dan statistik ${entry.name}`}>
+          <section className="panel panel--hero" aria-label={t('detail.heroWildlife', { name: entry.name })}>
             {kind.hasShadow ? (
               <div className="hero-layout">
                 <div className={`entry-stage${kind.waterStage ? ' entry-stage--water' : ''}`}>
@@ -101,14 +108,14 @@ function WildlifeDetailPage({ kindSlug }) {
                     <div className="spec">
                       <dt className="spec__label">
                         <Award aria-hidden="true" />
-                        Syarat level
+                        {t('detail.levelRequirement')}
                       </dt>
-                      <dd className="spec__value">Level {entry.level ?? '—'}</dd>
+                      <dd className="spec__value">{t('common.level', { level: entry.level ?? '—' })}</dd>
                     </div>
                     <div className="spec">
                       <dt className="spec__label">
                         <Waves aria-hidden="true" />
-                        Shadow
+                        {t('detail.shadow')}
                       </dt>
                       <dd className="spec__value spec__value--text">
                         <ShadowIndicator shadow={entry.shadow} />
@@ -120,10 +127,10 @@ function WildlifeDetailPage({ kindSlug }) {
                   <div className="market">
                     <h2 className="market__title">
                       <Coins aria-hidden="true" />
-                      {kind.priceLabel}
-                      <span className="market__hint">per kualitas</span>
+                      {priceLabel}
+                      <span className="market__hint">{t('common.perQuality')}</span>
                     </h2>
-                    <MarketValue values={entry.marketValue} missingLabel={kind.missingPrice} absent={entry.marketValueMissing} />
+                    <MarketValue values={entry.marketValue} missingLabel={missingPrice} absent={entry.marketValueMissing} />
                   </div>
                 </div>
               </div>
@@ -133,18 +140,20 @@ function WildlifeDetailPage({ kindSlug }) {
                   <EntryImage src={entry.image} alt={entry.name} className="entry-stage__image" loading="eager" size={entry.imageSize} />
                   {kind.hasLevel && (
                     <p className="stage-level" style={levelToneStyle(entry.level)}>
-                      <span aria-hidden="true">Lv. {entry.level ?? '—'}</span>
-                      <span className="visually-hidden">Syarat level {entry.level ?? 'belum diketahui'}</span>
+                      <span aria-hidden="true">{t('common.levelShort', { level: entry.level ?? '—' })}</span>
+                      <span className="visually-hidden">
+                        {entry.level != null ? t('common.levelRequired', { level: entry.level }) : t('common.levelRequiredUnknown')}
+                      </span>
                     </p>
                   )}
                 </div>
                 <div className="market">
                   <h2 className="market__title">
                     <Coins aria-hidden="true" />
-                    {kind.priceLabel}
-                    <span className="market__hint">per kualitas</span>
+                    {priceLabel}
+                    <span className="market__hint">{t('common.perQuality')}</span>
                   </h2>
-                  <MarketValue values={entry.marketValue} missingLabel={kind.missingPrice} absent={entry.marketValueMissing} />
+                  <MarketValue values={entry.marketValue} missingLabel={missingPrice} absent={entry.marketValueMissing} />
                 </div>
               </div>
             )}
@@ -153,23 +162,23 @@ function WildlifeDetailPage({ kindSlug }) {
           {/* Kotak 3 — schedule & weather */}
           <section className="panel panel--when" aria-labelledby="entry-when">
             <PanelTitle icon={Sunrise} id="entry-when">
-              Waktu muncul
+              {t('detail.schedule')}
             </PanelTitle>
-            <AvailabilityChips options={SCHEDULE_OPTIONS} active={entry.schedule} label="Schedule" columns={2} />
+            <AvailabilityChips options={scheduleOptions} active={entry.schedule} label={t('detail.scheduleList')} columns={2} />
 
-            <PanelTitle icon={CloudSun}>Cuaca</PanelTitle>
-            <AvailabilityChips options={WEATHERS} active={entry.weather} label="Weather" columns={3} layout="stack" />
+            <PanelTitle icon={CloudSun}>{t('detail.weather')}</PanelTitle>
+            <AvailabilityChips options={WEATHERS} active={entry.weather} label={t('detail.weatherList')} columns={3} layout="stack" />
 
             <p className="panel__legend">
-              <span className="legend-swatch legend-swatch--on" aria-hidden="true" /> Berlaku
-              <span className="legend-swatch legend-swatch--off" aria-hidden="true" /> Tidak berlaku
+              <span className="legend-swatch legend-swatch--on" aria-hidden="true" /> {t('detail.applies')}
+              <span className="legend-swatch legend-swatch--off" aria-hidden="true" /> {t('detail.notApplies')}
             </p>
           </section>
 
           {/* Kotak 4 — waktu server */}
           <section className="panel panel--time" aria-labelledby="entry-server-time">
             <PanelTitle icon={Globe} id="entry-server-time">
-              Waktu server
+              {t('detail.serverTime')}
             </PanelTitle>
             <ServerTime />
           </section>
@@ -179,7 +188,7 @@ function WildlifeDetailPage({ kindSlug }) {
             <div className="location-layout">
               <div className="location-info">
                 <PanelTitle icon={MapPin} id="entry-location">
-                  Lokasi
+                  {t('common.location')}
                 </PanelTitle>
                 {locations.length > 1 ? (
                   <ul className="location-info__list">
@@ -200,14 +209,14 @@ function WildlifeDetailPage({ kindSlug }) {
       <footer className="entry-detail__footer">
         <Link to={listHref} className="btn btn--ghost">
           <ArrowLeft aria-hidden="true" />
-          {`Kembali ke daftar ${kind.name}`}
+          {t('detail.back', { name: kind.name })}
         </Link>
         <p className="source-credit">
-          Sumber data:{' '}
+          {t('detail.source')}{' '}
           <a href={entry.source} target="_blank" rel="noopener noreferrer">
-            Heartodex — {entry.name}
+            {t('detail.sourceLink', { name: entry.name })}
             <ExternalLink aria-hidden="true" />
-            <span className="visually-hidden"> (membuka tab baru)</span>
+            <span className="visually-hidden">{t('common.newTab')}</span>
           </a>
         </p>
       </footer>

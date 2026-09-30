@@ -1,8 +1,13 @@
-import { useEffect, useRef } from 'react'
-import { Link, Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
-import { ExternalLink, Heart } from 'lucide-react'
+import { Suspense, useEffect, useRef } from 'react'
+import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
+import { ExternalLink, Globe, Heart } from 'lucide-react'
 import { useReplayAnimation } from '../../hooks/useReplayAnimation'
+import { I18nProvider, useI18n } from '../../i18n/I18nProvider'
+import { Link } from '../../i18n/LocaleLink'
+import { getLocale, localeFromPath, stripLocale } from '../../i18n/locales'
 import GlobalSearch from '../search/GlobalSearch'
+import LanguageMenu, { LanguageLinks } from './LanguageMenu'
+import LanguageSuggestion from './LanguageSuggestion'
 import MobileMenu from './MobileMenu'
 import NavMenu from './NavMenu'
 import StoreLinks from './StoreLinks'
@@ -14,10 +19,12 @@ import '../../pages/recipes/recipeTint.css'
 import '../../pages/goods/goodsTints.css'
 import './Layout.css'
 import './SiteNav.css'
+import './Language.css'
 
 function Brand() {
+  const { t } = useI18n()
   return (
-    <Link to="/" className="brand" aria-label="Hatowiki, ke beranda">
+    <Link to="/" className="brand" aria-label={t('layout.brandHome')}>
       <span className="brand__mark" aria-hidden="true">
         <Heart />
       </span>
@@ -27,20 +34,23 @@ function Brand() {
 }
 
 // Toolbar global: bar melayang berbentuk pil (sticky, semi transparan + blur) berisi logo, menu Wildlife & Wiki
-// (desktop), pencarian, tombol tema, dan tombol menu seluler. Di bawah 760px menu pindah ke drawer dan pencarian ke
-// balik tombol ikon. Di beranda, pencarian toolbar disembunyikan selama hero (yang punya kolom cari sendiri) terlihat.
-const WILDLIFE_ALL = { to: '/wildlife', label: 'Semua kategori wildlife' }
+// (desktop), pencarian, pemilih bahasa, tombol tema, dan tombol menu seluler. Di bawah 760px menu pindah ke drawer dan
+// pencarian ke balik tombol ikon. Di beranda, pencarian toolbar disembunyikan selama hero (yang punya kolom cari sendiri)
+// terlihat.
 function SiteHeader() {
+  const { t } = useI18n()
+  const wildlifeAll = { to: '/wildlife', label: t('layout.allWildlife') }
   return (
     <header className="site-header">
       <div className="container site-header__inner">
         <Brand />
-        <nav className="site-nav" aria-label="Navigasi utama">
-          <NavMenu label="Wildlife" catalogs={WILDLIFE_CATALOGS} sections={['/wildlife']} allLink={WILDLIFE_ALL} />
+        <nav className="site-nav" aria-label={t('layout.mainNav')}>
+          <NavMenu label="Wildlife" catalogs={WILDLIFE_CATALOGS} sections={['/wildlife']} allLink={wildlifeAll} />
           <NavMenu label="Wiki" catalogs={WIKI_CATALOGS} sections={WIKI_CATALOGS.map((catalog) => catalog.href())} />
         </nav>
         <div className="site-header__tools">
           <GlobalSearch />
+          <LanguageMenu />
           <ThemeToggle />
           <MobileMenu />
         </div>
@@ -50,53 +60,60 @@ function SiteHeader() {
 }
 
 function SiteFooter() {
+  const { t } = useI18n()
+  const heartodex = (
+    <a href="https://www.heartodex.com/en" target="_blank" rel="noopener noreferrer">
+      Heartodex
+      <ExternalLink aria-hidden="true" />
+      <span className="visually-hidden">{t('common.newTab')}</span>
+    </a>
+  )
   return (
     <footer className="site-footer">
       <div className="container">
         <div className="site-footer__grid">
           <div className="site-footer__about">
             <Brand />
-            <p>Wiki dan panduan untuk penjelajah Heartopia dalam bahasa Indonesia.</p>
-            <h2 className="site-footer__title site-footer__title--stores">Unduh Heartopia</h2>
+            <p>{t('footer.about')}</p>
+            <h2 className="site-footer__title site-footer__title--stores">{t('footer.download')}</h2>
             <StoreLinks />
           </div>
           <div>
-            <h2 className="site-footer__title">Jelajahi</h2>
+            <h2 className="site-footer__title">{t('footer.explore')}</h2>
             <ul className="site-footer__links">
-              <li><Link to="/">Beranda</Link></li>
+              <li><Link to="/">{t('common.home')}</Link></li>
               <li><Link to="/wildlife">Wildlife</Link></li>
               <li><Link to="/wildlife/fish">Fish</Link></li>
             </ul>
           </div>
           <div>
-            <h2 className="site-footer__title">Sumber data</h2>
-            <p className="site-footer__credit">
-              Data game (nama, statistik, jadwal, cuaca, dan lokasi), gambar, serta peta dan zona lokasi berasal dari{' '}
-              <a href="https://www.heartodex.com/en" target="_blank" rel="noopener noreferrer">
-                Heartodex
-                <ExternalLink aria-hidden="true" />
-                <span className="visually-hidden"> (membuka tab baru)</span>
-              </a>
-              .
-            </p>
+            <h2 className="site-footer__title">{t('footer.sources')}</h2>
+            <p className="site-footer__credit">{t('footer.credit', { link: heartodex })}</p>
           </div>
         </div>
         <div className="site-footer__bottom">
-          <p>
-            Hatowiki adalah proyek komunitas tidak resmi untuk Heartopia dan tidak berafiliasi dengan XD
-            Entertainment Co., Ltd. Semua aset game adalah milik XD Entertainment Co., Ltd.
-          </p>
-          <p className="site-footer__meta">
-            <span>© 2026 Hatowiki · Dibuat untuk komunitas</span>
-            {/* Ikon X dari Simple Icons (CC0), satu warna mengikuti teks */}
-            <a href="https://x.com/pingkendi" className="site-footer__social" target="_blank" rel="noopener">
+          <p>{t('footer.disclaimer')}</p>
+          <div className="site-footer__meta">
+            <span>{t('footer.copyright')}</span>
+            {/* Ikon X dari Simple Icons (CC0), satu warna mengikuti teks; tanpa teks terlihat, nama lewat aria-label */}
+            <a
+              href="https://x.com/pingkendi"
+              className="site-footer__social"
+              target="_blank"
+              rel="noopener"
+              aria-label={t('footer.xLabel')}
+              title={t('footer.xTitle')}
+            >
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
               </svg>
-              @pingkendi
-              <span className="visually-hidden"> di X (membuka tab baru)</span>
             </a>
-          </p>
+            {/* Pemilih bahasa kedua (selain bola dunia di toolbar): dua tautan kecil ke halaman yang sama */}
+            <nav className="site-footer__language" aria-label={t('language.label')}>
+              <Globe aria-hidden="true" />
+              <LanguageLinks className="site-footer__language-list" />
+            </nav>
+          </div>
         </div>
       </div>
     </footer>
@@ -107,11 +124,17 @@ const SITE_URL = 'https://www.hatowiki.site'
 // Area dengan tint latar sendiri (token --page-bg-<area> di tokens.css), dari segmen pertama URL.
 const TINTED_AREAS = ['wildlife', 'recipes', 'crops', 'collectibles', 'ingredients']
 
-function Layout() {
+function setMeta(selector, attribute, value) {
+  document.querySelector(selector)?.setAttribute(attribute, value)
+}
+
+function SiteShell() {
   const { pathname } = useLocation()
+  const { t, locale } = useI18n()
   const mainRef = useRef(null)
-  const area = pathname.split('/')[1]
-  const isHome = pathname === '/'
+  const route = stripLocale(pathname)
+  const area = route.split('/')[1]
+  const isHome = route === '/'
 
   // Pindah halaman: konten memudar masuk (CSS, lihat .page-enter di base.css).
   useReplayAnimation(mainRef, pathname, 'page-enter')
@@ -119,15 +142,28 @@ function Layout() {
   // Canonical & og:url mengikuti halaman yang sedang dibuka (index.html hanya berisi versi beranda).
   useEffect(() => {
     const url = SITE_URL + pathname
-    document.querySelector('link[rel="canonical"]')?.setAttribute('href', url)
-    document.querySelector('meta[property="og:url"]')?.setAttribute('content', url)
+    setMeta('link[rel="canonical"]', 'href', url)
+    setMeta('meta[property="og:url"]', 'content', url)
   }, [pathname])
+
+  // Judul & deskripsi dasar situs mengikuti bahasa halaman (SEO per halaman menyusul).
+  useEffect(() => {
+    setMeta('meta[name="description"]', 'content', t('meta.description'))
+    setMeta('meta[property="og:locale"]', 'content', getLocale(locale).ogLocale)
+    setMeta('meta[property="og:title"]', 'content', t('meta.titleDefault'))
+    setMeta('meta[name="twitter:title"]', 'content', t('meta.titleDefault'))
+    setMeta('meta[property="og:description"]', 'content', t('meta.ogDescription'))
+    setMeta('meta[name="twitter:description"]', 'content', t('meta.ogDescription'))
+    setMeta('meta[property="og:image:alt"]', 'content', t('meta.ogImageAlt'))
+    setMeta('meta[name="twitter:image:alt"]', 'content', t('meta.ogImageAlt'))
+  }, [t, locale])
 
   return (
     <div className="site" data-area={TINTED_AREAS.includes(area) ? area : undefined}>
       <a href="#konten" className="skip-link">
-        Lewati ke konten
+        {t('layout.skipLink')}
       </a>
+      <LanguageSuggestion />
       <SiteHeader />
       {/* Beranda: hero dimulai dari tepi atas, di belakang toolbar melayang. */}
       <main id="konten" ref={mainRef} className={`site-main${isHome ? ' site-main--flush' : ''}`} tabIndex={-1}>
@@ -136,6 +172,19 @@ function Layout() {
       <SiteFooter />
       <ScrollRestoration />
     </div>
+  )
+}
+
+// Bahasa halaman dari awalan alamat (/th → Thai, tanpa awalan → Indonesia). Teks bahasa yang belum dimuat ditunggu
+// dulu (main.jsx & pemilih bahasa biasanya sudah memuatnya lebih awal).
+function Layout() {
+  const { pathname } = useLocation()
+  return (
+    <Suspense fallback={null}>
+      <I18nProvider locale={localeFromPath(pathname)}>
+        <SiteShell />
+      </I18nProvider>
+    </Suspense>
   )
 }
 

@@ -1,5 +1,6 @@
 import DayCycle from '../components/DayCycle'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { useI18n } from '../i18n/I18nProvider'
 import CategorySection from './home/CategorySection'
 import HomeHero from './home/HomeHero'
 import NowAppearing from './home/NowAppearing'
@@ -7,6 +8,7 @@ import './HomePage.css'
 
 // Beranda: hero, waktu server (pita siklus hari), kartu kategori, dan Muncul Sekarang.
 function HomePage() {
+  const { t } = useI18n()
   usePageTitle()
 
   return (
@@ -16,12 +18,9 @@ function HomePage() {
       <section className="home-section home-time" id="waktu-server" aria-labelledby="time-title">
         <div className="container">
           <header className="section-head">
-            <p className="eyebrow">Jam live</p>
-            <h2 id="time-title">Waktu Server</h2>
-            <p>
-              Jam dan periode waktu (Dawn, Day, Dusk, Night) di kelima server Heartopia. Jadwal muncul ikan, serangga,
-              dan burung mengikuti periode ini.
-            </p>
+            <p className="eyebrow">{t('home.timeEyebrow')}</p>
+            <h2 id="time-title">{t('home.timeTitle')}</h2>
+            <p>{t('home.timeIntro')}</p>
           </header>
           <DayCycle />
         </div>

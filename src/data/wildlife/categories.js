@@ -1,7 +1,8 @@
 import { ANIMAL_CATEGORIES, BIRD_CATEGORIES, BUG_CATEGORIES, FISH_CATEGORIES } from './attributes'
 
 /**
- * Kategori di hub /wildlife. Nama kategori mengikuti menu Heartodex (Fish, Bugs, Birds, Animals).
+ * Kategori di hub /wildlife. Nama kategori mengikuti menu Heartodex (Fish, Bugs, Birds, Animals). Label, hobi, dan
+ * deskripsinya ada di teks antarmuka per bahasa (src/i18n/messages, kunci `kinds.<slug>`).
  * `available: false` berarti halamannya masih "Segera Hadir" dan belum berisi data apa pun.
  *
  * Kategori yang sudah berisi data juga membawa skema datanya, dipakai bersama oleh validator,
@@ -15,15 +16,12 @@ import { ANIMAL_CATEGORIES, BIRD_CATEGORIES, BUG_CATEGORIES, FISH_CATEGORIES } f
  * - `hasMarketValue`: entri punya harga jual per kualitas (kotak harga di detail).
  * - `hasFavoriteFood`: entri punya makanan favorit (`favoriteFood`, id di src/data/items.js) dan titik tempat makan
  *   di peta (`feedingSpot`); dipakai Animals.
- * - `weatherLabel`: nama atribut cuaca di UI ("Cuaca", atau "Cuaca favorit" untuk hewan).
+ * - `weatherKey`: nama atribut cuaca di UI, kunci teks `filter.<weatherKey>` ("Cuaca", atau "Cuaca favorit" untuk hewan).
  */
 export const WILDLIFE_CATEGORIES = [
   {
     slug: 'fish',
     name: 'Fish',
-    label: 'Ikan',
-    hobby: 'Hobi fishing',
-    description: 'Ikan yang bisa kamu tangkap lewat hobi fishing, lengkap dengan jadwal, cuaca, dan lokasinya.',
     available: true,
     entryCategories: FISH_CATEGORIES,
     hasShadow: true,
@@ -33,14 +31,11 @@ export const WILDLIFE_CATEGORIES = [
     hasSchedule: true,
     hasMarketValue: true,
     hasFavoriteFood: false,
-    weatherLabel: 'Cuaca',
+    weatherKey: 'weather',
   },
   {
     slug: 'bugs',
     name: 'Bugs',
-    label: 'Serangga',
-    hobby: 'Hobi bug hunting',
-    description: 'Serangga yang bisa kamu tangkap lewat hobi bug hunting, lengkap dengan jadwal, cuaca, dan lokasinya.',
     available: true,
     entryCategories: BUG_CATEGORIES,
     hasShadow: false,
@@ -50,14 +45,11 @@ export const WILDLIFE_CATEGORIES = [
     hasSchedule: true,
     hasMarketValue: true,
     hasFavoriteFood: false,
-    weatherLabel: 'Cuaca',
+    weatherKey: 'weather',
   },
   {
     slug: 'birds',
     name: 'Birds',
-    label: 'Burung',
-    hobby: 'Hobi bird watching',
-    description: 'Burung yang bisa kamu amati lewat hobi bird watching, lengkap dengan jadwal, cuaca, dan lokasinya.',
     available: true,
     entryCategories: BIRD_CATEGORIES,
     hasShadow: false,
@@ -67,14 +59,11 @@ export const WILDLIFE_CATEGORIES = [
     hasSchedule: true,
     hasMarketValue: true,
     hasFavoriteFood: false,
-    weatherLabel: 'Cuaca',
+    weatherKey: 'weather',
   },
   {
     slug: 'animals',
     name: 'Animals',
-    label: 'Hewan',
-    hobby: 'Hewan liar',
-    description: 'Hewan liar yang berkeliaran di sekitar map dan bisa kamu beri makan.',
     available: true,
     entryCategories: ANIMAL_CATEGORIES,
     hasShadow: false,
@@ -84,7 +73,7 @@ export const WILDLIFE_CATEGORIES = [
     hasSchedule: false,
     hasMarketValue: false,
     hasFavoriteFood: true,
-    weatherLabel: 'Cuaca favorit',
+    weatherKey: 'favoriteWeather',
   },
 ]
 

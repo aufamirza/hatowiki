@@ -1,6 +1,7 @@
 /**
  * Alat bersama uji UI: Chrome/Edge headless lewat Chrome DevTools Protocol, tab dengan lebar tertentu, dan
- * perhitungan kontras WCAG. Dipakai scripts/qa/wildlife-list.test.mjs dan scripts/qa/home.test.mjs.
+ * perhitungan kontras WCAG. Dipakai scripts/qa/wildlife-list.test.mjs, scripts/qa/home.test.mjs, dan
+ * scripts/qa/i18n.test.mjs.
  */
 import { spawn, execSync } from 'node:child_process'
 import { existsSync, mkdtempSync, rmSync } from 'node:fs'
@@ -66,9 +67,12 @@ export async function openTab(port, width) {
   let id = 0
   const pending = new Map()
   const logs = []
+  // Pendengar event CDP (mis. Fetch.requestPaused untuk mencegat request), lihat on() di bawah.
+  const listeners = new Map()
   ws.addEventListener('message', (event) => {
     const msg = JSON.parse(event.data)
     if (msg.id && pending.has(msg.id)) { pending.get(msg.id)(msg); pending.delete(msg.id); return }
+    for (const listener of listeners.get(msg.method) ?? []) listener(msg.params)
     if (msg.method === 'Runtime.consoleAPICalled') logs.push(`console.${msg.params.type}: ${msg.params.args.map((a) => a.value ?? a.description ?? '').join(' ')}`)
     if (msg.method === 'Runtime.exceptionThrown') logs.push(`EXCEPTION: ${msg.params.exceptionDetails.exception?.description ?? msg.params.exceptionDetails.text}`)
     if (msg.method === 'Log.entryAdded') logs.push(`log.${msg.params.entry.level}: ${msg.params.entry.text}`)
@@ -84,6 +88,10 @@ export async function openTab(port, width) {
     send,
     logs,
     evaluate: async (expression) => (await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true })).result?.result?.value,
+    on(method, listener) {
+      if (!listeners.has(method)) listeners.set(method, [])
+      listeners.get(method).push(listener)
+    },
     async close() { ws.close(); await fetch(`http://127.0.0.1:${port}/json/close/${target.id}`) },
   }
 }

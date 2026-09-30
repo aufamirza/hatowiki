@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { PERIODS, SERVERS, formatClock, formatUtcOffset, getPeriod, getServerTime } from '../data/gameTime'
 import { useNow } from '../hooks/useNow'
+import { useI18n } from '../i18n/I18nProvider'
 import { spreadLabels } from './dayCycleLayout'
 import { PERIOD_ICONS } from './ServerTime'
 import './DayCycle.css'
@@ -25,6 +26,7 @@ const sameLayout = (a, b) =>
  * teks berisi server, jam, dan periode.
  */
 function DayCycle() {
+  const { t } = useI18n()
   const now = useNow()
   const rootRef = useRef(null)
   const bandRef = useRef(null)
@@ -162,7 +164,12 @@ function DayCycle() {
       <ul className="day-cycle__list visually-hidden">
         {servers.map(({ server, period, clock }) => (
           <li key={server.id}>
-            {server.name} ({formatUtcOffset(server.utcOffset)}): <time dateTime={clock}>{clock}</time>, periode {period.id}
+            {t('home.cycleItem', {
+              server: server.name,
+              utc: formatUtcOffset(server.utcOffset),
+              clock: <time dateTime={clock}>{clock}</time>,
+              period: period.id,
+            })}
           </li>
         ))}
       </ul>

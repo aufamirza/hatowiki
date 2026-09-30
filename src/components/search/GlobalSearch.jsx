@@ -1,11 +1,11 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { Search, SearchX, X } from 'lucide-react'
+import { useI18n } from '../../i18n/I18nProvider'
+import { useLocaleNavigate } from '../../i18n/LocaleLink'
 import EntryImage from '../wildlife/EntryImage'
 import { searchCatalogs } from './searchIndex'
 import './GlobalSearch.css'
-
-const SEARCH_LABEL = 'Cari ikan, serangga, burung, hewan, resep, tanaman, atau bahan alam'
 
 // Bagian nama yang cocok dengan kata kunci ditebalkan (kalau cocok apa adanya, tanpa beda huruf besar/kecil).
 function Highlight({ text, query }) {
@@ -37,7 +37,8 @@ function GlobalSearch({ variant = 'toolbar' }) {
   const rootRef = useRef(null)
   const inputRef = useRef(null)
   const toggleRef = useRef(null)
-  const navigate = useNavigate()
+  const navigate = useLocaleNavigate()
+  const { t, kind } = useI18n()
   const { pathname } = useLocation()
   const baseId = useId()
   const inputId = `${baseId}-input`
@@ -141,7 +142,7 @@ function GlobalSearch({ variant = 'toolbar' }) {
           ref={toggleRef}
           type="button"
           className="icon-button global-search__toggle"
-          aria-label={panelOpen ? 'Tutup pencarian' : 'Buka pencarian'}
+          aria-label={panelOpen ? t('search.close') : t('search.open')}
           aria-expanded={panelOpen}
           aria-controls={panelId}
           onClick={() => (panelOpen ? closePanel() : setPanelOpen(true))}
@@ -154,7 +155,7 @@ function GlobalSearch({ variant = 'toolbar' }) {
         <div className="global-search__field">
           <Search aria-hidden="true" className="global-search__icon" />
           <label htmlFor={inputId} className="visually-hidden">
-            {SEARCH_LABEL}
+            {t('search.label')}
           </label>
           <input
             ref={inputRef}
@@ -169,7 +170,7 @@ function GlobalSearch({ variant = 'toolbar' }) {
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             onFocus={() => hasQuery && setListOpen(true)}
-            placeholder={isHero ? 'Cari nama ikan, serangga, burung, resep, atau bahan…' : 'Cari ikan, serangga, resep…'}
+            placeholder={isHero ? t('search.placeholderHero') : t('search.placeholder')}
             autoComplete="off"
             autoCapitalize="off"
             spellCheck="false"
@@ -180,7 +181,7 @@ function GlobalSearch({ variant = 'toolbar' }) {
             <button
               type="button"
               className="global-search__clear"
-              aria-label="Kosongkan pencarian"
+              aria-label={t('search.clear')}
               tabIndex={-1}
               onClick={() => {
                 setQuery('')
@@ -195,7 +196,7 @@ function GlobalSearch({ variant = 'toolbar' }) {
         {showList && (
           <div className="global-search__dropdown">
             {items.length > 0 ? (
-              <ul className="global-search__list" id={listId} role="listbox" aria-label="Hasil pencarian">
+              <ul className="global-search__list" id={listId} role="listbox" aria-label={t('search.results')}>
                 {items.map((item, index) => {
                   const Icon = item.catalog.icon
                   return (
@@ -220,7 +221,7 @@ function GlobalSearch({ variant = 'toolbar' }) {
                       </span>
                       <span className="search-option__kind">
                         <Icon aria-hidden="true" />
-                        {item.catalog.label}
+                        {kind(item.catalog.slug).label}
                       </span>
                     </li>
                   )
@@ -229,19 +230,19 @@ function GlobalSearch({ variant = 'toolbar' }) {
             ) : (
               <p className="global-search__empty">
                 <SearchX aria-hidden="true" />
-                Tidak ada nama yang cocok dengan “{query.trim()}”.
+                {t('search.empty', { query: query.trim() })}
               </p>
             )}
             {total > items.length && (
               <p className="global-search__more">
-                {items.length} dari {total} hasil teratas. Ketik lebih spesifik untuk mempersempit.
+                {t('search.more', { shown: items.length, total })}
               </p>
             )}
           </div>
         )}
 
         <p className="visually-hidden" role="status">
-          {showList ? (total ? `${total} hasil` : 'Tidak ada hasil') : ''}
+          {showList ? (total ? t('search.count', { count: total }) : t('search.none')) : ''}
         </p>
       </div>
     </div>

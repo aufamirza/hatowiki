@@ -5,6 +5,7 @@ import { formatCoins } from '../../components/recipes/starValues'
 import EntryImage from '../../components/wildlife/EntryImage'
 import { getIngredientBySlug } from '../../data/ingredients/ingredients'
 import { usePageTitle } from '../../hooks/usePageTitle'
+import { useI18n } from '../../i18n/I18nProvider'
 import NotFoundPage from '../NotFoundPage'
 import { DetailFooter, IdentityPanel } from './GoodsDetailParts'
 import { AnimalUsagePanel, RecipeUsagePanel, getItemUsage } from './UsagePanels'
@@ -22,33 +23,37 @@ function IngredientDetailPage() {
   const { slug } = useParams()
   const location = useLocation()
   const item = getIngredientBySlug(slug)
+  const i18n = useI18n()
+  const { t, formatNumber, dataText } = i18n
+  const text = i18n.kind('ingredients')
   const listHref = `/ingredients${location.state?.listSearch ?? ''}`
-  usePageTitle(item ? item.name : 'Bahan masak tidak ditemukan')
+  usePageTitle(item ? item.name : text.notFoundTitle)
 
   if (!item) {
     return (
       <NotFoundPage
-        title="Bahan masak tidak ditemukan"
-        message="Bahan ini belum ada di database kami, atau alamatnya salah ketik."
+        title={text.notFoundTitle}
+        message={text.notFoundMessage}
         backTo="/ingredients"
-        backLabel={`Lihat daftar ${INGREDIENT_KIND.name}`}
+        backLabel={t('detail.seeList', { name: INGREDIENT_KIND.name })}
       />
     )
   }
 
   const usage = getItemUsage(`ingredients/${item.slug}`)
   const obtained = item.obtainedFrom
-  const amount = (key) => (item[key] != null ? formatCoins(item[key]) : item.uncertain?.includes(key) ? 'Belum pasti' : '—')
+  const amount = (key) =>
+    item[key] != null ? formatCoins(item[key], formatNumber) : item.uncertain?.includes(key) ? t('common.uncertain') : '—'
   const prices = [
-    { key: 'buyPrice', label: 'Harga beli' },
-    { key: 'sellPrice', label: 'Harga jual' },
+    { key: 'buyPrice', label: t('card.buyPrice') },
+    { key: 'sellPrice', label: t('common.sellPrice') },
   ]
 
   return (
     <div className="container page entry-detail" data-wildlife="ingredients">
       <Breadcrumbs
         items={[
-          { label: 'Beranda', to: '/' },
+          { label: t('common.home'), to: '/' },
           { label: INGREDIENT_KIND.name, to: listHref },
           { label: item.name },
         ]}
@@ -63,7 +68,7 @@ function IngredientDetailPage() {
         <IdentityPanel kind={INGREDIENT_KIND} entry={item} />
 
         {/* Kotak 2 — gambar | harga beli, harga jual & tempat membeli */}
-        <section className="panel panel--hero" aria-label={`Gambar dan harga ${item.name}`}>
+        <section className="panel panel--hero" aria-label={t('goods.ingredientHero', { name: item.name })}>
           <div className="hero-layout hero-layout--split">
             <div className="entry-stage">
               <EntryImage src={item.image} alt={item.name} className="entry-stage__image" loading="eager" size={item.imageSize} />
@@ -77,25 +82,25 @@ function IngredientDetailPage() {
                   </dt>
                   <dd className={`spec__value${item[key] == null ? ' is-missing' : ''}`}>
                     {amount(key)}
-                    {item[key] != null && <span className="spec__unit">koin</span>}
+                    {item[key] != null && <span className="spec__unit">{t('common.coins')}</span>}
                   </dd>
                 </div>
               ))}
               <div className="spec spec--wide">
                 <dt className="spec__label">
                   <Store aria-hidden="true" />
-                  Didapat dari
+                  {t('card.obtainedFrom')}
                 </dt>
                 <dd className={`spec__value spec__value--text${obtained ? '' : ' is-missing'}`}>
-                  {obtained ? obtained.place : '—'}
-                  {obtained?.when && <span className="spec__note">{obtained.when}</span>}
+                  {obtained ? dataText(obtained.place) : '—'}
+                  {obtained?.when && <span className="spec__note">{dataText(obtained.when)}</span>}
                 </dd>
               </div>
               {item.origin && (
                 <div className="spec">
                   <dt className="spec__label">
                     <MapPinned aria-hidden="true" />
-                    Asal
+                    {t('goods.origin')}
                   </dt>
                   <dd className="spec__value spec__value--text">{item.origin}</dd>
                 </div>

@@ -45,7 +45,8 @@ export function formatUtcOffset(offset) {
   return `UTC${offset > 0 ? '+' : '−'}${Math.abs(offset)}`
 }
 
-export function formatPeriodRange(period) {
-  const pad = (hour) => `${String(hour).padStart(2, '0')}.00`
+// "06.00–12.00". `formatHour` = format satu jam dari dua digit (bawaan gaya Indonesia "06.00"; Thai "06:00").
+export function formatPeriodRange(period, formatHour = (hour) => `${hour}.00`) {
+  const pad = (hour) => formatHour(String(hour).padStart(2, '0'))
   return `${pad(period.startHour)}–${pad(period.endHour)}`
 }

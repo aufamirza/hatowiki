@@ -3,6 +3,8 @@
  * 2026-09-29). Ikon merek dari Simple Icons (CC0, https://simpleicons.org), bukan badge resmi Apple/Google; teksnya
  * menyebut nama tokonya dengan jelas.
  */
+import { useI18n } from '../../i18n/I18nProvider'
+
 const STORES = [
   {
     id: 'app-store',
@@ -28,6 +30,7 @@ const STORES = [
 ]
 
 function StoreLinks() {
+  const { t } = useI18n()
   return (
     <ul className="store-links">
       {STORES.map((store) => (
@@ -40,7 +43,7 @@ function StoreLinks() {
               <span className="store-link__platform">{store.platform}</span>
               <span className="store-link__name">{store.name}</span>
             </span>
-            <span className="visually-hidden"> (membuka tab baru)</span>
+            <span className="visually-hidden">{t('common.newTab')}</span>
           </a>
         </li>
       ))}

@@ -1,6 +1,9 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { ArrowRight, ChevronDown } from 'lucide-react'
+import { useI18n } from '../../i18n/I18nProvider'
+import { Link, NavLink } from '../../i18n/LocaleLink'
+import { stripLocale } from '../../i18n/locales'
 
 // Jeda hover (mouse saja): menu tidak terbuka sendiri saat kursor hanya lewat, dan tidak langsung tertutup saat kursor
 // menyeberang celah antara tombol dan panel.
@@ -27,8 +30,10 @@ function NavMenu({ label, catalogs, sections, allLink = null }) {
   const openedBy = useRef(null)
   const hoverTimer = useRef(0)
   const panelId = useId()
+  const { t, kind } = useI18n()
   const { pathname } = useLocation()
-  const inSection = sections.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
+  const route = stripLocale(pathname)
+  const inSection = sections.some((prefix) => route === prefix || route.startsWith(`${prefix}/`))
 
   const clearHoverTimer = () => window.clearTimeout(hoverTimer.current)
   const show = (source) => {
@@ -163,7 +168,7 @@ function NavMenu({ label, catalogs, sections, allLink = null }) {
                     <span className="nav-menu__text">
                       <span className="nav-menu__name">{catalog.name}</span>
                       <span className="nav-menu__meta">
-                        {catalog.label} · {catalog.entries.length} entri
+                        {t('layout.menuMeta', { label: kind(catalog.slug).label, count: catalog.entries.length })}
                       </span>
                     </span>
                   </NavLink>

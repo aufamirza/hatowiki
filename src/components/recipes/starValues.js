@@ -1,17 +1,17 @@
-const formatNumber = new Intl.NumberFormat('id-ID')
-
-export const formatEnergy = (value) => `+${formatNumber.format(value)}`
-export const formatCoins = (value) => formatNumber.format(value)
+// Format angka mengikuti bahasa halaman: `formatNumber` = useI18n().formatNumber (id-ID "1.200", th-TH "1,200").
+export const formatEnergy = (value, formatNumber) => `+${formatNumber(value)}`
+export const formatCoins = (value, formatNumber) => formatNumber(value)
 
 /**
  * Ringkasan 5 nilai per kualitas (energi / harga jual resep) untuk kartu: `short` = rentang 1★ sampai 5★,
  * `full` = semua nilai per bintang (untuk atribut title). Nilai yang tidak ada tampil "—"; yang desimal di sumber
- * (`uncertain`) "Belum pasti". Kalau 1★ atau 5★ tidak ada, yang ditampilkan nilai yang ada beserta bintangnya.
+ * (`uncertain`) memakai `uncertainLabel` ("Belum pasti"). Kalau 1★ atau 5★ tidak ada, yang ditampilkan nilai yang ada
+ * beserta bintangnya.
  */
-export function summarizeStars(values, format, uncertain = []) {
+export function summarizeStars(values, format, uncertain = [], uncertainLabel) {
   if (!values || values.every((value) => value == null)) return { short: '—', full: '—' }
   const full = values
-    .map((value, i) => `${i + 1}★ ${value != null ? format(value) : uncertain.includes(i) ? 'Belum pasti' : '—'}`)
+    .map((value, i) => `${i + 1}★ ${value != null ? format(value) : uncertain.includes(i) ? uncertainLabel : '—'}`)
     .join(', ')
   const [first, last] = [values[0], values[4]]
   if (first != null && last != null) return { short: first === last ? format(first) : `${format(first)} – ${format(last)}`, full }

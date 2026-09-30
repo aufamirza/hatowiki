@@ -228,3 +228,23 @@ button:disabled {
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Aksara Thai (halaman /th, dan teks ber-lang="th" seperti notifikasi saran bahasa). Latin tetap Plus Jakarta Sans &
+ * Fraunces; aksara Thai jatuh ke Anuphan. Tanda vokal & nada Thai bertumpuk di atas/bawah huruf, jadi judul diberi jarak
+ * baris lebih lega dan tanpa letter-spacing (spasi antarhuruf memisahkan tanda dari hurufnya). :where() menjaga
+ * spesifisitasnya rendah, jadi aturan per komponen (mis. judul hero) tetap berlaku.
+ */
+:lang(th) {
+  --font-display: 'Fraunces', var(--font-thai);
+  --font-body: 'Plus Jakarta Sans', var(--font-thai);
+}
+
+:where(:lang(th)) :is(h1, h2, h3, h4, h5) {
+  line-height: 1.3;
+  letter-spacing: normal;
+}
+
+:where(:lang(th)) .eyebrow {
+  letter-spacing: 0.02em;
+}

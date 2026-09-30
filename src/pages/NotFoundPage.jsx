@@ -1,14 +1,18 @@
-import { Link } from 'react-router-dom'
 import { ArrowLeft, Compass } from 'lucide-react'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { useI18n } from '../i18n/I18nProvider'
+import { Link } from '../i18n/LocaleLink'
 import './NotFoundPage.css'
 
-function NotFoundPage({
-  title = 'Halaman tidak ditemukan',
-  message = 'Alamat yang kamu buka tidak ada. Mungkin salah ketik, atau halamannya belum dibuat.',
-  backTo = '/',
-  backLabel = 'Kembali ke beranda',
-}) {
+// Tanpa props: halaman 404 umum. Halaman detail memberi judul, pesan, dan tautan kembali ke daftarnya sendiri.
+function NotFoundPage(props) {
+  const { t } = useI18n()
+  const {
+    title = t('notFound.title'),
+    message = t('notFound.message'),
+    backTo = '/',
+    backLabel = t('notFound.back'),
+  } = props
   usePageTitle(title)
 
   return (

@@ -1,13 +1,15 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
+import { useI18n } from '../../i18n/I18nProvider'
 import './FilterDropdown.css'
 
 /**
  * Dropdown checkbox untuk satu kelompok filter (ATAU di dalam kelompok).
  * Menutup saat klik di luar, Escape, atau fokus keyboard keluar; panah atas/bawah, Home, End
- * memindahkan fokus antar opsi.
+ * memindahkan fokus antar opsi. `label` = nama kelompok (sudah diterjemahkan).
  */
-function FilterDropdown({ group, open, onOpenChange, onToggle }) {
+function FilterDropdown({ group, label, open, onOpenChange, onToggle }) {
+  const { t } = useI18n()
   const { def, options, selectedCount } = group
   const rootRef = useRef(null)
   const buttonRef = useRef(null)
@@ -91,8 +93,8 @@ function FilterDropdown({ group, open, onOpenChange, onToggle }) {
         onClick={() => onOpenChange(!open)}
         onKeyDown={handleButtonKeyDown}
       >
-        <span className="filter-dropdown__label">{def.label}:</span>
-        <span className="filter-dropdown__status">{selectedCount ? `${selectedCount} dipilih` : 'Semua'}</span>
+        <span className="filter-dropdown__label">{label}:</span>
+        <span className="filter-dropdown__status">{selectedCount ? t('filter.selected', { count: selectedCount }) : t('filter.all')}</span>
         <ChevronDown aria-hidden="true" className="filter-dropdown__chevron" />
       </button>
 
@@ -104,7 +106,7 @@ function FilterDropdown({ group, open, onOpenChange, onToggle }) {
           onKeyDown={handlePanelKeyDown}
         >
           <fieldset>
-            <legend className="visually-hidden">{def.label}</legend>
+            <legend className="visually-hidden">{label}</legend>
             <ul>
               {options.map((option) => (
                 <li key={option.value}>
@@ -112,12 +114,12 @@ function FilterDropdown({ group, open, onOpenChange, onToggle }) {
                     <input type="checkbox" checked={option.selected} onChange={() => onToggle(def, option.value)} />
                     <span className="filter-check__label">
                       {option.emoji && <span aria-hidden="true">{option.emoji}</span>}
-                      {option.label}
+                      {def.optionKey ? t(def.optionKey, { value: option.value }) : option.value}
                     </span>
                     <span className="filter-check__count">
                       <span className="visually-hidden">, </span>
                       {option.count}
-                      <span className="visually-hidden"> ikan</span>
+                      <span className="visually-hidden">{t('filter.optionCountSuffix')}</span>
                     </span>
                   </label>
                 </li>

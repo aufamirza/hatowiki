@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { useI18n } from '../../i18n/I18nProvider'
+import { Link } from '../../i18n/LocaleLink'
 import EntryImage from '../wildlife/EntryImage'
 import { levelToneStyle } from '../wildlife/levelTone'
 import { categoryToneStyle } from './categoryTone'
@@ -13,6 +14,7 @@ import './CatalogCard.css'
  * `linkState` diteruskan ke halaman detail supaya tombol kembali bisa memulihkan filter daftar.
  */
 function CatalogCard({ to, linkState, image, imageSize, name, category, categoryEmoji, level, facts }) {
+  const { t } = useI18n()
   return (
     <Link to={to} state={linkState} className="entry-card">
       <span className="entry-card__media">
@@ -25,7 +27,7 @@ function CatalogCard({ to, linkState, image, imageSize, name, category, category
       <span className="entry-card__badges">
         {category && (
           <span className="card-badge card-badge--category" style={categoryToneStyle(category)}>
-            <span className="visually-hidden">Kategori: </span>
+            <span className="visually-hidden">{t('common.categoryPrefix')}</span>
             {/* Spasi tak terputus: emoji tidak pernah tertinggal sendirian di baris pertama */}
             {categoryEmoji && <span aria-hidden="true">{categoryEmoji}{' '}</span>}
             {category}
@@ -33,29 +35,29 @@ function CatalogCard({ to, linkState, image, imageSize, name, category, category
         )}
         {level != null && (
           <span className="card-badge card-badge--level" style={levelToneStyle(level)}>
-            <span aria-hidden="true">Lv. {level}</span>
-            <span className="visually-hidden">Level {level}</span>
+            <span aria-hidden="true">{t('common.levelShort', { level })}</span>
+            <span className="visually-hidden">{t('common.level', { level })}</span>
           </span>
         )}
       </span>
       {/* Baris satu-baris dengan kolom ikon yang sama; teks lengkap ada di title */}
       <ul className="entry-card__facts">
         {facts.map(({ key, label, Icon, short, full, more = 0 }) => (
-          <li key={key} title={`${label}: ${full}`}>
+          <li key={key} title={t('card.fact', { label, value: full })}>
             <Icon aria-hidden="true" className="entry-card__fact-icon" />
             {more > 0 ? (
               // Nama pertama boleh terpotong elipsis, "+N" selalu terlihat.
               <span className="entry-card__fact-text entry-card__fact-text--split">
-                <span className="visually-hidden">{label}: </span>
+                <span className="visually-hidden">{t('card.fact', { label, value: '' })}</span>
                 <span className="entry-card__fact-first">{short}</span>
                 <span className="entry-card__fact-more">
                   <span aria-hidden="true">+{more}</span>
-                  <span className="visually-hidden"> dan {more} lokasi lain</span>
+                  <span className="visually-hidden">{t('card.moreLocations', { count: more })}</span>
                 </span>
               </span>
             ) : (
               <span className="entry-card__fact-text">
-                <span className="visually-hidden">{label}: </span>
+                <span className="visually-hidden">{t('card.fact', { label, value: '' })}</span>
                 {short}
               </span>
             )}

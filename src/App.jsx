@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouterProvider, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import Layout from './components/layout/Layout'
 import HomePage from './pages/HomePage'
@@ -13,58 +13,72 @@ import CropDetailPage from './pages/goods/CropDetailPage'
 import CollectibleDetailPage from './pages/goods/CollectibleDetailPage'
 import IngredientDetailPage from './pages/goods/IngredientDetailPage'
 
-const router = createBrowserRouter([
+// Semua halaman, dipakai dua kali: tanpa awalan (Indonesia) dan di bawah /th (Thai). Slug sama untuk kedua bahasa.
+const pageRoutes = () => [
+  { index: true, element: <HomePage /> },
   {
-    path: '/',
-    element: <Layout />,
+    path: 'wildlife',
     children: [
-      { index: true, element: <HomePage /> },
-      {
-        path: 'wildlife',
-        children: [
-          { index: true, element: <WildlifePage /> },
-          // key per kategori: pindah dari Fish ke Bugs memasang halaman baru, bukan membawa status halaman lama.
-          { path: 'fish', element: <WildlifeListPage key="fish" kindSlug="fish" /> },
-          { path: 'fish/:slug', element: <WildlifeDetailPage key="fish" kindSlug="fish" /> },
-          { path: 'bugs', element: <WildlifeListPage key="bugs" kindSlug="bugs" /> },
-          { path: 'bugs/:slug', element: <WildlifeDetailPage key="bugs" kindSlug="bugs" /> },
-          { path: 'birds', element: <WildlifeListPage key="birds" kindSlug="birds" /> },
-          { path: 'birds/:slug', element: <WildlifeDetailPage key="birds" kindSlug="birds" /> },
-          { path: 'animals', element: <WildlifeListPage key="animals" kindSlug="animals" /> },
-          { path: 'animals/:slug', element: <WildlifeDetailPage key="animals" kindSlug="animals" /> },
-        ],
-      },
-      {
-        path: 'recipes',
-        children: [
-          { index: true, element: <RecipeListPage /> },
-          { path: ':slug', element: <RecipeDetailPage /> },
-        ],
-      },
-      {
-        path: 'crops',
-        children: [
-          { index: true, element: <GoodsListPage key="crops" kindSlug="crops" /> },
-          { path: ':slug', element: <CropDetailPage /> },
-        ],
-      },
-      {
-        path: 'collectibles',
-        children: [
-          { index: true, element: <GoodsListPage key="collectibles" kindSlug="collectibles" /> },
-          { path: ':slug', element: <CollectibleDetailPage /> },
-        ],
-      },
-      {
-        path: 'ingredients',
-        children: [
-          { index: true, element: <GoodsListPage key="ingredients" kindSlug="ingredients" /> },
-          { path: ':slug', element: <IngredientDetailPage /> },
-        ],
-      },
-      { path: '*', element: <NotFoundPage /> },
+      { index: true, element: <WildlifePage /> },
+      // key per kategori: pindah dari Fish ke Bugs memasang halaman baru, bukan membawa status halaman lama.
+      { path: 'fish', element: <WildlifeListPage key="fish" kindSlug="fish" /> },
+      { path: 'fish/:slug', element: <WildlifeDetailPage key="fish" kindSlug="fish" /> },
+      { path: 'bugs', element: <WildlifeListPage key="bugs" kindSlug="bugs" /> },
+      { path: 'bugs/:slug', element: <WildlifeDetailPage key="bugs" kindSlug="bugs" /> },
+      { path: 'birds', element: <WildlifeListPage key="birds" kindSlug="birds" /> },
+      { path: 'birds/:slug', element: <WildlifeDetailPage key="birds" kindSlug="birds" /> },
+      { path: 'animals', element: <WildlifeListPage key="animals" kindSlug="animals" /> },
+      { path: 'animals/:slug', element: <WildlifeDetailPage key="animals" kindSlug="animals" /> },
     ],
   },
+  {
+    path: 'recipes',
+    children: [
+      { index: true, element: <RecipeListPage /> },
+      { path: ':slug', element: <RecipeDetailPage /> },
+    ],
+  },
+  {
+    path: 'crops',
+    children: [
+      { index: true, element: <GoodsListPage key="crops" kindSlug="crops" /> },
+      { path: ':slug', element: <CropDetailPage /> },
+    ],
+  },
+  {
+    path: 'collectibles',
+    children: [
+      { index: true, element: <GoodsListPage key="collectibles" kindSlug="collectibles" /> },
+      { path: ':slug', element: <CollectibleDetailPage /> },
+    ],
+  },
+  {
+    path: 'ingredients',
+    children: [
+      { index: true, element: <GoodsListPage key="ingredients" kindSlug="ingredients" /> },
+      { path: ':slug', element: <IngredientDetailPage /> },
+    ],
+  },
+  { path: '*', element: <NotFoundPage /> },
+]
+
+// Tidak ada awalan /id: /id/... diarahkan ke alamat tanpa awalan (vercel.json melakukannya di server; ini cadangan
+// untuk development dan navigasi di dalam aplikasi).
+function RedirectFromId() {
+  const { pathname, search, hash } = useLocation()
+  return <Navigate replace to={`${pathname.replace(/^\/id(?=\/|$)/, '') || '/'}${search}${hash}`} />
+}
+
+// Layout tanpa path membungkus kedua bahasa, jadi toolbar & footer tidak dipasang ulang saat bahasa diganti.
+const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      { path: '/', children: pageRoutes() },
+      { path: '/th', children: pageRoutes() },
+    ],
+  },
+  { path: '/id/*', element: <RedirectFromId /> },
 ])
 
 function App() {

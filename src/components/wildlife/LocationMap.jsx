@@ -2,9 +2,8 @@ import { useId } from 'react'
 import { MapPin, MapPinned } from 'lucide-react'
 import { LOCATION_ZONES, MAP_SIZE } from '../../data/wildlife/locationZones'
 import { zoneViewBox } from '../../data/wildlife/zoneViewBox'
+import { useI18n } from '../../i18n/I18nProvider'
 import './LocationMap.css'
-
-const formatNames = new Intl.ListFormat('id', { type: 'conjunction' })
 
 // Potongan peta di sekitar pin: lebar 400 unit (40% peta), rasio sama dengan kotak peta (1,08), tidak keluar peta.
 const SPOT_VIEW_WIDTH = 400
@@ -25,7 +24,9 @@ function spotViewBox({ x, y }) {
  * Kalau gambar peta tidak ada, tampil placeholder.
  * Kredit peta dan zona (Heartodex) ada di footer situs.
  */
-function LocationMap({ locations, image, spot = null, spotLabel = 'Titik tempat makan' }) {
+function LocationMap({ locations, image, spot = null, spotLabel: spotLabelProp }) {
+  const { t, formatList } = useI18n()
+  const spotLabel = spotLabelProp ?? t('detail.feedingSpot')
   const maskId = `zone-mask-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
   const zoned = locations.filter((location) => location.zone && LOCATION_ZONES[location.zone])
   const zones = zoned.map((location) => LOCATION_ZONES[location.zone])
@@ -34,7 +35,7 @@ function LocationMap({ locations, image, spot = null, spotLabel = 'Titik tempat 
     return (
       <div className="location-map location-map--empty">
         <MapPinned aria-hidden="true" />
-        <p>Gambar peta untuk lokasi ini belum tersedia.</p>
+        <p>{t('detail.mapMissing')}</p>
       </div>
     )
   }
@@ -42,7 +43,7 @@ function LocationMap({ locations, image, spot = null, spotLabel = 'Titik tempat 
   if (spot) {
     return (
       <figure className="location-map">
-        <svg className="location-map__svg" viewBox={spotViewBox(spot)} preserveAspectRatio="xMidYMid slice" role="img" aria-label={`Peta Heartopia dengan pin: ${spotLabel}`}>
+        <svg className="location-map__svg" viewBox={spotViewBox(spot)} preserveAspectRatio="xMidYMid slice" role="img" aria-label={t('detail.mapPin', { label: spotLabel })}>
           <image
             className="location-map__base"
             href={image}
@@ -68,8 +69,8 @@ function LocationMap({ locations, image, spot = null, spotLabel = 'Titik tempat 
   const viewBox =
     zones.length === 1 ? zones[0].viewBox : zones.length ? zoneViewBox(zones.map((zone) => zone.polygons)) : `0 0 ${MAP_SIZE} ${MAP_SIZE}`
   const label = zones.length
-    ? `Peta Heartopia dengan area ${formatNames.format(zoned.map((location) => location.name))} disorot`
-    : `Peta Heartopia untuk lokasi ${formatNames.format(locations.map((location) => location.name))}`
+    ? t('detail.mapZones', { names: formatList(zoned.map((location) => location.name)) })
+    : t('detail.mapPlaces', { names: formatList(locations.map((location) => location.name)) })
 
   return (
     <figure className="location-map">

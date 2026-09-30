@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
 import { ChevronRight, Package } from 'lucide-react'
+import { Link } from '../../i18n/LocaleLink'
 import './ItemList.css'
 
 /**

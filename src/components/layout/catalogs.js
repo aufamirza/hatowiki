@@ -7,7 +7,9 @@ import { WILDLIFE_KINDS } from '../../pages/wildlife/wildlifeKinds'
  * Semua katalog yang punya halaman, dipakai toolbar (menu Wildlife & Wiki, drawer seluler), pencarian global, dan
  * kartu kategori di beranda. Jumlah entri selalu dihitung dari `entries` (termasuk entri event), bukan ditulis manual.
  * - `slug`: kunci warna (data-wildlife, lihat wildlifeTints.css & recipeTint.css) sekaligus segmen URL.
- * - `href(entry?)`: halaman daftar, atau halaman detail kalau diberi entri.
+ * - `href(entry?)`: halaman daftar, atau halaman detail kalau diberi entri (tanpa awalan bahasa; komponen tautan dari
+ *   src/i18n/LocaleLink menambahkannya).
+ * Label, kata benda, hobi, dan deskripsi tiap katalog ada di src/i18n/messages (`kinds.<slug>`, lihat useI18n().kind).
  */
 function wildlifeCatalog(slug) {
   const kind = WILDLIFE_KINDS[slug]
@@ -15,10 +17,6 @@ function wildlifeCatalog(slug) {
     slug,
     group: 'wildlife',
     name: kind.name,
-    label: kind.label,
-    noun: kind.noun,
-    hobby: kind.hobby,
-    description: kind.description,
     icon: kind.icon,
     entries: kind.entries,
     hasSchedule: kind.hasSchedule,
@@ -32,10 +30,6 @@ export const RECIPE_CATALOG = {
   slug: 'recipes',
   group: 'recipes',
   name: RECIPE_KIND.name,
-  label: RECIPE_KIND.label,
-  noun: RECIPE_KIND.noun,
-  hobby: RECIPE_KIND.hobby,
-  description: 'Resep yang bisa kamu masak lewat hobi cooking, lengkap dengan bahan, energi, dan harga jualnya.',
   icon: CookingPot,
   entries: RECIPE_KIND.entries,
   hasSchedule: false,
@@ -48,10 +42,6 @@ function goodsCatalog(kind) {
     slug: kind.slug,
     group: 'wiki',
     name: kind.name,
-    label: kind.label,
-    noun: kind.noun,
-    hobby: kind.hobby,
-    description: kind.description,
     icon: kind.icon,
     entries: kind.entries,
     hasSchedule: false,

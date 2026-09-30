@@ -2,10 +2,13 @@ import { CookingPot, PawPrint } from 'lucide-react'
 import PanelTitle from '../../components/PanelTitle'
 import LinkTileList from '../../components/items/LinkTileList'
 import { animalsFavoringItem, recipesUsingItem } from '../../data/itemUsage'
+import { useI18n } from '../../i18n/I18nProvider'
 
 // Keterangan cara pakai di resep: bahan tetap (dengan jumlah) atau salah satu pilihan di kelompok "pilih N".
-function useText(uses) {
-  return uses.map((use) => (use.type === 'fixed' ? `Bahan tetap x${use.quantity}` : `Bahan pilihan (pilih ${use.count})`)).join(' · ')
+function useText(uses, t) {
+  return uses
+    .map((use) => (use.type === 'fixed' ? t('goods.useFixed', { quantity: use.quantity }) : t('goods.useChoose', { count: use.count })))
+    .join(' · ')
 }
 
 /**
@@ -18,40 +21,42 @@ export function getItemUsage(itemId) {
 }
 
 export function RecipeUsagePanel({ usage, name }) {
+  const { t } = useI18n()
   return (
     <section className="panel panel--recipes" aria-labelledby="entry-recipes">
       <PanelTitle icon={CookingPot} id="entry-recipes">
-        Dipakai di resep
-        {usage.recipes.length > 0 && <span className="panel__hint">{`${usage.recipes.length} resep`}</span>}
+        {t('goods.usedIn')}
+        {usage.recipes.length > 0 && <span className="panel__hint">{t('goods.recipeCount', { count: usage.recipes.length })}</span>}
       </PanelTitle>
       {usage.recipes.length ? (
         <LinkTileList
-          label={`Resep yang memakai ${name}`}
+          label={t('goods.recipesUsing', { name })}
           entries={usage.recipes.map(({ recipe, uses }) => ({
             key: recipe.slug,
             href: `/recipes/${recipe.slug}`,
             image: recipe.image,
             imageSize: recipe.imageSize,
             name: recipe.name,
-            meta: `Lv. ${recipe.level ?? '—'} · ${useText(uses)}`,
+            meta: t('goods.recipeMeta', { level: recipe.level ?? '—', uses: useText(uses, t) }),
           }))}
         />
       ) : (
-        <p className="entry-detail__description is-missing">{`Belum ada resep di Hatowiki yang memakai ${name}.`}</p>
+        <p className="entry-detail__description is-missing">{t('goods.noRecipes', { name })}</p>
       )}
     </section>
   )
 }
 
 export function AnimalUsagePanel({ usage, name }) {
+  const { t } = useI18n()
   if (!usage.animals.length) return null
   return (
     <section className="panel panel--animals" aria-labelledby="entry-animals">
       <PanelTitle icon={PawPrint} id="entry-animals">
-        Makanan favorit hewan
+        {t('goods.favoredBy')}
       </PanelTitle>
       <LinkTileList
-        label={`Hewan yang menyukai ${name}`}
+        label={t('goods.animalsLiking', { name })}
         entries={usage.animals.map((animal) => ({
           key: animal.slug,
           href: `/wildlife/animals/${animal.slug}`,

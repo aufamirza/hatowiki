@@ -1,6 +1,7 @@
-import { Link } from 'react-router-dom'
 import { ChevronRight, Fish, Package } from 'lucide-react'
 import { getItem } from '../../data/items'
+import { useI18n } from '../../i18n/I18nProvider'
+import { Link } from '../../i18n/LocaleLink'
 import { itemHref } from './itemHref'
 import './ItemList.css'
 
@@ -24,6 +25,7 @@ function ItemList({ entries, showType = false }) {
 }
 
 function ItemTile({ id, quantity, showType }) {
+  const { t } = useI18n()
   const item = getItem(id) ?? { id, name: id, type: null, image: null }
   const href = itemHref(item)
   const Icon = TYPE_ICONS[item.type] ?? Package
@@ -52,7 +54,7 @@ function ItemTile({ id, quantity, showType }) {
       </span>
       <span className="item-tile__text">
         <span className="item-tile__name">{item.name}</span>
-        {quantity != null && <span className="visually-hidden">{`, jumlah ${quantity}`}</span>}
+        {quantity != null && <span className="visually-hidden">{t('detail.quantityHidden', { quantity })}</span>}
         {showType && item.type && <span className="item-tile__type">{item.type}</span>}
       </span>
       {href && <ChevronRight aria-hidden="true" className="item-tile__go" />}

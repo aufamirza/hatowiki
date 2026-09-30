@@ -9,21 +9,17 @@ import { WILDLIFE_ICONS } from './wildlifeIcons'
 
 /**
  * Konfigurasi halaman daftar & detail per kategori wildlife. Skema data (shadow, lokasi jamak, harga bulat,
- * level, jadwal, makanan favorit, kategori entri) diambil dari WILDLIFE_CATEGORIES; di sini ditambah data,
- * teks, dan tampilan.
+ * level, jadwal, makanan favorit, kategori entri) diambil dari WILDLIFE_CATEGORIES; di sini ditambah data dan tampilan.
+ * Teksnya (label, hobi, intro, label harga, …) ada di src/i18n/messages, kunci `kinds.<slug>`.
  */
 function defineKind(slug, config) {
   const category = getWildlifeCategory(slug)
   return {
     ...category,
     icon: WILDLIFE_ICONS[slug],
-    // Kata benda untuk teks UI, mis. "Cari nama ikan…", "Menampilkan 12 dari 97 serangga".
-    noun: category.label.toLowerCase(),
     filters: buildListFilters(category),
     // Tanpa level (hewan): hanya urutan default dan A–Z.
     sortOptions: category.hasLevel ? SORT_OPTIONS : SORT_OPTIONS_NO_LEVEL,
-    // Judul deretan 5 angka per kualitas di halaman detail.
-    priceLabel: 'Harga jual',
     ...config,
   }
 }
@@ -32,37 +28,30 @@ export const WILDLIFE_KINDS = {
   fish: defineKind('fish', {
     entries: fish,
     totalInGame: FISH_TOTAL_IN_GAME,
-    intro: 'Ikan yang bisa kamu tangkap lewat hobi fishing. Pilih ikan untuk melihat jadwal, cuaca, lokasi, dan harga jualnya.',
     // Panggung gambar di halaman detail diberi riak air.
     waterStage: true,
-    // Harga jual null: belum ada di sumber.
-    missingPrice: '—',
+    // Harga jual null: belum ada di sumber ("—").
+    missingPrice: 'dash',
   }),
   bugs: defineKind('bugs', {
     entries: bugs,
     totalInGame: BUGS_TOTAL_IN_GAME,
-    intro:
-      'Serangga yang bisa kamu tangkap lewat hobi bug hunting. Pilih serangga untuk melihat jadwal, cuaca, lokasi, dan harga jualnya.',
     waterStage: false,
-    // Harga jual null: harga di sumber desimal (tidak dibulatkan), lihat TODO di bugs.js.
-    missingPrice: 'Belum pasti',
+    // Harga jual null: harga di sumber desimal (tidak dibulatkan), lihat TODO di bugs.js ("Belum pasti").
+    missingPrice: 'uncertain',
   }),
   birds: defineKind('birds', {
     entries: birds,
     totalInGame: BIRDS_TOTAL_IN_GAME,
-    intro:
-      'Burung yang bisa kamu potret lewat hobi bird watching. Pilih burung untuk melihat jadwal, cuaca, lokasi, dan harga jual Info Card-nya.',
     waterStage: false,
-    // Burung dipotret, bukan ditangkap: yang dijual adalah Info Card (foto) berkualitas 1★–5★ (lihat birds.js).
-    priceLabel: 'Harga jual Info Card',
-    // Angka null: angka di sumber desimal (tidak dibulatkan), lihat TODO di birds.js.
-    missingPrice: 'Belum pasti',
+    // Burung dipotret, bukan ditangkap: yang dijual adalah Info Card (foto) berkualitas 1★–5★ (lihat birds.js), jadi
+    // judul harganya "Harga jual Info Card" (kinds.birds.priceLabel).
+    // Angka null: angka di sumber desimal (tidak dibulatkan), lihat TODO di birds.js ("Belum pasti").
+    missingPrice: 'uncertain',
   }),
   animals: defineKind('animals', {
     entries: animals,
     totalInGame: ANIMALS_TOTAL_IN_GAME,
-    intro:
-      'Hewan liar yang berkeliaran di sekitar map. Pilih hewan untuk melihat lokasi, titik tempat makan, cuaca favorit, dan makanan favoritnya.',
     waterStage: false,
   }),
 }

@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider'
 import './AvailabilityChips.css'
 
 /**
@@ -6,6 +7,7 @@ import './AvailabilityChips.css'
  * layout: 'row' (emoji di samping teks) atau 'stack' (emoji di atas teks, lebih ringkas).
  */
 function AvailabilityChips({ options, active = [], label, columns = 2, layout = 'row' }) {
+  const { t } = useI18n()
   return (
     <ul
       className={`availability availability--${layout}`}
@@ -23,7 +25,7 @@ function AvailabilityChips({ options, active = [], label, columns = 2, layout = 
               <span className="availability__label">{option.id}</span>
               {option.hint && <span className="availability__hint">{option.hint}</span>}
             </span>
-            <span className="visually-hidden">{isOn ? ', berlaku' : ', tidak berlaku'}</span>
+            <span className="visually-hidden">{isOn ? t('detail.appliesHidden') : t('detail.notAppliesHidden')}</span>
           </li>
         )
       })}

@@ -10,6 +10,9 @@
   /* Font */
   --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
   --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Font untuk aksara Thai (hanya dimuat di halaman /th, lihat src/i18n/fonts.js). Huruf Latin tetap memakai font di
+     depannya, aksara Thai jatuh ke Anuphan. */
+  --font-thai: 'Anuphan', 'Noto Sans Thai', 'Leelawadee UI', Tahoma, sans-serif;
 
   /* Skala teks */
   --text-xs: 0.75rem;

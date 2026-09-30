@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Leaf } from 'lucide-react'
 import { CATALOGS, WILDLIFE_CATALOGS } from '../../components/layout/catalogs'
 import GlobalSearch from '../../components/search/GlobalSearch'
+import { useI18n } from '../../i18n/I18nProvider'
 
 /**
  * Hiasan hero: ikan, serangga, dan burung dari data (gambar yang sudah ada di public/images), masing-masing
@@ -89,8 +90,9 @@ function HeroScene() {
 }
 
 // "124 ikan" untuk tagline: jumlah entri dari data (termasuk entri event), dengan spasi tak terputus supaya angka tidak
-// terpisah dari kata bendanya di akhir baris.
-const countOf = (slug, noun) => `${CATALOGS.find((catalog) => catalog.slug === slug)?.entries.length ?? 0}\u00a0${noun}`
+// terpisah dari kata bendanya di akhir baris. `t` = teks bahasa halaman (kinds.<slug>.count).
+const countOf = (t, slug) =>
+  t(`kinds.${slug}.count`, { count: CATALOGS.find((catalog) => catalog.slug === slug)?.entries.length ?? 0 }).replace(/ /g, '\u00a0')
 
 /**
  * Hero beranda: judul, satu kalimat isi wiki, dan kolom pencarian global versi besar. Selama hero terlihat, atribut
@@ -99,6 +101,7 @@ const countOf = (slug, noun) => `${CATALOGS.find((catalog) => catalog.slug === s
  * HomePage.css).
  */
 function HomeHero() {
+  const { t } = useI18n()
   const heroRef = useRef(null)
 
   // Dipasang sebelum tampil supaya pencarian toolbar tidak sempat muncul sekilas saat beranda dibuka.
@@ -135,14 +138,13 @@ function HomeHero() {
       <div className="container hero__content">
         <p className="hero__badge">
           <Leaf aria-hidden="true" />
-          Proyek komunitas, tidak resmi
+          {t('home.heroBadge')}
         </p>
         <h1 id="hero-title" className="hero__title">
           Hatowiki
         </h1>
         <p className="hero__lead">
-          Jadwal, lokasi, dan harga {countOf('fish', 'ikan')}, {countOf('bugs', 'serangga')}, {countOf('birds', 'burung')},
-          dan {countOf('recipes', 'resep')} Heartopia, dalam bahasa Indonesia.
+          {t('home.heroLead', { fish: countOf(t, 'fish'), bugs: countOf(t, 'bugs'), birds: countOf(t, 'birds'), recipes: countOf(t, 'recipes') })}
         </p>
         <GlobalSearch variant="hero" />
       </div>

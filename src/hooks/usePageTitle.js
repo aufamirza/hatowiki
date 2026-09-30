@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
+import { useI18n } from '../i18n/I18nProvider'
 
-const SITE_NAME = 'Hatowiki'
-
+// "<judul> | Hatowiki", atau judul dasar situs (per bahasa) kalau halaman tidak punya judul sendiri.
 export function usePageTitle(title) {
+  const { t } = useI18n()
   useEffect(() => {
-    document.title = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} | Wiki Komunitas Heartopia`
-  }, [title])
+    document.title = title ? t('meta.titlePage', { title }) : t('meta.titleDefault')
+  }, [title, t])
 }

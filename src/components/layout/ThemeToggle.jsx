@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Moon, Sun } from 'lucide-react'
+import { useI18n } from '../../i18n/I18nProvider'
 
 const STORAGE_KEY = 'hdx-theme'
 
 function ThemeToggle() {
+  const { t } = useI18n()
   // Tema awal sudah dipasang di index.html sebelum React jalan.
   const [theme, setTheme] = useState(() => document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light')
   const isDark = theme === 'dark'
@@ -19,7 +21,7 @@ function ThemeToggle() {
     setTheme(next)
   }
 
-  const label = isDark ? 'Ganti ke mode terang' : 'Ganti ke mode gelap'
+  const label = isDark ? t('layout.themeToLight') : t('layout.themeToDark')
 
   return (
     <button type="button" className="icon-button" onClick={toggleTheme} aria-label={label} title={label}>

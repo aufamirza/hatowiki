@@ -7,6 +7,7 @@ import EntryImage from '../../components/wildlife/EntryImage'
 import LocationMap from '../../components/wildlife/LocationMap'
 import { getCollectibleBySlug } from '../../data/collectibles/collectibles'
 import { usePageTitle } from '../../hooks/usePageTitle'
+import { useI18n } from '../../i18n/I18nProvider'
 import NotFoundPage from '../NotFoundPage'
 import { DetailFooter, IdentityPanel } from './GoodsDetailParts'
 import { AnimalUsagePanel, RecipeUsagePanel, getItemUsage } from './UsagePanels'
@@ -24,29 +25,33 @@ function CollectibleDetailPage() {
   const { slug } = useParams()
   const location = useLocation()
   const item = getCollectibleBySlug(slug)
+  const i18n = useI18n()
+  const { t, formatNumber } = i18n
+  const text = i18n.kind('collectibles')
   const listHref = `/collectibles${location.state?.listSearch ?? ''}`
-  usePageTitle(item ? item.name : 'Bahan alam tidak ditemukan')
+  usePageTitle(item ? item.name : text.notFoundTitle)
 
   if (!item) {
     return (
       <NotFoundPage
-        title="Bahan alam tidak ditemukan"
-        message="Bahan ini belum ada di database kami, atau alamatnya salah ketik."
+        title={text.notFoundTitle}
+        message={text.notFoundMessage}
         backTo="/collectibles"
-        backLabel={`Lihat daftar ${COLLECTIBLE_KIND.name}`}
+        backLabel={t('detail.seeList', { name: COLLECTIBLE_KIND.name })}
       />
     )
   }
 
   const usage = getItemUsage(`collectibles/${item.slug}`)
   const locations = item.locations ?? []
-  const amount = (key, format) => (item[key] != null ? format(item[key]) : item.uncertain?.includes(key) ? 'Belum pasti' : '—')
+  const amount = (key, format) =>
+    item[key] != null ? format(item[key], formatNumber) : item.uncertain?.includes(key) ? t('common.uncertain') : '—'
 
   return (
     <div className="container page entry-detail" data-wildlife="collectibles">
       <Breadcrumbs
         items={[
-          { label: 'Beranda', to: '/' },
+          { label: t('common.home'), to: '/' },
           { label: COLLECTIBLE_KIND.name, to: listHref },
           { label: item.name },
         ]}
@@ -61,7 +66,7 @@ function CollectibleDetailPage() {
         <IdentityPanel kind={COLLECTIBLE_KIND} entry={item} />
 
         {/* Kotak 2 — gambar | nilai jual & energi */}
-        <section className="panel panel--hero" aria-label={`Gambar, nilai jual, dan energi ${item.name}`}>
+        <section className="panel panel--hero" aria-label={t('goods.collectibleHero', { name: item.name })}>
           <div className="hero-layout hero-layout--split">
             <div className="entry-stage">
               <EntryImage src={item.image} alt={item.name} className="entry-stage__image" loading="eager" size={item.imageSize} />
@@ -70,22 +75,22 @@ function CollectibleDetailPage() {
               <div className="spec">
                 <dt className="spec__label">
                   <Coins aria-hidden="true" />
-                  Nilai jual
+                  {t('card.sellValue')}
                 </dt>
                 <dd className={`spec__value${item.sellValue == null ? ' is-missing' : ''}`}>
                   {amount('sellValue', formatCoins)}
-                  {item.sellValue != null && <span className="spec__unit">koin</span>}
+                  {item.sellValue != null && <span className="spec__unit">{t('common.coins')}</span>}
                 </dd>
               </div>
               {(item.energy != null || item.uncertain?.includes('energy')) && (
                 <div className="spec">
                   <dt className="spec__label">
                     <Zap aria-hidden="true" />
-                    Energi
+                    {t('card.energy')}
                   </dt>
                   <dd className="spec__value">
                     {amount('energy', formatEnergy)}
-                    {item.energy != null && <span className="spec__unit">energi</span>}
+                    {item.energy != null && <span className="spec__unit">{t('common.energy')}</span>}
                   </dd>
                 </div>
               )}
@@ -98,7 +103,7 @@ function CollectibleDetailPage() {
           <div className="location-layout">
             <div className="location-info">
               <PanelTitle icon={MapPin} id="entry-location">
-                Lokasi
+                {t('common.location')}
               </PanelTitle>
               {locations.length > 1 ? (
                 <ul className="location-info__list">
