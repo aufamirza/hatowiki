@@ -3,7 +3,7 @@
 Wiki komunitas Heartopia (proyek fan, tidak resmi) dalam tiga bahasa: Indonesia (bawaan, alamat tanpa awalan), Thai
 (`/th`), dan Inggris (`/en`). Lihat [Bahasa](#bahasa), [Deskripsi isian manual](#deskripsi-isian-manual), dan [SEO](#seo).
 
-Tahap sekarang: kategori **Wildlife**, dengan **Fish** berisi 124 ikan (97 Base Game + 27 event), **Bugs** berisi 101 serangga (76 + 25), **Birds** berisi 103 burung (77 + 26), dan **Animals** berisi 11 hewan (8 + 3), serta **Recipes** berisi 208 resep (87 Base Game + 121 dari 13 event). Kategori Wiki **Crops** berisi 19 tanaman (14 Base Game + 5 event) dan **Collectibles** berisi 40 bahan alam (33 Base Game + 7 event), ditambah **Ingredients** (32 bahan masak), **Items** (23 benda pakai per hobi), **NPCs** (19 NPC), dan **Achievements** (70 achievement, 1 tersembunyi). Semua entri di halaman daftar Heartodex sudah dimasukkan.
+Tahap sekarang: kategori **Wildlife**, dengan **Fish** berisi 124 ikan (97 Base Game + 27 event), **Bugs** berisi 101 serangga (76 + 25), **Birds** berisi 103 burung (77 + 26), dan **Animals** berisi 11 hewan (8 + 3), serta **Recipes** berisi 208 resep (87 Base Game + 121 dari 13 event). Kategori Wiki **Crops** berisi 19 tanaman (14 Base Game + 5 event) dan **Collectibles** berisi 40 bahan alam (33 Base Game + 7 event), ditambah **Ingredients** (32 bahan masak), **Items** (23 benda pakai per hobi), **NPCs** (19 NPC), dan **Achievements** (70 achievement, 1 tersembunyi). Semua entri di halaman daftar Heartodex sudah dimasukkan. Halaman **Checklist** (`/checklist`) melacak koleksi pemain; lihat [Checklist](#checklist).
 
 ## Menjalankan
 
@@ -32,6 +32,9 @@ Uji lain yang ikut `npm run test:ui`:
 - `scripts/qa/new-catalogs.test.mjs`: Achievements, Items, dan NPCs (data, daftar, filter, pencarian, detail, tujuan
   achievement tersembunyi yang buram sampai diklik, "Dijual oleh" dari data NPC, barang dagangan & hadiah favorit NPC,
   nama NPC tertaut di "Didapat dari" bahan masak, menu, pencarian global, bento beranda, tiga bahasa).
+- `scripts/qa/checklist.test.mjs`: Checklist dengan jam halaman dikunci (menandai lewat ketuk/klik & keyboard, Batalkan,
+  filter & pencarian, Target Sekarang: level, cuaca, server & periode berikutnya, reset dengan konfirmasi, Cadangkan &
+  Pulihkan termasuk berkas yang salah, tidak ada request selain GET, area ketuk ponsel, tiga bahasa); bawaan lebar 390 & 1280.
 - `scripts/qa/seo.test.mjs`: meta tag per halaman & bahasa di browser, lalu HTML statis, `sitemap.xml`, `robots.txt`, dan
   rewrite `vercel.json` di `dist/` (jalankan `npm run build` dulu).
 
@@ -43,13 +46,14 @@ node scripts/qa/home.test.mjs 390                 # beranda & toolbar, satu leba
 node scripts/qa/i18n.test.mjs 1280                # tiga bahasa, satu lebar
 node scripts/qa/links.test.mjs 1280               # tautan sungguhan, satu lebar
 node scripts/qa/new-catalogs.test.mjs 1280        # Achievements, Items, NPCs & tautan NPC, satu lebar
+node scripts/qa/checklist.test.mjs 390 1280       # Checklist, lebar 390 & 1280
 node scripts/qa/seo.test.mjs 1280                 # SEO (setelah npm run build)
 ```
 
 Semua halaman memakai toolbar global yang menempel di atas: logo, menu Wildlife (dropdown Fish, Bugs, Birds,
-Animals), menu Wiki (dropdown Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements), pencarian nama di semua
-kategori, dan tombol tema. Di bawah 760 px menu pindah ke drawer dan
-pencarian ke balik tombol ikon.
+Animals), menu Wiki (dropdown Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements), tautan Checklist,
+pencarian nama di semua kategori, dan tombol tema. Di bawah 760 px menu pindah ke drawer (Checklist tepat setelah
+Beranda) dan pencarian ke balik tombol ikon.
 
 Situs memakai client-side routing (`react-router-dom`). Saat build, tiap halaman di tiap bahasa juga mendapat berkas HTML
 statis sendiri (lihat [SEO](#seo)), jadi URL seperti `/wildlife/fish/sea-bass` atau `/th/wildlife/fish/sea-bass` bisa
@@ -78,6 +82,7 @@ dibuka langsung. Alamat yang tidak punya berkas diarahkan `vercel.json` ke `inde
 | `/npcs/:slug` | Detail (4 kotak): identitas & gambar (peran), lokasi + peta dengan pin posisi NPC (atau zona), hadiah favorit, barang yang dijual dengan harga (tertaut ke item) |
 | `/achievements` | Grid kartu (badge kategori hobi, title hadiah, tujuan; tujuan & title achievement tersembunyi tidak ditampilkan), pencarian nama & title, filter Kategori, urutan default & A–Z |
 | `/achievements/:slug` | Detail: identitas & tujuan (achievement tersembunyi: buram sampai diklik), gambar + title & kategori hadiah |
+| `/checklist` | Pelacak koleksi: tab Fish/Bugs/Birds/Recipes/Achievements dengan progres, daftar ringkas yang bisa dicentang, Target Sekarang (Fish, Bugs, Birds), reset per kategori, Cadangkan & Pulihkan |
 
 Katalog Items, NPCs, dan Achievements:
 
@@ -105,6 +110,33 @@ ditampilkan). Section ditentukan field `section` di data, yaitu posisi entri di 
 kategorinya (mis. Striped Red Mullet berkategori Sea Fishing dan Starfall Shard berkategori Meteor Shower tetap di Base
 Game). Pencarian, filter, dan urutan berlaku di dalam tiap section; section tanpa hasil disembunyikan. Status event
 (aktif/selesai) tidak disimpan maupun ditampilkan. Muncul Sekarang di beranda hanya memakai entri Base Game.
+
+## Checklist
+
+`/checklist` (Thai `/th/checklist`, Inggris `/en/checklist`) berdiri sendiri: halaman daftar & detail lain tidak punya
+tombol atau centang apa pun. Kodenya di `src/pages/checklist/`.
+
+- Tab kategori sekaligus ringkasan progres "didapat/total" (total termasuk entri event, sama dengan halaman daftar). Daftar
+  memakai baris ringkas (gambar, nama yang tertaut ke detail, level, lokasi, waktu, cuaca; resep: level & kategori;
+  achievement: kategori & title). Seluruh baris adalah label kotak centang, jadi satu ketukan di mana saja (kecuali nama)
+  menandai atau membatalkan. Filter Belum didapat (bawaan) / Sudah didapat / Semua dan pencarian nama; kategori, filter,
+  tampilan, dan kata kunci ada di URL (`?kategori=bugs&status=sudah&tampilan=sekarang&q=…`). Baris yang keluar dari filter
+  karena baru ditandai memunculkan notifikasi di bawah layar dengan tombol Batalkan.
+- Target Sekarang (Fish, Bugs, Birds; `catchNow.js`): entri Base Game yang belum didapat, cocok dengan cuaca pilihan pemain
+  (Sunny, Rainy, Rainbow; cuaca tidak bisa diketahui dari luar game), dan muncul di periode waktu server sekarang,
+  dikelompokkan per lokasi (lokasi dengan entri terbanyak di atas; entri dengan beberapa lokasi masuk ke tiap lokasinya).
+  Di bawahnya entri yang baru muncul di periode berikutnya beserta jam mulainya. Level hobi (Fishing, Bug Catching,
+  Birdwatching; bawaan level tertinggi di data) menyembunyikan entri yang syarat levelnya lebih tinggi; jumlahnya disebut
+  dan bisa ditampilkan redup. Entri event tidak ikut karena hanya bisa didapat selama eventnya.
+- Penyimpanan (`checklistStore.js`): localStorage `hdx-checklist` = `{ version: 1, obtained: { <kategori>: [slug, …] },
+  levels: { <kategori>: level }, updatedAt }`. Slug atau kategori yang belum dikenal tetap disimpan (cadangan dari versi
+  lain tidak kehilangan isi), yang dihitung hanya entri yang ada di data. Server memakai kunci `hdx-server` yang sama
+  dengan Muncul Sekarang di beranda; cuaca disimpan di sessionStorage (`hdx-checklist-weather`). Perubahan dari tab lain
+  ikut tampil (event `storage`).
+- Cadangkan mengunduh `hatowiki-checklist-<tanggal>.json` (bentuk yang sama + `app: 'hatowiki'`, `kind: 'checklist'`).
+  Pulihkan membaca berkas di browser, menolak berkas yang bukan cadangan Checklist atau dari versi yang lebih baru, lalu
+  mengganti progres setelah dikonfirmasi. Reset per kategori juga lewat dialog konfirmasi (level hobi tidak ikut terhapus).
+- Progres tidak pernah dikirim ke server mana pun (uji memeriksa tidak ada request selain GET).
 
 ## Struktur
 
@@ -185,7 +217,9 @@ src/
     ├── goods/                GoodsListPage (juga daftar NPCs & Achievements), Crop/Collectible/Ingredient/HobbyItemDetailPage,
     │                         GoodsDetailParts (identitas, Dijual oleh, tautan NPC), UsagePanels, goodsKinds.js (Crops, Collectibles, Ingredients, Items)
     ├── npcs/                 NpcDetailPage, NpcCard, npcKind.js
-    └── achievements/         AchievementDetailPage (tujuan tersembunyi buram sampai diklik), AchievementCard, achievementKind.js
+    ├── achievements/         AchievementDetailPage (tujuan tersembunyi buram sampai diklik), AchievementCard, achievementKind.js
+    └── checklist/            ChecklistPage, ChecklistRow, CatchNowView (Target Sekarang), BackupPanel, ConfirmDialog,
+                              checklistKinds.js, catchNow.js, checklistStore.js (localStorage, cadangan)
 ```
 
 `components/layout/catalogs.js` mengumpulkan semua katalog (Fish, Bugs, Birds, Animals, Recipes, Crops, Collectibles, Ingredients,

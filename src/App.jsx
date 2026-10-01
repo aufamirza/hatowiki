@@ -16,6 +16,7 @@ import IngredientDetailPage from './pages/goods/IngredientDetailPage'
 import HobbyItemDetailPage from './pages/goods/HobbyItemDetailPage'
 import NpcDetailPage from './pages/npcs/NpcDetailPage'
 import AchievementDetailPage from './pages/achievements/AchievementDetailPage'
+import ChecklistPage from './pages/checklist/ChecklistPage'
 
 // Semua halaman, dipakai sekali per bahasa: tanpa awalan (Indonesia), di bawah /th (Thai), dan di bawah /en (Inggris).
 // Slug sama untuk semua bahasa. Daftar halaman untuk HTML statis & sitemap ada di src/seo/pageMeta.js.
@@ -85,6 +86,7 @@ const pageRoutes = () => [
       { path: ':slug', element: <AchievementDetailPage /> },
     ],
   },
+  { path: 'checklist', element: <ChecklistPage /> },
   { path: '*', element: <NotFoundPage /> },
 ]
 

@@ -15,6 +15,18 @@
   transition: transform var(--duration) var(--ease-out);
 }
 
+/* Tautan langsung di toolbar (Checklist): ikon kecil di depan teks, sejajar dengan tombol menu */
+.site-nav__link--icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.site-nav__link--icon svg {
+  width: 16px;
+  height: 16px;
+}
+
 .nav-menu__button[aria-expanded='true'] {
   color: var(--color-text);
   background: var(--color-surface-sunken);

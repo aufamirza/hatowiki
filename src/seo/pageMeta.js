@@ -24,16 +24,20 @@ export const MAX_DESCRIPTION = 160
 
 const stripTrailingSlash = (route) => (route.length > 1 ? route.replace(/\/+$/, '') || '/' : route)
 
-/** Semua halaman yang ada (tanpa awalan bahasa): beranda, hub Wildlife, tiap daftar, dan tiap detail. */
+// Halaman alat yang bukan katalog (tanpa entri): Checklist.
+const TOOL_ROUTES = ['/checklist']
+
+/** Semua halaman yang ada (tanpa awalan bahasa): beranda, hub Wildlife, Checklist, tiap daftar, dan tiap detail. */
 export function listRoutes() {
-  return ['/', '/wildlife', ...CATALOGS.flatMap((catalog) => [catalog.href(), ...catalog.entries.map((entry) => catalog.href(entry))])]
+  return ['/', '/wildlife', ...TOOL_ROUTES, ...CATALOGS.flatMap((catalog) => [catalog.href(), ...catalog.entries.map((entry) => catalog.href(entry))])]
 }
 
-/** Halaman di balik sebuah route: beranda, hub, daftar, detail, detail yang entrinya tidak ada, atau tidak dikenal. */
+/** Halaman di balik sebuah route: beranda, hub, Checklist, daftar, detail, detail yang entrinya tidak ada, atau tidak dikenal. */
 export function resolveRoute(path) {
   const route = stripTrailingSlash(path)
   if (route === '/') return { type: 'home', route }
   if (route === '/wildlife') return { type: 'hub', route }
+  if (route === '/checklist') return { type: 'checklist', route }
   for (const catalog of CATALOGS) {
     const base = catalog.href()
     if (route === base) return { type: 'list', route, catalog }
@@ -250,6 +254,10 @@ export function getPageMeta(path, localeId, messages) {
     case 'hub':
       title = pageTitle('Wildlife')
       description = t('wildlifeHub.metaDescription', { fish: countOf('fish'), bugs: countOf('bugs'), birds: countOf('birds'), animals: countOf('animals') })
+      break
+    case 'checklist':
+      title = pageTitle(t('checklist.title'))
+      description = t('checklist.metaDescription')
       break
     case 'list':
       title = pageTitle(page.catalog.name)

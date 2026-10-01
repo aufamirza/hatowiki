@@ -340,7 +340,7 @@ async function runSuite(width) {
     const outsideState = await evaluate(`({ open: !!document.querySelector('.nav-menu__panel'), path: location.pathname })`)
     check('Menu Wildlife: klik di luar menutup menu (tanpa pindah halaman)', !outsideState.open && outsideState.path === '/wildlife/bugs', outsideState.path)
     // Menu Wiki: Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements (tanpa tautan "Semua"); Resep tidak lagi
-    // berupa tautan terpisah di toolbar.
+    // berupa tautan terpisah di toolbar. Satu-satunya tautan langsung di toolbar adalah Checklist.
     const buttons = await evaluate(`[...document.querySelectorAll('.site-nav .nav-menu__button')].map((b) => b.textContent.trim())`)
     const plainLinks = await evaluate(`[...document.querySelectorAll('.site-nav > a')].map((a) => a.textContent.trim())`)
     await evaluate(`[...document.querySelectorAll('.nav-menu__button')].find((b) => b.textContent.trim() === 'Wiki').click()`); await sleep(300)
@@ -357,8 +357,8 @@ async function runSuite(width) {
     })()`)
     const counts = await evaluate(`(async () => { ${LOAD_DATA} return Object.fromEntries(CATALOGS.map((c) => [c.slug, c.entries.length])) })()`)
     check(
-      'Toolbar: menu Wildlife & Wiki (tanpa tautan Resep terpisah); Wiki berisi Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements (nama Inggris + label Indonesia & jumlah entri)',
-      buttons.join() === 'Wildlife,Wiki' && plainLinks.length === 0 && wiki.expanded === 'true' && !wiki.all && wiki.inView && wiki.items.every((i) => i.icon) &&
+      'Toolbar: menu Wildlife & Wiki lalu tautan Checklist (tanpa tautan Resep terpisah); Wiki berisi Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements (nama Inggris + label Indonesia & jumlah entri)',
+      buttons.join() === 'Wildlife,Wiki' && plainLinks.join() === 'Checklist' && wiki.expanded === 'true' && !wiki.all && wiki.inView && wiki.items.every((i) => i.icon) &&
         wiki.items.map((i) => `${i.name}|${i.meta}>${i.href}`).join() === `Recipes|Resep · ${counts.recipes} entri>/recipes,Crops|Tanaman · ${counts.crops} entri>/crops,Collectibles|Bahan Alam · ${counts.collectibles} entri>/collectibles,Ingredients|Bahan Masak · ${counts.ingredients} entri>/ingredients,Items|Benda Pakai · ${counts.items} entri>/items,NPCs|Penduduk Kota · ${counts.npcs} entri>/npcs,Achievements|Pencapaian · ${counts.achievements} entri>/achievements`,
       wiki.items.map((i) => `${i.name} (${i.meta})`).join(', '),
     )
@@ -478,9 +478,9 @@ async function runSuite(width) {
     await evaluate(`document.querySelector('.site-header .menu-button').click()`); await sleep(450)
     let drawer = await readDrawer()
     check('Drawer: tombol menu membuka dialog modal berlabel, fokus ke tombol tutup, scroll halaman terkunci', drawer.open && drawer.modal === 'true' && drawer.label === 'Menu' && drawer.expanded === 'true' && drawer.focusClose && drawer.locked && drawer.inView && drawer.overflow <= 0, JSON.stringify({ label: drawer.label, locked: drawer.locked, overflow: drawer.overflow }))
-    const expectedLinks = 'Beranda>/,Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Semua kategori wildlife>/wildlife,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles,Ingredients>/ingredients,Items>/items,NPCs>/npcs,Achievements>/achievements'
+    const expectedLinks = 'Beranda>/,Checklist>/checklist,Fish>/wildlife/fish,Bugs>/wildlife/bugs,Birds>/wildlife/birds,Animals>/wildlife/animals,Semua kategori wildlife>/wildlife,Recipes>/recipes,Crops>/crops,Collectibles>/collectibles,Ingredients>/ingredients,Items>/items,NPCs>/npcs,Achievements>/achievements'
     const drawerGroups = await evaluate(`[...document.querySelectorAll('.drawer__group')].map((g) => g.textContent.trim()).join()`)
-    check('Drawer: tautan Beranda, grup Wildlife (Fish, Bugs, Birds, Animals, Semua kategori), grup Wiki (Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements), dengan ikon', drawer.links.map((l) => `${l.text}>${l.href}`).join() === expectedLinks && drawer.links.filter((l) => l.href !== '/wildlife').every((l) => l.icon) && drawerGroups === 'Wildlife,Wiki', drawer.links.map((l) => l.text).join(', '))
+    check('Drawer: tautan Beranda & Checklist, grup Wildlife (Fish, Bugs, Birds, Animals, Semua kategori), grup Wiki (Resep, Crops, Collectibles, Ingredients, Items, NPCs, Achievements), dengan ikon', drawer.links.map((l) => `${l.text}>${l.href}`).join() === expectedLinks && drawer.links.filter((l) => l.href !== '/wildlife').every((l) => l.icon) && drawerGroups === 'Wildlife,Wiki', drawer.links.map((l) => l.text).join(', '))
     // Tab dari elemen terakhir kembali ke elemen pertama (dan sebaliknya).
     await evaluate(`[...document.querySelectorAll('.drawer__panel a')].at(-1).focus()`)
     await KEY.tab()

@@ -1,0 +1,1162 @@
+/*
+ * Halaman Checklist. Memakai token kartu yang sama dengan kotak detail & kartu daftar (garis tepi tipis + bayangan
+ * keras berwarna tint) dan warna per kategori dari data-wildlife (--tint / --tint-ink). Semua area ketuk minimal 44px,
+ * baris checklist 64px+, karena halaman ini biasanya dibuka di ponsel sambil bermain.
+ */
+
+/* ---------- Tab kategori = ringkasan progres ---------- */
+.checklist-kinds {
+  min-width: 0;
+  margin: 0 0 var(--space-6);
+  padding: 0;
+  border: 0;
+}
+
+.checklist-kinds__row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.checklist-kind {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    transform var(--duration-fast) var(--ease-out);
+}
+
+/* Radio asli menutupi kartu (fokus & panah kiri/kanan dari browser), hanya tampilannya diganti */
+.checklist-kind input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checklist-kind:hover {
+  border-color: var(--card-edge-hover);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.checklist-kind:active {
+  transform: var(--card-press);
+  box-shadow: var(--card-shadow-pressed);
+}
+
+.checklist-kind:has(input:checked) {
+  border-color: var(--color-accent);
+  box-shadow: 0 var(--card-drop-y) 0 var(--color-accent);
+}
+
+.checklist-kind:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.checklist-kind__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--tint);
+  color: var(--tint-ink);
+}
+
+.checklist-kind__icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.9;
+}
+
+.checklist-kind__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.checklist-kind__name {
+  overflow: hidden;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.checklist-kind__count {
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.checklist-kind__count strong {
+  font-size: var(--text-base);
+}
+
+.checklist-kind__bar,
+.checklist-main__bar {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sunken);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  overflow: hidden;
+}
+
+.checklist-kind__bar {
+  grid-column: 1 / -1;
+}
+
+.checklist-kind__bar > span,
+.checklist-main__bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+  transition: width var(--duration) var(--ease-out);
+}
+
+/* Layar sempit: satu baris kartu yang bisa digeser, kartu terpotong di tepi sebagai tanda masih ada lagi */
+@media (max-width: 899px) {
+  .checklist-kinds__row {
+    display: flex;
+    gap: var(--space-3);
+    margin-inline: calc(-1 * var(--space-5));
+    padding: 2px var(--space-5) calc(var(--card-drop-y) + var(--space-2));
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--space-5);
+    scrollbar-width: none;
+  }
+
+  .checklist-kinds__row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .checklist-kind {
+    flex: 0 0 9.75rem;
+    scroll-snap-align: start;
+  }
+}
+
+/* ---------- Kotak utama per kategori ---------- */
+.checklist-panel {
+  container-type: inline-size;
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+}
+
+.checklist-main__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.checklist-main__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  font-size: var(--text-2xl);
+  line-height: 1.1;
+}
+
+.checklist-main__label {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.checklist-main__progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.checklist-main__bar {
+  flex: 0 0 120px;
+  height: 8px;
+}
+
+.checklist-main__head .segmented {
+  margin-left: auto;
+}
+
+/* ---------- Pilihan bersegmen (tampilan, status) ---------- */
+.segmented {
+  display: inline-flex;
+  min-width: 0;
+  margin: 0;
+  padding: 4px;
+  gap: 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-sunken);
+}
+
+.segmented__option {
+  position: relative;
+  flex: 1 1 auto;
+}
+
+.segmented__option input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.segmented__option > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.segmented__option:hover > span {
+  color: var(--color-text);
+}
+
+.segmented__option input:checked + span {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--color-border-strong);
+  color: var(--color-accent-ink);
+  font-weight: 700;
+}
+
+.segmented__option input:focus-visible + span {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.segmented__count {
+  min-width: 1.75em;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.segmented__option input:checked + span .segmented__count {
+  background: var(--color-accent-soft);
+}
+
+/* ---------- Daftar: status, pencarian, baris ---------- */
+.checklist-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.checklist-search {
+  flex: 1 1 16rem;
+}
+
+.checklist-status {
+  margin: var(--space-4) 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.checklist-section + .checklist-section {
+  margin-top: var(--space-6);
+}
+
+.checklist-section__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+.checklist-section__count {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+.check-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+  gap: var(--space-2) var(--space-3);
+}
+
+.check-list--compact {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.check-row {
+  min-width: 0;
+}
+
+/* Seluruh baris adalah label kotak centang: ketuk di mana saja (kecuali nama) untuk menandai */
+.check-row__hit {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 68px;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+
+@media (hover: hover) {
+  .check-row__hit:hover {
+    border-color: var(--color-border-strong);
+  }
+}
+
+.check-row__hit:active {
+  background: var(--color-surface-sunken);
+}
+
+.check-row__hit:has(.check-row__input:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.check-row__input {
+  position: absolute;
+  top: 50%;
+  right: var(--space-4);
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.check-row__media {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: var(--tint, var(--color-surface-sunken));
+  overflow: hidden;
+}
+
+.check-row__image {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.check-row__media .entry-image-missing {
+  width: 44px;
+  height: 44px;
+}
+
+.check-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+/* Nama = tautan ke halaman detail; garis bawah tipis supaya terlihat bisa dibuka juga di layar sentuh */
+.check-row__name {
+  width: fit-content;
+  max-width: 100%;
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 30%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.check-row__name:hover {
+  color: var(--color-accent-ink);
+  text-decoration-color: currentColor;
+}
+
+.check-row__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.check-row__facts .card-badge {
+  box-shadow: none;
+}
+
+.check-row__fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.check-row__fact svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  color: var(--color-text-faint);
+}
+
+.check-row__fact--text {
+  display: block;
+}
+
+/* Waktu & cuaca ringkas: ikon periode berwarna periode, emoji cuaca */
+.check-row__fact--icons {
+  gap: 3px;
+  overflow: visible;
+}
+
+.check-row__fact--icons > span {
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.8125rem;
+  line-height: 1;
+}
+
+.check-row__fact--icons > [data-period] {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+}
+
+.check-row__fact .check-row__fact--icons svg,
+.check-row__fact--icons > [data-period] svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.2;
+  color: var(--period-ink);
+}
+
+.check-row__fact--icons > [data-period='Dawn'] {
+  --period-ink: var(--color-dawn-ink);
+  background: var(--color-dawn-soft);
+}
+
+.check-row__fact--icons > [data-period='Day'] {
+  --period-ink: var(--color-day-ink);
+  background: var(--color-day-soft);
+}
+
+.check-row__fact--icons > [data-period='Dusk'] {
+  --period-ink: var(--color-dusk-ink);
+  background: var(--color-dusk-soft);
+}
+
+.check-row__fact--icons > [data-period='Night'] {
+  --period-ink: var(--color-night-ink);
+  background: var(--color-night-soft);
+}
+
+.check-row__box {
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 2px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: transparent;
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.check-row__box svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 3;
+}
+
+.check-row[data-obtained] .check-row__hit {
+  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  background: color-mix(in srgb, var(--color-accent-soft) 55%, var(--color-surface));
+}
+
+.check-row[data-obtained] .check-row__box {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* Level pemain belum cukup (Target Sekarang): gambar redup, nama memakai warna teks redup, syarat levelnya tampil */
+.check-row[data-locked] .check-row__media {
+  opacity: 0.45;
+}
+
+.check-row[data-locked] .check-row__name {
+  color: var(--color-text-dimmed);
+}
+
+.check-row__locked {
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--color-border-strong);
+  background: var(--color-surface-sunken);
+  color: var(--color-text-dimmed);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.checklist-empty,
+.catch-section__empty {
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-border-strong);
+  font-size: var(--text-sm);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.checklist-main__foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+/* ---------- Target Sekarang ---------- */
+.catch-now__intro {
+  margin-bottom: var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.catch-controls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: var(--space-4) var(--space-6);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-sunken);
+}
+
+.chip-radios {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* float + lebar penuh: legend berperilaku seperti judul biasa di atas pilihan */
+.chip-radios__legend {
+  float: left;
+  width: 100%;
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.level-stepper .chip-radios__legend {
+  display: block;
+  float: none;
+}
+
+.chip-radios__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  clear: both;
+}
+
+.chip-radios__option {
+  position: relative;
+}
+
+.chip-radios__option input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.chip-radios__option > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.chip-radios__option:hover > span {
+  border-color: var(--color-border-strong);
+}
+
+.chip-radios__option input:checked + span {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 700;
+}
+
+.chip-radios__option input:focus-visible + span {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.chip-radios__hint {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.level-stepper__control {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.level-stepper__button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+
+.level-stepper__button:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+}
+
+.level-stepper__button:disabled {
+  color: var(--color-text-faint);
+  cursor: default;
+}
+
+.level-stepper__button svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.4;
+}
+
+.level-stepper__value {
+  min-width: 2.25ch;
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+}
+
+.catch-now__clock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin: var(--space-4) 0;
+  font-size: var(--text-sm);
+}
+
+.catch-now__time {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.catch-now__locked {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  margin-bottom: var(--space-4);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-sky-soft);
+  font-size: var(--text-sm);
+}
+
+.catch-now__locked > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--color-sky-ink);
+}
+
+.catch-now__locked p {
+  flex: 1 1 12rem;
+}
+
+.catch-now__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.catch-now__toggle input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.catch-section {
+  margin-top: var(--space-6);
+}
+
+.catch-section__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
+  font-size: var(--text-xl);
+}
+
+.catch-section__count {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.catch-section__when {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.catch-section__when svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-faint);
+}
+
+.catch-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+  align-items: start;
+  gap: var(--space-4);
+}
+
+/* Satu lokasi = satu nampan berwarna tint kategori */
+.catch-group {
+  min-width: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--tint) 45%, var(--color-surface));
+}
+
+.catch-group__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 var(--space-1) var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+.catch-group__head svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--tint-ink);
+}
+
+.catch-group__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.catch-group__count {
+  flex: none;
+  margin-left: auto;
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.catch-now__note {
+  margin-top: var(--space-6);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* ---------- Simpan progres ---------- */
+.backup-panel {
+  margin-top: var(--space-8);
+}
+
+.backup-panel__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  font-size: var(--text-xl);
+}
+
+.backup-panel__title svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--color-accent-ink);
+}
+
+.backup-panel__text {
+  max-width: 62ch;
+  font-size: var(--text-sm);
+}
+
+.backup-panel__warning {
+  display: flex;
+  gap: var(--space-2);
+  max-width: 62ch;
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-dawn-soft);
+  color: var(--color-dawn-ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.backup-panel__warning svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.backup-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.backup-panel__actions .btn {
+  justify-content: flex-start;
+  min-height: 56px;
+  padding: var(--space-2) var(--space-5) var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+
+.backup-panel__actions .btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.backup-panel__label {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.backup-panel__hint {
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.backup-panel__status {
+  min-height: 1.5em;
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.backup-panel__status[data-tone='ok'] {
+  color: var(--color-sage-ink);
+}
+
+.backup-panel__status[data-tone='error'] {
+  color: var(--color-dawn-ink);
+}
+
+/* ---------- Dialog konfirmasi ---------- */
+/* margin: auto mengembalikan posisi tengah bawaan <dialog> (reset global di base.css menghapusnya) */
+.confirm-dialog {
+  width: min(28rem, calc(100vw - 2 * var(--space-4)));
+  max-width: none;
+  margin: auto;
+  padding: 0;
+  border: var(--card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-lg);
+}
+
+.confirm-dialog::backdrop {
+  background: var(--map-dim);
+  backdrop-filter: blur(2px);
+}
+
+.confirm-dialog__box {
+  padding: var(--space-6);
+}
+
+.confirm-dialog__title {
+  margin-bottom: var(--space-3);
+  font-size: var(--text-xl);
+  line-height: 1.2;
+}
+
+.confirm-dialog__text {
+  font-size: var(--text-sm);
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.confirm-dialog__actions .btn {
+  min-width: 7rem;
+}
+
+.confirm-dialog__confirm--primary {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.confirm-dialog__confirm--primary:hover {
+  background: var(--color-accent-hover);
+}
+
+/* Tindakan yang menghapus progres: merah anggur (kontras teks ≥ 7:1 di light & dark) */
+.confirm-dialog__confirm--danger {
+  background: var(--color-dusk-ink);
+  color: var(--color-surface);
+}
+
+.confirm-dialog__confirm--danger:hover {
+  background: color-mix(in srgb, var(--color-dusk-ink) 88%, var(--color-text));
+}
+
+/* ---------- Notifikasi di bawah layar ---------- */
+.checklist-toast-region {
+  position: fixed;
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  z-index: 200;
+  width: min(30rem, calc(100vw - 2 * var(--space-4)));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.checklist-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 52px;
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-text);
+  box-shadow: var(--shadow-lg);
+  color: var(--color-bg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  pointer-events: auto;
+  animation: toast-in var(--duration) var(--ease-out);
+}
+
+.checklist-toast__text {
+  flex: 1;
+  min-width: 0;
+  padding-block: var(--space-2);
+}
+
+.checklist-toast__undo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  border: 0;
+  background: transparent;
+  color: var(--color-accent-soft);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.checklist-toast__undo:hover {
+  background: color-mix(in srgb, var(--color-bg) 14%, transparent);
+}
+
+.checklist-toast__undo:focus-visible {
+  outline: 2px solid var(--color-accent-soft);
+  outline-offset: -2px;
+}
+
+.checklist-toast__undo svg {
+  width: 18px;
+  height: 18px;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---------- Ponsel & kotak sempit ---------- */
+@container (max-width: 760px) {
+  .catch-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 759px) {
+  .checklist-panel {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+
+  .checklist-main__head .segmented,
+  .checklist-tools .segmented {
+    display: flex;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  /* Tiga pilihan berbagi lebar sama rata; jumlahnya pindah ke bawah label supaya muat di 320px */
+  .segmented__option {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .segmented__option > span {
+    min-height: 44px;
+    padding: 0 var(--space-2);
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .checklist-tools .segmented__option > span {
+    flex-direction: column;
+    gap: 2px;
+    min-height: 52px;
+    padding: var(--space-1) 2px;
+    font-size: var(--text-xs);
+  }
+
+  .checklist-search {
+    flex-basis: 100%;
+  }
+
+  .check-row__hit {
+    grid-template-columns: 48px minmax(0, 1fr) 40px;
+    gap: var(--space-2);
+    min-height: 64px;
+  }
+
+  .check-row__media {
+    width: 48px;
+    height: 48px;
+  }
+
+  .check-row__image {
+    width: 40px;
+    height: 40px;
+  }
+
+  .catch-group {
+    padding: var(--space-2);
+  }
+
+  .backup-panel__actions .btn {
+    flex: 1 1 100%;
+  }
+
+  .confirm-dialog__actions .btn {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}

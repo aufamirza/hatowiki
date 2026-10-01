@@ -1,9 +1,9 @@
 import { Suspense, useEffect, useRef } from 'react'
 import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
-import { ExternalLink, Globe, Heart } from 'lucide-react'
+import { ExternalLink, Globe, Heart, ListChecks } from 'lucide-react'
 import { useReplayAnimation } from '../../hooks/useReplayAnimation'
 import { I18nProvider, getLoadedMessages, useI18n } from '../../i18n/I18nProvider'
-import { Link } from '../../i18n/LocaleLink'
+import { Link, NavLink } from '../../i18n/LocaleLink'
 import { localeFromPath, stripLocale } from '../../i18n/locales'
 import { applyPageMeta } from '../../seo/applyPageMeta'
 import { getPageMeta } from '../../seo/pageMeta'
@@ -35,8 +35,8 @@ function Brand() {
   )
 }
 
-// Toolbar global: bar melayang berbentuk pil (sticky, semi transparan + blur) berisi logo, menu Wildlife & Wiki
-// (desktop), pencarian, pemilih bahasa, tombol tema, dan tombol menu seluler. Di bawah 760px menu pindah ke drawer dan
+// Toolbar global: bar melayang berbentuk pil (sticky, semi transparan + blur) berisi logo, menu Wildlife & Wiki, tautan
+// Checklist (desktop), pencarian, pemilih bahasa, tombol tema, dan tombol menu seluler. Di bawah 760px menu pindah ke drawer dan
 // pencarian ke balik tombol ikon. Di beranda, pencarian toolbar disembunyikan selama hero (yang punya kolom cari sendiri)
 // terlihat.
 function SiteHeader() {
@@ -49,6 +49,10 @@ function SiteHeader() {
         <nav className="site-nav" aria-label={t('layout.mainNav')}>
           <NavMenu label="Wildlife" catalogs={WILDLIFE_CATALOGS} sections={['/wildlife']} allLink={wildlifeAll} />
           <NavMenu label="Wiki" catalogs={WIKI_CATALOGS} sections={WIKI_CATALOGS.map((catalog) => catalog.href())} />
+          <NavLink to="/checklist" className="site-nav__link site-nav__link--icon">
+            <ListChecks aria-hidden="true" />
+            {t('layout.checklist')}
+          </NavLink>
         </nav>
         <div className="site-header__tools">
           <GlobalSearch />

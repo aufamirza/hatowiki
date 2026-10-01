@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation } from 'react-router-dom'
-import { ArrowRight, House, Menu, X } from 'lucide-react'
+import { ArrowRight, House, ListChecks, Menu, X } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Link, NavLink } from '../../i18n/LocaleLink'
 import { WIKI_CATALOGS, WILDLIFE_CATALOGS } from './catalogs'
@@ -133,6 +133,12 @@ function MobileMenu() {
                     <House />
                   </span>
                   <span className="drawer__name">{t('common.home')}</span>
+                </NavLink>
+                <NavLink to="/checklist" className="drawer__link drawer__link--plain">
+                  <span className="drawer__icon" aria-hidden="true">
+                    <ListChecks />
+                  </span>
+                  <span className="drawer__name">{t('layout.checklist')}</span>
                 </NavLink>
 
                 <p className="drawer__group">Wildlife</p>
