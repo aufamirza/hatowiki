@@ -33,7 +33,8 @@ Uji lain yang ikut `npm run test:ui`:
   achievement tersembunyi yang buram sampai diklik, "Dijual oleh" dari data NPC, barang dagangan & hadiah favorit NPC,
   nama NPC tertaut di "Didapat dari" bahan masak, menu, pencarian global, bento beranda, tiga bahasa).
 - `scripts/qa/checklist.test.mjs`: Checklist dengan jam halaman dikunci (menandai lewat ketuk/klik & keyboard, Batalkan,
-  filter & pencarian, Target Sekarang: level, cuaca, server & periode berikutnya, reset dengan konfirmasi, Cadangkan &
+  filter & pencarian, Target Sekarang: level, cuaca, server, periode berikutnya, event yang sedang berjalan & lokasi
+  khusus, reset dengan konfirmasi, Cadangkan &
   Pulihkan termasuk berkas yang salah, tidak ada request selain GET, area ketuk ponsel, tiga bahasa); bawaan lebar 390 & 1280.
 - `scripts/qa/seo.test.mjs`: meta tag per halaman & bahasa di browser, lalu HTML statis, `sitemap.xml`, `robots.txt`, dan
   rewrite `vercel.json` di `dist/` (jalankan `npm run build` dulu).
@@ -127,7 +128,17 @@ tombol atau centang apa pun. Kodenya di `src/pages/checklist/`.
   dikelompokkan per lokasi (lokasi dengan entri terbanyak di atas; entri dengan beberapa lokasi masuk ke tiap lokasinya).
   Di bawahnya entri yang baru muncul di periode berikutnya beserta jam mulainya. Level hobi (Fishing, Bug Catching,
   Birdwatching; bawaan level tertinggi di data) menyembunyikan entri yang syarat levelnya lebih tinggi; jumlahnya disebut
-  dan bisa ditampilkan redup. Entri event tidak ikut karena hanya bisa didapat selama eventnya.
+  dan bisa ditampilkan redup.
+- Event yang sedang berjalan: chip berisi event dari `src/data/events.js` yang punya entri di kategori itu (terbaru dulu).
+  Hatowiki tidak tahu event mana yang aktif di game, jadi pemain memilih sendiri; bawaannya tidak ada yang dipilih.
+  Entri dari event yang dipilih ikut dihitung (dengan badge event di barisnya). Pilihan disimpan di localStorage
+  `hdx-checklist-events` (array nama event, berlaku untuk semua kategori).
+- Lokasi khusus (`src/data/wildlife/specialLocations.js`): lokasi yang hanya bisa diakses lewat aktivitas atau item khusus,
+  menurut label lokasi di sumber: berawalan "[EVENT] " atau berakhiran " Event" (aktivitas, mis. `[EVENT] Sea Fishing`,
+  `[EVENT] Nest of Hundreds`, `Garfish Event`), atau sama dengan nama item (mis. `Inflatable Insect Attractor`). Kelompoknya
+  dipisah ke blok "Lokasi khusus" di paling bawah dengan syaratnya (Sea Fishing disebut event harian, sesuai achievement
+  Sea Fishing Master). Entri yang juga punya lokasi biasa tetap tampil di lokasi biasanya. Ikan Mermaid Fish Attractor
+  tetap di lokasi biasa karena sumbernya mencantumkan lokasi biasa (All Lakes, All Rivers, All Seas & Ocean).
 - Penyimpanan (`checklistStore.js`): localStorage `hdx-checklist` = `{ version: 1, obtained: { <kategori>: [slug, …] },
   levels: { <kategori>: level }, updatedAt }`. Slug atau kategori yang belum dikenal tetap disimpan (cadangan dari versi
   lain tidak kehilangan isi), yang dihitung hanya entri yang ada di data. Server memakai kunci `hdx-server` yang sama
@@ -194,6 +205,7 @@ src/
 │       ├── validateWildlife.js  Validator skema (dipakai app saat dev dan skrip sinkronisasi)
 │       ├── attributes.js     Nilai valid: shadow, weather, kategori ikan, serangga, burung & hewan
 │       ├── entryLocations.js Lokasi entri sebagai [{ name, zone }] untuk skema mana pun
+│       ├── specialLocations.js  Lokasi khusus (aktivitas atau item khusus) dari label lokasi sumber, untuk Target Sekarang
 │       ├── locationZones.js  Poligon zona lokasi di peta
 │       └── zoneViewBox.js    Potongan peta untuk beberapa zona sekaligus
 ├── i18n/                     Bahasa: locales.js (id, th, en), I18nProvider (useI18n), LocaleLink, format.js (teks & bentuk

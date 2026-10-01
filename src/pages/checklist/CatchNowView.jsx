@@ -1,10 +1,13 @@
 import { useId, useMemo, useState } from 'react'
-import { Clock, Info, MapPin, Minus, Plus } from 'lucide-react'
+import { Clock, Info, KeyRound, MapPin, Minus, Plus } from 'lucide-react'
 import { PERIOD_ICONS } from '../../components/ServerTime'
 import { SERVERS, formatClock, formatPeriodRange, formatUtcOffset, getPeriod, getServerTime } from '../../data/gameTime'
+import { itemHref } from '../../components/items/itemHref'
+import { getItem } from '../../data/items'
 import { WEATHERS } from '../../data/wildlife/attributes'
 import { useNow } from '../../hooks/useNow'
 import { useI18n } from '../../i18n/I18nProvider'
+import { Link } from '../../i18n/LocaleLink'
 import { buildCatchNow, nextPeriodOf } from './catchNow'
 import ChecklistRow from './ChecklistRow'
 
@@ -65,22 +68,66 @@ function LevelStepper({ hobby, level, max, onChange }) {
   )
 }
 
+// Pilihan jamak berbentuk chip (kotak centang asli, tampilannya diganti), mis. event yang sedang berjalan.
+function ChipChecks({ legend, options, values, onChange, hint, className = '' }) {
+  const hintId = useId()
+  const toggle = (id, on) => onChange(on ? [...values, id] : values.filter((value) => value !== id))
+  return (
+    <fieldset className={`chip-radios ${className}`} aria-describedby={hint ? hintId : undefined}>
+      <legend className="chip-radios__legend">{legend}</legend>
+      <div className="chip-radios__options">
+        {options.map((option) => (
+          <label key={option.id} className="chip-radios__option" data-value={option.id}>
+            <input type="checkbox" value={option.id} checked={values.includes(option.id)} onChange={(event) => toggle(option.id, event.target.checked)} />
+            <span>
+              {option.emoji && <span aria-hidden="true">{option.emoji}</span>}
+              {option.label}
+            </span>
+          </label>
+        ))}
+      </div>
+      {hint && (
+        <p id={hintId} className="chip-radios__hint">
+          {hint}
+        </p>
+      )}
+    </fieldset>
+  )
+}
+
+// Syarat lokasi khusus: item (tertaut ke halaman item kalau ada) atau aktivitas (lihat specialLocations.js).
+function SpecialRequirement({ special }) {
+  const { t } = useI18n()
+  if (special.type === 'item') {
+    const item = getItem(special.item) ?? { id: special.item, name: special.name }
+    const href = itemHref(item)
+    return t('checklist.specialItem', { item: href ? <Link to={href}>{item.name}</Link> : item.name })
+  }
+  return t(special.daily ? 'checklist.specialDaily' : 'checklist.specialActivity', { activity: special.activity })
+}
+
 function LocationGroups({ kind, groups, obtained, onToggle }) {
   const { t, kind: kindText } = useI18n()
   return (
     <div className="catch-groups">
       {groups.map((group) => {
         const open = group.entries.filter((item) => !item.locked).length
+        const Icon = group.special ? KeyRound : MapPin
         return (
-          <section key={group.name} className="catch-group" data-location={group.name} aria-label={group.name}>
+          <section key={group.name} className="catch-group" data-location={group.name} data-special={group.special?.type} aria-label={group.name}>
             <h4 className="catch-group__head">
-              <MapPin aria-hidden="true" />
+              <Icon aria-hidden="true" />
               <span className="catch-group__name">{group.name}</span>
               <span className="catch-group__count">{t('checklist.locationCount', { count: open, unit: kindText(kind.slug).unit })}</span>
             </h4>
+            {group.special && (
+              <p className="catch-group__requirement">
+                <SpecialRequirement special={group.special} />
+              </p>
+            )}
             <ul className="check-list check-list--compact">
               {group.entries.map(({ entry, locked }) => (
-                <ChecklistRow key={entry.slug} kind={kind} entry={entry} obtained={obtained.has(entry.slug)} locked={locked} showLocation={false} onToggle={onToggle} />
+                <ChecklistRow key={entry.slug} kind={kind} entry={entry} obtained={obtained.has(entry.slug)} locked={locked} showLocation={false} showEvent onToggle={onToggle} />
               ))}
             </ul>
           </section>
@@ -90,13 +137,35 @@ function LocationGroups({ kind, groups, obtained, onToggle }) {
   )
 }
 
+// Kelompok lokasi biasa, lalu lokasi khusus (aktivitas atau item khusus) di paling bawah dengan keterangannya.
+function CatchGroups({ kind, section, obtained, onToggle }) {
+  const { t } = useI18n()
+  return (
+    <>
+      {section.groups.length > 0 && <LocationGroups kind={kind} groups={section.groups} obtained={obtained} onToggle={onToggle} />}
+      {section.special.length > 0 && (
+        <div className="catch-special">
+          <h4 className="catch-special__title">
+            <KeyRound aria-hidden="true" />
+            {t('checklist.specialTitle')}
+          </h4>
+          <p className="catch-special__intro">{t('checklist.specialIntro')}</p>
+          <LocationGroups kind={kind} groups={section.special} obtained={obtained} onToggle={onToggle} />
+        </div>
+      )}
+    </>
+  )
+}
+
 /**
  * Target Sekarang (Fish, Bugs, Birds): yang belum didapat dan bisa didapat di periode waktu server saat ini dengan cuaca
  * pilihan pemain, dikelompokkan per lokasi; di bawahnya yang baru muncul di periode berikutnya beserta jam mulainya.
  * Entri dengan syarat level di atas level hobi pemain disembunyikan (bisa ditampilkan redup). Server diingat bersama
  * Muncul Sekarang di beranda, cuaca hanya selama sesi (cuaca di game cepat berganti), level di progres Checklist.
+ * Entri event ikut kalau pemain memilih eventnya di "Event yang sedang berjalan" (`events`, diingat di localStorage);
+ * pilihannya hanya event yang punya entri di kategori ini (`eventOptions`, dari src/data/events.js).
  */
-function CatchNowView({ kind, obtained, level, onLevelChange, serverId, onServerChange, weather, onWeatherChange, onToggle }) {
+function CatchNowView({ kind, obtained, level, onLevelChange, serverId, onServerChange, weather, onWeatherChange, events, eventOptions, onEventsChange, onToggle }) {
   const { t, kind: kindText } = useI18n()
   const text = kindText(kind.slug)
   const now = useNow()
@@ -111,11 +180,11 @@ function CatchNowView({ kind, obtained, level, onLevelChange, serverId, onServer
   const PeriodIcon = PERIOD_ICONS[period.id]
   const NextIcon = PERIOD_ICONS[next.id]
   const result = useMemo(
-    () => buildCatchNow({ kind, obtained, level, period, weather, showLocked }),
-    [kind, obtained, level, period, weather, showLocked],
+    () => buildCatchNow({ kind, obtained, level, period, weather, showLocked, events }),
+    [kind, obtained, level, period, weather, showLocked, events],
   )
   const lockedTotal = result.now.lockedCount + result.next.lockedCount
-  const placesOf = (groups) => groups.filter((group) => group.entries.some((item) => !item.locked)).length
+  const placesOf = (section) => [...section.groups, ...section.special].filter((group) => group.entries.some((item) => !item.locked)).length
   const vars = { noun: text.noun, unit: text.unit, label: text.label, period: period.id, weather }
 
   return (
@@ -139,6 +208,16 @@ function CatchNowView({ kind, obtained, level, onLevelChange, serverId, onServer
           onChange={onWeatherChange}
           hint={t('checklist.weatherHint')}
         />
+        {eventOptions.length > 0 && (
+          <ChipChecks
+            className="catch-events"
+            legend={t('checklist.events')}
+            options={eventOptions.map((event) => ({ id: event.name, label: event.name, emoji: event.emoji }))}
+            values={events}
+            onChange={onEventsChange}
+            hint={t('checklist.eventsHint')}
+          />
+        )}
       </div>
 
       <p className="catch-now__clock">
@@ -175,11 +254,11 @@ function CatchNowView({ kind, obtained, level, onLevelChange, serverId, onServer
         <h3 id={`catch-now-${kind.slug}`} className="catch-section__title">
           {t('checklist.nowTitle')}
           <span className="catch-section__count">
-            {t('checklist.nowCount', { count: result.now.count, places: placesOf(result.now.groups), unit: text.unit })}
+            {t('checklist.nowCount', { count: result.now.count, places: placesOf(result.now), unit: text.unit })}
           </span>
         </h3>
-        {result.now.groups.length > 0 ? (
-          <LocationGroups kind={kind} groups={result.now.groups} obtained={obtained} onToggle={onToggle} />
+        {result.now.groups.length + result.now.special.length > 0 ? (
+          <CatchGroups kind={kind} section={result.now} obtained={obtained} onToggle={onToggle} />
         ) : (
           <p className="catch-section__empty">{t('checklist.nowEmpty', vars)}</p>
         )}
@@ -198,14 +277,14 @@ function CatchNowView({ kind, obtained, level, onLevelChange, serverId, onServer
           <Clock aria-hidden="true" />
           {t('checklist.nextWhen', { time: formatHour(String(next.startHour).padStart(2, '0')), duration: formatDuration(minutesLeft, t) })}
         </p>
-        {result.next.groups.length > 0 ? (
-          <LocationGroups kind={kind} groups={result.next.groups} obtained={obtained} onToggle={onToggle} />
+        {result.next.groups.length + result.next.special.length > 0 ? (
+          <CatchGroups kind={kind} section={result.next} obtained={obtained} onToggle={onToggle} />
         ) : (
           <p className="catch-section__empty">{t('checklist.nextEmpty', { ...vars, period: next.id })}</p>
         )}
       </section>
 
-      <p className="catch-now__note">{t('checklist.baseGameOnly')}</p>
+      <p className="catch-now__note">{t('checklist.eventsNote')}</p>
     </div>
   )
 }

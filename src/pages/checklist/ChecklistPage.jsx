@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { ListChecks, RotateCcw, Search, Undo2 } from 'lucide-react'
 import Breadcrumbs from '../../components/Breadcrumbs'
 import CategoryHeader from '../../components/CategoryHeader'
+import { EVENTS, compareSections } from '../../data/events'
 import { SERVERS } from '../../data/gameTime'
 import { WEATHERS } from '../../data/wildlife/attributes'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -41,6 +42,17 @@ const DEFAULT_SERVER = 'sea'
 // Cuaca hanya diingat selama sesi tab ini: cuaca di game cepat berganti.
 const WEATHER_KEY = 'hdx-checklist-weather'
 const DEFAULT_WEATHER = 'Sunny'
+// Event yang menurut pemain sedang berjalan di game (Target Sekarang), daftar nama event; bawaannya tidak ada.
+const EVENTS_KEY = 'hdx-checklist-events'
+
+function readStoredEvents() {
+  try {
+    const names = JSON.parse(localStorage.getItem(EVENTS_KEY) ?? '[]')
+    return Array.isArray(names) ? names.filter((name) => EVENTS.some((event) => event.name === name)) : []
+  } catch {
+    return []
+  }
+}
 
 function readStored(storage, key, valid, fallback) {
   try {
@@ -139,6 +151,7 @@ function ChecklistPage() {
   const [query, setQuery] = useState(urlQuery)
   const [serverId, setServerId] = useState(() => readStored(() => localStorage, SERVER_KEY, (id) => SERVERS.some((server) => server.id === id), DEFAULT_SERVER))
   const [weather, setWeather] = useState(() => readStored(() => sessionStorage, WEATHER_KEY, (id) => WEATHERS.some((item) => item.id === id), DEFAULT_WEATHER))
+  const [activeEvents, setActiveEvents] = useState(readStoredEvents)
   const [toast, setToast] = useState(null)
   const [resetOpen, setResetOpen] = useState(false)
   const toastTimer = useRef(0)
@@ -190,6 +203,11 @@ function ChecklistPage() {
   }, [kind, obtained, status, urlQuery])
   const sections = useMemo(() => groupBySection(results), [results])
   const multiSection = useMemo(() => new Set(kind.entries.map((entry) => entry.section)).size > 1, [kind])
+  // Event yang punya entri di kategori ini, terbaru dulu (urutan section).
+  const eventOptions = useMemo(
+    () => EVENTS.filter((event) => kind.entries.some((entry) => entry.section === event.name)).sort((a, b) => compareSections(a.name, b.name)),
+    [kind],
+  )
 
   const showToast = (next) => {
     window.clearTimeout(toastTimer.current)
@@ -246,6 +264,10 @@ function ChecklistPage() {
     setWeather(id)
     writeStored(() => sessionStorage, WEATHER_KEY, id)
   }
+  const changeEvents = (names) => {
+    setActiveEvents(names)
+    writeStored(() => localStorage, EVENTS_KEY, JSON.stringify(names))
+  }
   const confirmReset = () => {
     resetKind(kind.slug)
     setResetOpen(false)
@@ -301,6 +323,9 @@ function ChecklistPage() {
               onServerChange={changeServer}
               weather={weather}
               onWeatherChange={changeWeather}
+              events={activeEvents}
+              eventOptions={eventOptions}
+              onEventsChange={changeEvents}
               onToggle={toggle}
             />
           ) : (

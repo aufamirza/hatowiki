@@ -61,10 +61,12 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
   useReplayAnimation(resultsRef, location.search, 'results-enter')
 
   // Nilai terakhir yang dikirim kolom pencarian ke URL, supaya perubahan itu tidak disalin balik
-  // ke kolom (bisa menimpa huruf yang baru saja diketik).
+  // ke kolom (bisa menimpa huruf yang baru saja diketik). Debounce di bawah membandingkan kolom dengan nilai ini, bukan
+  // dengan URL: pembaruan URL dari react-router berjalan sebagai transition dan bisa tiba belakangan, jadi membandingkan
+  // dengan URL lama membuat timer mengirim ulang kata kunci (dengan parameter URL lama) dan menimpa reset filter.
   const lastSentQuery = useRef(state.query)
 
-  // URL → kolom pencarian, hanya untuk perubahan dari luar (hapus chip, reset, navigasi).
+  // URL → kolom pencarian, hanya untuk perubahan dari luar (mis. tombol kembali/maju browser).
   useEffect(() => {
     if (state.query !== lastSentQuery.current) {
       lastSentQuery.current = state.query
@@ -75,13 +77,13 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
   // Kolom pencarian → URL, dengan debounce.
   useEffect(() => {
     const trimmed = query.trim()
-    if (trimmed === state.query) return undefined
+    if (trimmed === lastSentQuery.current) return undefined
     const timer = setTimeout(() => {
       lastSentQuery.current = trimmed
       setSearchParams((prev) => withQuery(prev, trimmed), URL_UPDATE)
     }, SEARCH_DEBOUNCE_MS)
     return () => clearTimeout(timer)
-  }, [query, state.query, setSearchParams])
+  }, [query, setSearchParams])
 
   const results = useMemo(
     () => sortEntries(filterEntries(entries, state, filters, { searchText }), state.sort, { rank: kind.sortRank }),
@@ -92,8 +94,16 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
   const activeFilterCount = countActiveFilters(state, filters)
   const hasActive = activeFilterCount > 0 || state.query !== ''
 
+  // Hapus kata kunci (chip "Nama"): kolom dan nilai terakhir yang dikirim ikut dikosongkan, supaya debounce tidak
+  // mengirim ulang kata kunci lama sebelum pembaruan URL tiba.
+  const clearQuery = () => {
+    lastSentQuery.current = ''
+    setQuery('')
+    setSearchParams((prev) => withQuery(prev, ''), URL_UPDATE)
+  }
+
   const activeChips = [
-    ...(state.query ? [{ key: 'q', label: t('list.chipName', { query: state.query }), onRemove: () => setSearchParams((prev) => withQuery(prev, ''), URL_UPDATE) }] : []),
+    ...(state.query ? [{ key: 'q', label: t('list.chipName', { query: state.query }), onRemove: clearQuery }] : []),
     ...filters.flatMap((def) =>
       state.filters[def.id].map((value) => ({
         key: `${def.id}:${value}`,
@@ -105,6 +115,7 @@ function CatalogListPage({ kind, tint, breadcrumbs, eyebrow, renderCard }) {
 
   const toggleFilter = (def, value) => setSearchParams((prev) => withToggledValue(prev, def, value), URL_UPDATE)
   const resetAll = () => {
+    lastSentQuery.current = ''
     setQuery('')
     setOpenGroupId(null)
     setSearchParams((prev) => withoutFilters(prev, filters), URL_UPDATE)

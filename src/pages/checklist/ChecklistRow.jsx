@@ -3,6 +3,7 @@ import { PERIOD_ICONS } from '../../components/ServerTime'
 import { categoryToneStyle } from '../../components/catalog/categoryTone'
 import EntryImage from '../../components/wildlife/EntryImage'
 import { levelToneStyle } from '../../components/wildlife/levelTone'
+import { BASE_GAME, getSection } from '../../data/events'
 import { PERIODS } from '../../data/gameTime'
 import { WEATHERS } from '../../data/wildlife/attributes'
 import { getEntryLocations } from '../../data/wildlife/entryLocations'
@@ -78,7 +79,21 @@ const renderPeriod = (period) => {
 const renderWeather = (weather) => weather.emoji
 
 // Baris info di bawah nama, menurut jenis kategori (lihat `row` di checklistKinds.js).
-function RowFacts({ kind, entry, showLocation }) {
+// Badge event untuk entri dari section event (Target Sekarang dengan event yang dipilih pemain).
+function EventBadge({ section }) {
+  const { t } = useI18n()
+  if (!section || section === BASE_GAME) return null
+  const { emoji } = getSection(section)
+  return (
+    <span className="card-badge card-badge--category check-row__event" style={categoryToneStyle(section)}>
+      <span className="visually-hidden">{t('checklist.eventPrefix')}</span>
+      {emoji && <span aria-hidden="true">{emoji}{' '}</span>}
+      {section}
+    </span>
+  )
+}
+
+function RowFacts({ kind, entry, showLocation, showEvent }) {
   const { t } = useI18n()
   if (kind.row === 'recipe') {
     return (
@@ -101,6 +116,7 @@ function RowFacts({ kind, entry, showLocation }) {
   return (
     <>
       <LevelBadge level={entry.level} />
+      {showEvent && <EventBadge section={entry.section} />}
       {showLocation && (
         <Fact icon={MapPin} label={t('common.location')} value={locationText} title={t('card.fact', { label: t('common.location'), value: locations.join(', ') || '—' })} />
       )}
@@ -114,9 +130,10 @@ function RowFacts({ kind, entry, showLocation }) {
  * Satu baris checklist: gambar kecil, nama (tautan ke halaman detail), info ringkas, dan kotak centang. Seluruh baris
  * adalah <label> kotak centang, jadi ketuk di mana saja (kecuali nama) menandai sudah didapat atau membatalkannya; ketuk
  * nama membuka halaman detail. `locked` = level pemain belum cukup (Target Sekarang): baris tampil redup dengan syarat
- * levelnya. `showLocation` false di Target Sekarang, karena barisnya sudah dikelompokkan per lokasi.
+ * levelnya. `showLocation` false di Target Sekarang, karena barisnya sudah dikelompokkan per lokasi; `showEvent` menampilkan
+ * badge event untuk entri event (di daftar biasa event sudah terlihat dari judul section).
  */
-function ChecklistRow({ kind, entry, obtained, onToggle, locked = false, showLocation = true }) {
+function ChecklistRow({ kind, entry, obtained, onToggle, locked = false, showLocation = true, showEvent = false }) {
   const { t } = useI18n()
   return (
     <li className="check-row" data-slug={entry.slug} data-obtained={obtained || undefined} data-locked={locked || undefined}>
@@ -139,7 +156,7 @@ function ChecklistRow({ kind, entry, obtained, onToggle, locked = false, showLoc
             {locked && (
               <span className="check-row__locked">{t('checklist.lockedBadge', { level: t('common.levelShort', { level: entry.level }) })}</span>
             )}
-            <RowFacts kind={kind} entry={entry} showLocation={showLocation} />
+            <RowFacts kind={kind} entry={entry} showLocation={showLocation} showEvent={showEvent} />
           </span>
         </span>
         <span className="check-row__box" aria-hidden="true">

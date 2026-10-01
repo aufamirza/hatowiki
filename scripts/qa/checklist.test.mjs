@@ -14,6 +14,10 @@
  *   (dikelompokkan per lokasi) dan yang baru muncul di periode berikutnya (dengan jam mulainya); level hobi
  *   menyembunyikan entri di atasnya (bisa ditampilkan redup) dan disimpan per hobi; cuaca (sesi) dan server (diingat,
  *   sama dengan beranda) mengubah isi; menandai dari Target Sekarang; nama tertaut ke detail.
+ * - Event yang sedang berjalan: chip event yang punya entri di kategori itu (terbaru dulu), bawaan tidak ada yang
+ *   dipilih; event yang dipilih ikut dihitung (badge event di barisnya) dan diingat di localStorage.
+ * - Lokasi khusus (label sumber "[EVENT] …" / "… Event", atau nama item seperti Inflatable Insect Attractor): kelompok
+ *   tersendiri di paling bawah dengan syaratnya; entri yang juga punya lokasi biasa tetap tampil di lokasi biasanya.
  * - Reset per kategori dengan dialog konfirmasi (Batal / Escape tidak menghapus).
  * - Cadangkan (unduh JSON) & Pulihkan (pilih JSON, konfirmasi): isi berkas, ringkasan, berkas salah ditolak, slug &
  *   kategori yang tidak dikenal tetap disimpan.
@@ -52,24 +56,32 @@ const FAKE_CLOCK = `(() => {
 
 // Data dari modul aplikasi (lewat dev server), dipakai sebagai pembanding. Logika Target Sekarang ditulis ulang di sini.
 const LOAD = `
-  const [{ fish }, { bugs }, { birds }, { recipes }, { achievements }] = await Promise.all(
-    ['/src/data/wildlife/fish.js', '/src/data/wildlife/bugs.js', '/src/data/wildlife/birds.js', '/src/data/recipes/recipes.js', '/src/data/achievements/achievements.js'].map((p) => import(p)),
+  const [{ fish }, { bugs }, { birds }, { recipes }, { achievements }, { hobbyItems }, { EVENTS }] = await Promise.all(
+    ['/src/data/wildlife/fish.js', '/src/data/wildlife/bugs.js', '/src/data/wildlife/birds.js', '/src/data/recipes/recipes.js', '/src/data/achievements/achievements.js', '/src/data/hobbyItems/hobbyItems.js', '/src/data/events.js'].map((p) => import(p)),
   )
   const DATA = { fish, bugs, birds, recipes, achievements }
   const locationsOf = (entry) => (entry.locations ?? (entry.location ? [{ name: entry.location }] : [])).map((l) => l.name)
-  const expectCatch = (slug, { obtained = [], level = 99, period, next, weather }) => {
-    const pool = DATA[slug].filter((e) => e.section === 'Base Game' && !obtained.includes(e.slug) && e.weather.includes(weather))
+  const ITEM_NAMES = new Set(hobbyItems.map((item) => item.name))
+  // Lokasi khusus menurut label sumbernya: "[EVENT] …", "… Event", atau nama item (mis. Inflatable Insect Attractor).
+  const isSpecial = (name) => name.startsWith('[EVENT] ') || name.endsWith(' Event') || ITEM_NAMES.has(name)
+  const expectCatch = (slug, { obtained = [], level = 99, period, next, weather, events = [] }) => {
+    const pool = DATA[slug].filter((e) => (e.section === 'Base Game' || events.includes(e.section)) && !obtained.includes(e.slug) && e.weather.includes(weather))
     const now = pool.filter((e) => e.schedule.includes(period))
     const later = pool.filter((e) => !e.schedule.includes(period) && e.schedule.includes(next))
     const open = (list) => list.filter((e) => e.level <= level)
-    const groups = (list) => [...new Set(open(list).flatMap(locationsOf))].sort()
+    const names = (list) => [...new Set(open(list).flatMap(locationsOf))]
+    const groups = (list) => names(list).filter((name) => !isSpecial(name)).sort()
+    const special = (list) => names(list).filter(isSpecial).sort()
     return {
       now: open(now).map((e) => e.slug).sort(), next: open(later).map((e) => e.slug).sort(),
-      nowGroups: groups(now), nextGroups: groups(later),
+      nowGroups: groups(now), nextGroups: groups(later), nowSpecial: special(now), nextSpecial: special(later),
       locked: now.length + later.length - open(now).length - open(later).length,
       lockedSlugs: [...now, ...later].filter((e) => e.level > level).map((e) => e.slug).sort(),
     }
   }
+  // Pilihan "Event yang sedang berjalan": event yang punya entri di kategori itu, dari yang paling baru dimulai.
+  const eventOptions = (slug) => EVENTS.filter((ev) => DATA[slug].some((e) => e.section === ev.name))
+    .sort((a, b) => (b.startDate ?? '').localeCompare(a.startDate ?? '')).map((ev) => ev.name)
 `
 
 async function runSuite(width) {
@@ -278,9 +290,19 @@ async function runSuite(width) {
       const root = document.querySelector(sel)
       if (!root) return null
       const rows = [...root.querySelectorAll('.check-row')]
+      const all = [...root.querySelectorAll('.catch-group')]
+      const regular = all.filter((g) => !g.dataset.special)
+      const special = all.filter((g) => g.dataset.special)
       return {
         slugs: [...new Set(rows.map((r) => r.dataset.slug))].sort(),
-        groups: [...root.querySelectorAll('.catch-group')].map((g) => g.dataset.location).sort(),
+        groups: regular.map((g) => g.dataset.location).sort(),
+        special: special.map((g) => g.dataset.location).sort(),
+        // Lokasi khusus semuanya di blok "Lokasi khusus", sesudah lokasi biasa yang terakhir.
+        specialLast: special.every((g) => g.closest('.catch-special') && regular.every((r) => r.compareDocumentPosition(g) & Node.DOCUMENT_POSITION_FOLLOWING)) &&
+          regular.every((g) => !g.closest('.catch-special')),
+        specialTitle: root.querySelector('.catch-special__title')?.textContent.trim() ?? null,
+        requirements: Object.fromEntries(special.map((g) => [g.dataset.location, g.querySelector('.catch-group__requirement')?.textContent.trim() ?? null])),
+        eventBadges: [...new Set(rows.filter((r) => r.querySelector('.check-row__event')).map((r) => r.dataset.slug))].sort(),
         locked: [...new Set(rows.filter((r) => r.dataset.locked !== undefined).map((r) => r.dataset.slug))].sort(),
         links: rows.every((r) => r.querySelector('.check-row__name').getAttribute('href').endsWith('/' + r.dataset.slug)),
         badge: root.querySelector('.period-badge')?.textContent.trim() ?? null,
@@ -295,6 +317,7 @@ async function runSuite(width) {
       server: document.querySelector('input[name="catch-server-fish"]:checked')?.value,
       weather: document.querySelector('input[name="catch-weather-fish"]:checked')?.value,
       lockedNote: document.querySelector('.catch-now__locked p')?.textContent ?? null,
+      events: [...document.querySelectorAll('.catch-events input')].map((i) => i.value + (i.checked ? '*' : '')),
       now: section('.catch-section--now'), next: section('.catch-section--next'),
     }
   })()`)
@@ -307,6 +330,10 @@ async function runSuite(width) {
     `${caught.period} ${caught.clock} · ${caught.now.slugs.length} entri (harapan ${expected.now.length})`)
   check('Target Sekarang: dikelompokkan per lokasi (satu nampan per lokasi), tiap nama tertaut ke halaman detail',
     caught.now.groups.join() === expected.nowGroups.join() && caught.now.links && caught.next.links, `${caught.now.groups.length} lokasi`)
+  check('Lokasi khusus dipisah ke blok "Lokasi khusus" di paling bawah dengan syaratnya ([EVENT] Sea Fishing = event harian)',
+    caught.now.special.join() === expected.nowSpecial.join() && caught.next.special.join() === expected.nextSpecial.join() && expected.nowSpecial.includes('[EVENT] Sea Fishing') &&
+      caught.now.specialLast && caught.next.specialLast && caught.now.specialTitle === 'Lokasi khusus' && caught.now.requirements['[EVENT] Sea Fishing'] === 'Hanya lewat event harian Sea Fishing.',
+    `${caught.now.special.join()} · ${caught.now.requirements['[EVENT] Sea Fishing']}`)
   check('Periode berikutnya: Dusk mulai pukul 18.00 (5 jam ±30 menit lagi), isinya yang baru muncul saat Dusk',
     caught.next.badge === 'Dusk' && /Mulai pukul 18\.00, 5 jam \d+ menit lagi\./.test(caught.next.when) && caught.next.slugs.join() === expected.next.join() && caught.next.groups.join() === expected.nextGroups.join(),
     `${caught.next.when} · ${caught.next.slugs.length} entri (harapan ${expected.next.length})`)
@@ -357,8 +384,55 @@ async function runSuite(width) {
   state = await page()
   check('Menandai dari Target Sekarang: entri hilang dari daftar, tersimpan, notifikasi muncul, ringkasan bertambah',
     !caught.now.slugs.includes(target) && saved.obtained.fish.includes(target) && /ditandai sudah didapat/.test(state.toast ?? '') && state.kinds[0] === 'Fish:4/124*', `${target} · ${state.kinds[0]}`)
-  const events = await evaluate(`(async () => { ${LOAD} const rows = [...document.querySelectorAll('.catch-now .check-row')].map((r) => r.dataset.slug); return rows.filter((slug) => fish.find((e) => e.slug === slug).section !== 'Base Game') })()`)
-  check('Target Sekarang hanya berisi entri Base Game (entri event tidak ikut)', events.length === 0, events.join())
+  // Event yang sedang berjalan: bawaan tidak ada yang dipilih, jadi hanya entri Base Game.
+  const options = await evaluate(`(async () => { ${LOAD} return eventOptions('fish') })()`)
+  const eventsUi = await evaluate(`({ legend: document.querySelector('.catch-events .chip-radios__legend')?.textContent, hint: document.querySelector('.catch-events .chip-radios__hint')?.textContent, stored: localStorage.getItem('hdx-checklist-events') })`)
+  const fromEvents = await evaluate(`(async () => { ${LOAD} const rows = [...document.querySelectorAll('.catch-now .check-row')].map((r) => r.dataset.slug); return rows.filter((slug) => fish.find((e) => e.slug === slug).section !== 'Base Game') })()`)
+  check('Event yang sedang berjalan: chip event yang punya entri ikan (terbaru dulu) dengan keterangan bahwa pemain sendiri yang memilih; bawaan tidak ada yang dipilih, jadi hanya entri Base Game',
+    caught.events.join() === options.join() && options.length > 0 && eventsUi.legend === 'Event yang sedang berjalan' && /pilih sendiri event yang sedang berjalan/.test(eventsUi.hint ?? '') &&
+      eventsUi.stored === null && fromEvents.length === 0,
+    `${caught.events.join(', ')} · event di daftar: ${fromEvents.join() || '-'}`)
+  const obtainedNow = [...marked, target]
+  const echo = await evaluate(`(async () => { ${LOAD} return fish.filter((e) => e.section === 'Echo of Ancients').map((e) => e.slug).sort() })()`)
+  await tapOrClick('.catch-events input[value="Echo of Ancients"] + span')
+  caught = await readCatch()
+  expected = await expectFor({ obtained: obtainedNow, level: 3, period: 'Day', next: 'Dusk', weather: 'Sunny', events: ['Echo of Ancients'] })
+  let storedEvents = await evaluate(`localStorage.getItem('hdx-checklist-events')`)
+  check('Pilih Echo of Ancients: entri event itu ikut dihitung dengan badge event, Garfish Event masuk Lokasi khusus, pilihan disimpan di localStorage',
+    caught.events.filter((e) => e.endsWith('*')).join() === 'Echo of Ancients*' && caught.now.slugs.join() === expected.now.join() && echo.length > 0 && echo.every((slug) => caught.now.slugs.includes(slug)) &&
+      caught.now.eventBadges.join() === echo.join() && caught.now.groups.join() === expected.nowGroups.join() && caught.now.special.join() === expected.nowSpecial.join() &&
+      caught.now.requirements['Garfish Event'] === 'Hanya lewat aktivitas khusus: Garfish Event.' && storedEvents === '["Echo of Ancients"]',
+    `${caught.now.slugs.length} entri · badge ${caught.now.eventBadges.join()} · ${storedEvents}`)
+  await go('/checklist?tampilan=sekarang')
+  caught = await readCatch()
+  check('Setelah dimuat ulang: Echo of Ancients tetap dipilih, isinya sama', caught.events.filter((e) => e.endsWith('*')).join() === 'Echo of Ancients*' && caught.now.slugs.join() === expected.now.join(),
+    caught.events.join(', '))
+  await tapOrClick('.catch-events input[value="Echo of Ancients"] + span')
+  caught = await readCatch()
+  expected = await expectFor({ obtained: obtainedNow, level: 3, period: 'Day', next: 'Dusk', weather: 'Sunny' })
+  storedEvents = await evaluate(`localStorage.getItem('hdx-checklist-events')`)
+  check('Batal memilih event: kembali hanya Base Game, pilihan kosong tersimpan', caught.now.slugs.join() === expected.now.join() && caught.now.eventBadges.length === 0 && storedEvents === '[]', storedEvents)
+  // Bugs: entri dengan lokasi biasa + lokasi khusus tampil di keduanya; lokasi berupa item tertaut ke halaman item.
+  await tapOrClick('.checklist-kind[data-wildlife="bugs"] .checklist-kind__name')
+  await tapOrClick('input[name="checklist-view"][value="sekarang"] + span')
+  const bugsCatch = await evaluate(`(async () => {
+    ${LOAD}
+    const groups = [...document.querySelectorAll('.catch-section--now .catch-group')]
+    const group = (name) => groups.find((g) => g.dataset.location === name)
+    const slugs = (name) => [...(group(name)?.querySelectorAll('.check-row') ?? [])].map((r) => r.dataset.slug)
+    const attractor = group('Inflatable Insect Attractor')
+    return {
+      level: document.querySelector('.level-stepper__value')?.textContent, weather: document.querySelector('input[name="catch-weather-bugs"]:checked')?.value,
+      special: groups.filter((g) => g.dataset.special).map((g) => g.dataset.location).sort().join(), expected: expectCatch('bugs', { period: 'Day', next: 'Dusk', weather: 'Sunny' }).nowSpecial.join(),
+      ruins: slugs('Ruins'), ruinsSpecial: group('Ruins')?.dataset.special ?? null, bait: slugs('[EVENT] Bait the Insects'), baitSpecial: group('[EVENT] Bait the Insects')?.dataset.special ?? null,
+      attractor: attractor && { special: attractor.dataset.special, text: attractor.querySelector('.catch-group__requirement')?.textContent.trim(), href: attractor.querySelector('.catch-group__requirement a')?.getAttribute('href'), slugs: slugs('Inflatable Insect Attractor').join() },
+    }
+  })()`)
+  check('Bugs: Rainbow Stag Beetle tampil di lokasi biasa Ruins dan di lokasi khusus [EVENT] Bait the Insects; Inflatable Insect Attractor butuh item (tertaut ke halaman item)',
+    bugsCatch.level === '14' && bugsCatch.weather === 'Sunny' && bugsCatch.special === bugsCatch.expected && bugsCatch.ruins.includes('rainbow-stag-beetle') && bugsCatch.ruinsSpecial === null &&
+      bugsCatch.bait.includes('rainbow-stag-beetle') && bugsCatch.baitSpecial === 'activity' && bugsCatch.attractor?.special === 'item' &&
+      bugsCatch.attractor.text === 'Butuh item Inflatable Insect Attractor.' && bugsCatch.attractor.href === '/items/inflatable-insect-attractor' && bugsCatch.attractor.slugs === 'sulkowskys-morpho',
+    `${bugsCatch.special} · ${JSON.stringify(bugsCatch.attractor)}`)
   await tapOrClick('.checklist-kind[data-wildlife="birds"] .checklist-kind__name')
   await tapOrClick('input[name="checklist-view"][value="sekarang"] + span')
   const birds = await evaluate(`({ level: document.querySelector('.level-stepper__value')?.textContent, label: document.querySelector('.level-stepper .chip-radios__legend')?.textContent, path: location.pathname + location.search })`)

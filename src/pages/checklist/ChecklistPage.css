@@ -854,6 +854,58 @@
   font-weight: 600;
 }
 
+/* Lokasi khusus (aktivitas atau item khusus): blok terpisah di paling bawah, nampannya bergaris putus-putus */
+.catch-special {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--color-border-strong);
+}
+
+.catch-special__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+.catch-special__title svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--tint-ink);
+}
+
+.catch-special__intro {
+  margin: var(--space-1) 0 var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.catch-group[data-special] {
+  border: 1px dashed color-mix(in srgb, var(--tint-ink) 45%, var(--color-border));
+  background: color-mix(in srgb, var(--tint) 20%, var(--color-surface));
+}
+
+.catch-group__requirement {
+  margin: calc(var(--space-2) * -1) var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.catch-group__requirement a {
+  font-weight: 700;
+  color: var(--color-accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Event yang sedang berjalan: baris sendiri selebar panel kontrol */
+.catch-events {
+  grid-column: 1 / -1;
+}
+
 .catch-now__note {
   margin-top: var(--space-6);
   font-size: var(--text-xs);
