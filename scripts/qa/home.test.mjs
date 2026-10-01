@@ -593,7 +593,7 @@ async function runSuite(width) {
   let after = await evaluate(`({ value: document.querySelector('.global-search input').value, open: !!document.querySelector('.global-search__dropdown'), focusMain: document.activeElement?.id === 'konten' })`)
   check('Enter membuka hasil aktif, kolom dikosongkan & ditutup, fokus pindah ke konten', page.path === target?.href && page.title === target?.name && after.value === '' && !after.open && after.focusMain, `${target?.name} → ${page.path}`)
 
-  // Satu nama dari tiap kategori ditemukan dengan label kategorinya.
+  // Satu nama dari tiap kategori (11) ditemukan dengan label kategorinya.
   const samples = await evaluate(`(async () => { ${LOAD_DATA} return CATALOGS.map((c) => { const e = c.entries[Math.floor(c.entries.length / 2)]; return { name: e.name, label: c.label, href: c.list + '/' + e.slug } }) })()`)
   const found = []
   for (const sample of samples) {
@@ -604,7 +604,7 @@ async function runSuite(width) {
     found.push(hit && hit.label === sample.label && hit.href === sample.href ? `${sample.name} ✓` : `${sample.name} ✗ (${hit?.label} ${hit?.href})`)
     await KEY.escape(); await KEY.escape()
   }
-  check('Tiap kategori bisa dicari (ikan, serangga, burung, hewan, resep, tanaman, bahan alam, bahan masak) dengan label yang benar', found.every((f) => f.endsWith('✓')) && found.length === 8, found.join(', '))
+  check('Tiap kategori bisa dicari (ikan, serangga, burung, hewan, resep, tanaman, bahan alam, bahan masak, benda pakai, NPC, pencapaian) dengan label yang benar', found.every((f) => f.endsWith('✓')) && found.length === 11, found.join(', '))
   // Entri event (Prickly Pear, section Echo of Ancients) juga masuk pencarian.
   await openSearch()
   await type('prickly')
@@ -1032,7 +1032,8 @@ async function runSuite(width) {
   check('Kategori (bento): urut dari entri terbanyak — terbanyak besar, empat berikutnya sedang, sisanya kecil',
     categories.every((c, i) => i === 0 || c.count <= categories[i - 1].count) && categories.map((c) => c.size).join() === SIZES.join(),
     categories.map((c) => `${c.title} ${c.count} ${c.size}`).join(', '))
-  check('Kategori (bento): kartu dengan entri lebih banyak tidak pernah lebih kecil', categories.every((c, i) => i === 0 || c.rect.area <= categories[i - 1].rect.area + 1),
+  // Kartu seukuran (mis. empat kartu sedang) bisa berselisih pecahan piksel, jadi toleransinya 0,5% luas.
+  check('Kategori (bento): kartu dengan entri lebih banyak tidak pernah lebih kecil', categories.every((c, i) => i === 0 || c.rect.area <= categories[i - 1].rect.area * 1.005),
     categories.map((c) => Math.round(c.rect.area / 1000)).join('/'))
   if (width >= 1080) {
     const [xl, md1, md2, md3, md4, ...small] = categories
@@ -1044,11 +1045,11 @@ async function runSuite(width) {
       categories.map((c) => `${c.title} ${Math.round(c.rect.left)},${Math.round(c.rect.top)}`).join(' · '))
   }
   // Setiap baris penuh: kartu paling kanan tiap baris menempel ke tepi kanan grid.
-  const rows = new Map()
-  for (const c of categories) rows.set(Math.round(c.rect.top), Math.max(rows.get(Math.round(c.rect.top)) ?? 0, c.rect.right))
+  const rowEdges = new Map()
+  for (const c of categories) rowEdges.set(Math.round(c.rect.top), Math.max(rowEdges.get(Math.round(c.rect.top)) ?? 0, c.rect.right))
   const gridRight = Math.max(...categories.map((c) => c.rect.right))
-  check('Kategori (bento): tidak ada baris yang bolong (kartu terakhir tiap baris sampai tepi kanan)', [...rows.values()].every((right) => Math.abs(right - gridRight) <= 1),
-    [...rows.entries()].map(([top, right]) => `${top}:${Math.round(right)}`).join(' '))
+  check('Kategori (bento): tidak ada baris yang bolong (kartu terakhir tiap baris sampai tepi kanan)', [...rowEdges.values()].every((right) => Math.abs(right - gridRight) <= 1),
+    [...rowEdges.entries()].map(([top, right]) => `${top}:${Math.round(right)}`).join(' '))
   const SAMPLES = { xl: 3, md: 2, sm: 1 }
   check('Kategori: ikon di semua kartu, deskripsi hanya di kartu besar, contoh gambar termuat (3/2/1 menurut ukuran)',
     categories.every((c) => c.icon && c.samples === SAMPLES[c.size] && (c.size === 'xl' ? c.desc > 20 : c.desc === 0)), categories.map((c) => `${c.size}:${c.samples}`).join(' '))
