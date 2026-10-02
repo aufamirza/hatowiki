@@ -1,7 +1,8 @@
 {
   "meta": {
-    "titleDefault": "Hatowiki | Wiki Komunitas Heartopia",
-    "titlePage": "{title} | Hatowiki",
+    "titleDefault": "Hatowiki - Heartopia Wiki Indonesia",
+    "titlePage": "{title} - Heartopia Wiki Indonesia",
+    "siteAlternateName": "Heartopia Wiki Indonesia",
     "description": "Wiki komunitas Heartopia berbahasa Indonesia: ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak, dengan jadwal, lokasi, dan harga.",
     "ogDescription": "Ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak Heartopia dalam bahasa Indonesia: jadwal muncul, cuaca, lokasi, bahan, dan harga.",
     "ogImageAlt": "Hatowiki: pemandangan siang Heartopia dengan bukit, laut, ikan, serangga, dan burung"
@@ -75,6 +76,8 @@
   "kinds": {
     "fish": {
       "label": "Ikan",
+      "listTitle": "Daftar Ikan",
+      "inHeartopia": "Ikan di Heartopia",
       "noun": "ikan",
       "count": "{count} ikan",
       "hobby": "Hobi fishing",
@@ -84,10 +87,12 @@
       "notFoundMessage": "Ikan ini belum ada di database kami, atau alamatnya salah ketik.",
       "metaLead": "{name}, ikan level {level} di Heartopia.",
       "metaLeadNoLevel": "{name}, ikan di Heartopia.",
-      "metaList": "Daftar {count} ikan Heartopia beserta level, lokasi, waktu muncul, cuaca, dan harga jualnya. Cari dan filter untuk menemukan ikan yang kamu butuhkan."
+      "metaList": "Daftar {count} ikan Heartopia beserta level, lokasi, jadwal muncul, cuaca, dan harga jualnya. Cari dan filter untuk menemukan ikan yang kamu butuhkan."
     },
     "bugs": {
       "label": "Serangga",
+      "listTitle": "Daftar Serangga",
+      "inHeartopia": "Serangga di Heartopia",
       "noun": "serangga",
       "count": "{count} serangga",
       "hobby": "Hobi bug hunting",
@@ -97,10 +102,12 @@
       "notFoundMessage": "Serangga ini belum ada di database kami, atau alamatnya salah ketik.",
       "metaLead": "{name}, serangga level {level} di Heartopia.",
       "metaLeadNoLevel": "{name}, serangga di Heartopia.",
-      "metaList": "Daftar {count} serangga Heartopia beserta level, lokasi, waktu muncul, cuaca, dan harga jualnya. Cari dan filter untuk menemukan serangga yang kamu butuhkan."
+      "metaList": "Daftar {count} serangga Heartopia beserta level, lokasi, jadwal muncul, cuaca, dan harga jualnya. Cari dan filter untuk menemukan serangga yang kamu butuhkan."
     },
     "birds": {
       "label": "Burung",
+      "listTitle": "Daftar Burung",
+      "inHeartopia": "Burung di Heartopia",
       "noun": "burung",
       "count": "{count} burung",
       "hobby": "Hobi bird watching",
@@ -111,10 +118,12 @@
       "notFoundMessage": "Burung ini belum ada di database kami, atau alamatnya salah ketik.",
       "metaLead": "{name}, burung level {level} di Heartopia.",
       "metaLeadNoLevel": "{name}, burung di Heartopia.",
-      "metaList": "Daftar {count} burung Heartopia beserta level, lokasi, waktu muncul, cuaca, dan harga jual Info Card-nya. Cari dan filter untuk menemukan burung yang kamu butuhkan."
+      "metaList": "Daftar {count} burung Heartopia beserta level, lokasi, jadwal muncul, cuaca, dan harga jual Info Card. Cari dan filter untuk menemukan burung yang kamu butuhkan."
     },
     "animals": {
       "label": "Hewan",
+      "listTitle": "Daftar Hewan",
+      "inHeartopia": "Hewan liar di Heartopia",
       "noun": "hewan",
       "count": "{count} hewan",
       "hobby": "Hewan liar",
@@ -127,6 +136,8 @@
     },
     "recipes": {
       "label": "Resep",
+      "listTitle": "Daftar Resep",
+      "inHeartopia": "Resep masakan di Heartopia",
       "noun": "resep",
       "count": "{count} resep",
       "hobby": "Hobi cooking",
@@ -141,6 +152,8 @@
     },
     "crops": {
       "label": "Tanaman",
+      "listTitle": "Daftar Tanaman",
+      "inHeartopia": "Tanaman di Heartopia",
       "noun": "tanaman",
       "count": "{count} tanaman",
       "hobby": "Hobi farming",
@@ -154,6 +167,8 @@
     },
     "collectibles": {
       "label": "Bahan Alam",
+      "listTitle": "Daftar Bahan Alam",
+      "inHeartopia": "Bahan alam di Heartopia",
       "noun": "bahan alam",
       "count": "{count} bahan alam",
       "hobby": "Tersebar di map",
@@ -166,6 +181,8 @@
     },
     "ingredients": {
       "label": "Bahan Masak",
+      "listTitle": "Daftar Bahan Masak",
+      "inHeartopia": "Bahan masak di Heartopia",
       "noun": "bahan masak",
       "count": "{count} bahan masak",
       "hobby": "Dibeli di toko",
@@ -178,6 +195,8 @@
     },
     "items": {
       "label": "Benda Pakai",
+      "listTitle": "Daftar Item",
+      "inHeartopia": "Item di Heartopia",
       "noun": "benda pakai",
       "count": "{count} benda pakai",
       "hobby": "Alat bantu hobi",
@@ -191,6 +210,8 @@
     },
     "npcs": {
       "label": "Penduduk Kota",
+      "listTitle": "Daftar NPC",
+      "inHeartopia": "NPC di Heartopia",
       "noun": "NPC",
       "count": "{count} NPC",
       "hobby": "Warga kota",
@@ -205,6 +226,8 @@
     },
     "achievements": {
       "label": "Pencapaian",
+      "listTitle": "Daftar Achievement",
+      "inHeartopia": "Achievement di Heartopia",
       "noun": "pencapaian",
       "count": "{count} pencapaian",
       "hobby": "Title & hadiah",
@@ -250,7 +273,7 @@
     "soonStatus": "Status halaman",
     "soonText": "Halaman {name} sedang disiapkan. Datanya akan ditambahkan setelah diverifikasi dari sumber yang valid.",
     "backToWildlife": "Kembali ke Wildlife",
-    "metaDescription": "Ensiklopedia wildlife Heartopia: {fish}, {bugs}, {birds}, dan {animals}, lengkap dengan lokasi, waktu muncul, cuaca, dan harga jualnya."
+    "metaDescription": "Ensiklopedia wildlife Heartopia: {fish}, {bugs}, {birds}, dan {animals}, lengkap dengan lokasi, jadwal muncul, cuaca, dan harga jualnya."
   },
   "list": {
     "eyebrowWildlife": "Wildlife · {hobby}",
@@ -506,7 +529,7 @@
   "seo": {
     "separator": " ",
     "location": "Lokasi: {value}.",
-    "schedule": "Waktu muncul: {value}.",
+    "schedule": "Jadwal muncul: {value}.",
     "weather": "Cuaca: {value}.",
     "favoriteWeather": "Cuaca favorit: {value}.",
     "favoriteFood": "Makanan favorit: {value}.",

@@ -1,7 +1,8 @@
 {
   "meta": {
-    "titleDefault": "Hatowiki | Heartopia Community Wiki",
-    "titlePage": "{title} | Hatowiki",
+    "titleDefault": "Hatowiki - Heartopia Wiki",
+    "titlePage": "{title} - Heartopia Wiki | Hatowiki",
+    "siteAlternateName": "Heartopia Wiki",
     "description": "A community wiki for Heartopia: fish, bugs, birds, animals, recipes, crops, collectibles, and ingredients, with schedules, weather, locations, and prices.",
     "ogDescription": "Fish, bugs, birds, animals, recipes, crops, collectibles, and cooking ingredients in Heartopia: schedules, weather, locations, ingredients, and prices.",
     "ogImageAlt": "Hatowiki: a daytime Heartopia landscape with hills, sea, fish, bugs, and birds"
@@ -75,6 +76,8 @@
   "kinds": {
     "fish": {
       "label": "Fish",
+      "listTitle": "Fish List",
+      "inHeartopia": "A fish in Heartopia",
       "noun": "fish",
       "count": "{count} fish",
       "hobby": "Fishing hobby",
@@ -88,6 +91,8 @@
     },
     "bugs": {
       "label": "Bugs",
+      "listTitle": "Bug List",
+      "inHeartopia": "A bug in Heartopia",
       "noun": "bugs",
       "count": "{count} bugs",
       "hobby": "Bug hunting hobby",
@@ -101,6 +106,8 @@
     },
     "birds": {
       "label": "Birds",
+      "listTitle": "Bird List",
+      "inHeartopia": "A bird in Heartopia",
       "noun": "birds",
       "count": "{count} birds",
       "hobby": "Bird watching hobby",
@@ -115,6 +122,8 @@
     },
     "animals": {
       "label": "Animals",
+      "listTitle": "Animal List",
+      "inHeartopia": "A wild animal in Heartopia",
       "noun": "animals",
       "count": "{count} animals",
       "hobby": "Wild animals",
@@ -127,6 +136,8 @@
     },
     "recipes": {
       "label": "Recipes",
+      "listTitle": "Recipe List",
+      "inHeartopia": "A cooking recipe in Heartopia",
       "noun": "recipes",
       "count": "{count} recipes",
       "hobby": "Cooking hobby",
@@ -141,6 +152,8 @@
     },
     "crops": {
       "label": "Crops",
+      "listTitle": "Crop List",
+      "inHeartopia": "A crop in Heartopia",
       "noun": "crops",
       "count": "{count} crops",
       "hobby": "Farming hobby",
@@ -154,6 +167,8 @@
     },
     "collectibles": {
       "label": "Collectibles",
+      "listTitle": "Collectible List",
+      "inHeartopia": "A collectible in Heartopia",
       "noun": "collectibles",
       "count": "{count} collectibles",
       "hobby": "Found around the map",
@@ -166,6 +181,8 @@
     },
     "ingredients": {
       "label": "Ingredients",
+      "listTitle": "Ingredient List",
+      "inHeartopia": "A cooking ingredient in Heartopia",
       "noun": "ingredients",
       "count": "{count} ingredients",
       "hobby": "Bought from shops",
@@ -178,6 +195,8 @@
     },
     "items": {
       "label": "Items",
+      "listTitle": "Item List",
+      "inHeartopia": "An item in Heartopia",
       "noun": "items",
       "count": "{count} {count|item|items}",
       "hobby": "Hobby tools",
@@ -191,6 +210,8 @@
     },
     "npcs": {
       "label": "NPCs",
+      "listTitle": "NPC List",
+      "inHeartopia": "An NPC in Heartopia",
       "noun": "NPCs",
       "count": "{count} {count|NPC|NPCs}",
       "hobby": "Town residents",
@@ -205,6 +226,8 @@
     },
     "achievements": {
       "label": "Achievements",
+      "listTitle": "Achievement List",
+      "inHeartopia": "An achievement in Heartopia",
       "noun": "achievements",
       "count": "{count} {count|achievement|achievements}",
       "hobby": "Titles & rewards",

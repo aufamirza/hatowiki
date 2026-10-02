@@ -8,6 +8,7 @@ import { itemHref } from '../../components/items/itemHref'
 import { formatCoins } from '../../components/recipes/starValues'
 import EntryImage from '../../components/wildlife/EntryImage'
 import LocationMap from '../../components/wildlife/LocationMap'
+import InHeartopia from '../../components/InHeartopia'
 import { getItem } from '../../data/items'
 import { GIFT_LINKS } from '../../data/npcs/giftLinks'
 import { getNpcBySlug } from '../../data/npcs/npcs'
@@ -82,6 +83,7 @@ function NpcDetailPage() {
               <h1 id="entry-name" className="entry-detail__name">
                 {npc.name}
               </h1>
+              <InHeartopia kindSlug={NPC_KIND.slug} />
               {npc.role && (
                 <p className="npc-role">
                   <span className="visually-hidden">{t('npc.role')}: </span>

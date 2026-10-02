@@ -7,9 +7,15 @@
  *   noindex.
  * - Seluruh situs (src/seo/pageMeta.js): tiap halaman di tiap bahasa punya judul & deskripsi sendiri, deskripsi paling
  *   panjang 160 karakter dan berbeda antarbahasa.
- * - Hasil build (dist/, jalankan `npm run build` dulu): satu HTML statis per halaman & bahasa dengan meta tag dan atribut
- *   lang yang sudah diisi (sama dengan yang dipasang di browser), sitemap.xml dengan hreflang, robots.txt, dan rewrite
- *   vercel.json yang tidak menimpa berkas statis serta jatuh ke index.html bahasanya.
+ * - Judul "<nama> - Heartopia Wiki Indonesia" / "… - Heartopia Wiki ภาษาไทย" / "… - Heartopia Wiki | Hatowiki" (daftar:
+ *   "Daftar Ikan", "รายชื่อปลา", "Fish List"), tanpa tanda pisah panjang; JSON-LD WebSite + BreadcrumbList.
+ * - Hasil build (dist/, jalankan `npm run build` dulu): satu HTML statis per halaman & bahasa dengan meta tag, JSON-LD,
+ *   dan atribut lang yang sudah diisi (sama dengan yang dipasang di browser); hub, daftar & detail juga berisi isi
+ *   halamannya (H1, keterangan "… di Heartopia", deskripsi, data), beranda & Checklist tidak; sitemap.xml dengan
+ *   hreflang, robots.txt, dan rewrite vercel.json yang tidak menimpa berkas statis serta jatuh ke index.html bahasanya.
+ * - Hydrate (dist/ di server statis lokal yang meniru vercel.json, scripts/qa/dist-server.mjs): isi tampil tanpa
+ *   JavaScript dan tidak ada elemen yang bergeser setelah hydrate, tema gelap tanpa kedipan, id useId cocok, posisi gulir
+ *   tetap, alamat dengan query & alamat yang tidak ada dirender ulang, console bersih.
  *
  * Pemakaian (dev server harus sudah jalan, dan dist/ hasil build terbaru):
  *   npm run build && npm run dev
@@ -20,6 +26,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { openTab, sleep, startChrome } from './cdp.mjs'
+import { startDistServer } from './dist-server.mjs'
 
 const BASE_URL = process.env.BASE_URL ?? 'http://localhost:5173'
 const WIDTHS = process.argv.slice(2).map(Number).filter(Boolean)
@@ -35,33 +42,58 @@ const LOCALES = [
 // Judul & deskripsi yang diharapkan, ditulis ulang di sini supaya uji tidak memakai kode aplikasi untuk memeriksa dirinya.
 const EXPECTED = {
   '/': {
-    id: ['Hatowiki | Wiki Komunitas Heartopia', 'Wiki komunitas Heartopia berbahasa Indonesia: ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak, dengan jadwal, lokasi, dan harga.'],
-    th: ['Hatowiki | วิกิชุมชน Heartopia', 'วิกิชุมชน Heartopia ภาษาไทย: ปลา แมลง นก สัตว์ สูตรอาหาร พืชผล วัตถุดิบธรรมชาติ และวัตถุดิบทำอาหาร พร้อมช่วงเวลาที่ปรากฏ สภาพอากาศ สถานที่ และราคา'],
-    en: ['Hatowiki | Heartopia Community Wiki', 'A community wiki for Heartopia: fish, bugs, birds, animals, recipes, crops, collectibles, and ingredients, with schedules, weather, locations, and prices.'],
+    id: ['Hatowiki - Heartopia Wiki Indonesia', 'Wiki komunitas Heartopia berbahasa Indonesia: ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak, dengan jadwal, lokasi, dan harga.'],
+    th: ['Hatowiki - Heartopia Wiki ภาษาไทย', 'วิกิชุมชน Heartopia ภาษาไทย: ปลา แมลง นก สัตว์ สูตรอาหาร พืชผล วัตถุดิบธรรมชาติ และวัตถุดิบทำอาหาร พร้อมช่วงเวลาที่ปรากฏ สภาพอากาศ สถานที่ และราคา'],
+    en: ['Hatowiki - Heartopia Wiki', 'A community wiki for Heartopia: fish, bugs, birds, animals, recipes, crops, collectibles, and ingredients, with schedules, weather, locations, and prices.'],
   },
   '/wildlife/fish': {
-    id: ['Fish | Hatowiki', 'Daftar 124 ikan Heartopia beserta level, lokasi, waktu muncul, cuaca, dan harga jualnya. Cari dan filter untuk menemukan ikan yang kamu butuhkan.'],
-    th: ['Fish | Hatowiki', 'รวมปลาใน Heartopia ทั้ง 124 ชนิด พร้อมเลเวล สถานที่ ช่วงเวลาที่ปรากฏ สภาพอากาศ และราคาขาย ค้นหาและกรองเพื่อหาปลาที่ต้องการได้เลย'],
-    en: ['Fish | Hatowiki', 'All 124 Heartopia fish with their level, location, schedule, weather, and sell price. Search and filter to find the fish you need.'],
+    id: ['Daftar Ikan - Heartopia Wiki Indonesia', 'Daftar 124 ikan Heartopia beserta level, lokasi, jadwal muncul, cuaca, dan harga jualnya. Cari dan filter untuk menemukan ikan yang kamu butuhkan.'],
+    th: ['รายชื่อปลา - Heartopia Wiki ภาษาไทย', 'รวมปลาใน Heartopia ทั้ง 124 ชนิด พร้อมเลเวล สถานที่ ช่วงเวลาที่ปรากฏ สภาพอากาศ และราคาขาย ค้นหาและกรองเพื่อหาปลาที่ต้องการได้เลย'],
+    en: ['Fish List - Heartopia Wiki | Hatowiki', 'All 124 Heartopia fish with their level, location, schedule, weather, and sell price. Search and filter to find the fish you need.'],
   },
   '/wildlife/fish/sea-bass': {
-    id: ['Sea Bass | Hatowiki', 'Sea Bass, ikan level 1 di Heartopia. Lokasi: All Seas & Ocean. Waktu muncul: Semua waktu. Cuaca: Semua cuaca. Harga jual: 75–600 koin.'],
-    th: ['Sea Bass | Hatowiki', 'Sea Bass ปลาเลเวล 1 ใน Heartopia · สถานที่: All Seas & Ocean · ช่วงเวลาที่ปรากฏ: ทุกช่วงเวลา · สภาพอากาศ: ทุกสภาพอากาศ · ราคาขาย: 75–600 เหรียญ'],
-    en: ['Sea Bass | Hatowiki', 'Sea Bass: a level 1 fish in Heartopia. Location: All Seas & Ocean. Appears: Any time. Weather: Any weather. Sells for 75–600 coins.'],
+    id: ['Sea Bass - Heartopia Wiki Indonesia', 'Sea Bass, ikan level 1 di Heartopia. Lokasi: All Seas & Ocean. Jadwal muncul: Semua waktu. Cuaca: Semua cuaca. Harga jual: 75–600 koin.'],
+    th: ['Sea Bass - Heartopia Wiki ภาษาไทย', 'Sea Bass ปลาเลเวล 1 ใน Heartopia · สถานที่: All Seas & Ocean · ช่วงเวลาที่ปรากฏ: ทุกช่วงเวลา · สภาพอากาศ: ทุกสภาพอากาศ · ราคาขาย: 75–600 เหรียญ'],
+    en: ['Sea Bass - Heartopia Wiki | Hatowiki', 'Sea Bass: a level 1 fish in Heartopia. Location: All Seas & Ocean. Appears: Any time. Weather: Any weather. Sells for 75–600 coins.'],
   },
   '/recipes/tiramisu': {
-    id: ['Tiramisu | Hatowiki', 'Tiramisu, resep level 6 di Heartopia. Energi: +65–130. Bahan: Coffee Beans, Cheese, Milk, Egg. Harga jual: 530–4.240 koin.'],
-    th: ['Tiramisu | Hatowiki', 'Tiramisu สูตรอาหารเลเวล 6 ใน Heartopia · พลังงาน: +65–130 · ส่วนผสม: Coffee Beans, Cheese, Milk, Egg · ราคาขาย: 530–4,240 เหรียญ'],
-    en: ['Tiramisu | Hatowiki', 'Tiramisu: a level 6 recipe in Heartopia. Energy: +65–130. Ingredients: Coffee Beans, Cheese, Milk, Egg. Sells for 530–4,240 coins.'],
+    id: ['Tiramisu - Heartopia Wiki Indonesia', 'Tiramisu, resep level 6 di Heartopia. Energi: +65–130. Bahan: Coffee Beans, Cheese, Milk, Egg. Harga jual: 530–4.240 koin.'],
+    th: ['Tiramisu - Heartopia Wiki ภาษาไทย', 'Tiramisu สูตรอาหารเลเวล 6 ใน Heartopia · พลังงาน: +65–130 · ส่วนผสม: Coffee Beans, Cheese, Milk, Egg · ราคาขาย: 530–4,240 เหรียญ'],
+    en: ['Tiramisu - Heartopia Wiki | Hatowiki', 'Tiramisu: a level 6 recipe in Heartopia. Energy: +65–130. Ingredients: Coffee Beans, Cheese, Milk, Egg. Sells for 530–4,240 coins.'],
   },
   '/ingredients/egg': {
-    id: ['Egg (Bahan Masak) | Hatowiki', 'Egg, bahan masak di Heartopia. Harga beli: 100 koin. Didapat dari: Toko Massimo. Dipakai di 46 resep.'],
-    th: ['Egg (วัตถุดิบทำอาหาร) | Hatowiki','Egg วัตถุดิบทำอาหารใน Heartopia · ราคาซื้อ: 100 เหรียญ · หาได้จาก: ร้าน Massimo · ใช้ในสูตรอาหาร 46 สูตร'],
-    en: ['Egg (Ingredients) | Hatowiki', "Egg: a cooking ingredient in Heartopia. Buy price: 100 coins. Obtained from: Massimo's store. Used in 46 recipes."],
+    id: ['Egg (Bahan Masak) - Heartopia Wiki Indonesia', 'Egg, bahan masak di Heartopia. Harga beli: 100 koin. Didapat dari: Toko Massimo. Dipakai di 46 resep.'],
+    th: ['Egg (วัตถุดิบทำอาหาร) - Heartopia Wiki ภาษาไทย','Egg วัตถุดิบทำอาหารใน Heartopia · ราคาซื้อ: 100 เหรียญ · หาได้จาก: ร้าน Massimo · ใช้ในสูตรอาหาร 46 สูตร'],
+    en: ['Egg (Ingredients) - Heartopia Wiki | Hatowiki', "Egg: a cooking ingredient in Heartopia. Buy price: 100 coins. Obtained from: Massimo's store. Used in 46 recipes."],
   },
 }
 const urlOf = (route, locale) => SITE + (route === '/' ? locale.prefix || '/' : locale.prefix + route)
 const alternatesOf = (route) => [...LOCALES.map((locale) => [locale.id, urlOf(route, locale)]), ['x-default', urlOf(route, LOCALES[2])]]
+
+// Data terstruktur (JSON-LD): WebSite di semua halaman, BreadcrumbList (Beranda > … > halaman) di halaman selain beranda.
+const HOME_NAME = { id: 'Beranda', th: 'หน้าแรก', en: 'Home' }
+const SITE_ALT_NAME = { id: 'Heartopia Wiki Indonesia', th: 'Heartopia Wiki ภาษาไทย', en: 'Heartopia Wiki' }
+const TRAILS = {
+  '/wildlife/fish': [['Wildlife', '/wildlife'], ['Fish', '/wildlife/fish']],
+  '/wildlife/fish/sea-bass': [['Wildlife', '/wildlife'], ['Fish', '/wildlife/fish'], ['Sea Bass', '/wildlife/fish/sea-bass']],
+  '/recipes/tiramisu': [['Recipes', '/recipes'], ['Tiramisu', '/recipes/tiramisu']],
+  '/ingredients/egg': [['Ingredients', '/ingredients'], ['Egg', '/ingredients/egg']],
+}
+const jsonLdOf = (route, locale) => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebSite', '@id': `${urlOf('/', locale)}#website`, name: 'Hatowiki', alternateName: SITE_ALT_NAME[locale.id], url: urlOf('/', locale), inLanguage: locale.id },
+    ...(TRAILS[route]
+      ? [{ '@type': 'BreadcrumbList', itemListElement: [[HOME_NAME[locale.id], '/'], ...TRAILS[route]].map(([name, step], index) => ({ '@type': 'ListItem', position: index + 1, name, item: urlOf(step, locale) })) }]
+      : []),
+  ],
+})
+// Keterangan di bawah H1 halaman detail.
+const CONTEXT = {
+  '/wildlife/fish/sea-bass': { id: 'Ikan di Heartopia', th: 'ปลาใน Heartopia', en: 'A fish in Heartopia' },
+  '/recipes/tiramisu': { id: 'Resep masakan di Heartopia', th: 'สูตรอาหารใน Heartopia', en: 'A cooking recipe in Heartopia' },
+  '/ingredients/egg': { id: 'Bahan masak di Heartopia', th: 'วัตถุดิบทำอาหารใน Heartopia', en: 'A cooking ingredient in Heartopia' },
+}
 
 // Meta tag dari HTML mentah (tanpa menjalankan JavaScript), seperti yang dibaca crawler.
 function readHead(html) {
@@ -78,7 +110,11 @@ function readHead(html) {
     ogDescription: attr(/<meta property="og:description" content="([^"]*)"/),
     ogImage: attr(/<meta property="og:image" content="([^"]*)"/),
     alternates: [...html.matchAll(/<link rel="alternate" hreflang="([^"]*)" href="([^"]*)"/g)].map((match) => [match[1], decode(match[2])]),
-    app: /<div id="root"><\/div>/.test(html) && /<script type="module"[^>]*src="\/assets\//.test(html),
+    jsonLd: (() => { try { return JSON.parse(html.match(/<script type="application\/ld\+json" id="structured-data">([^<]*)<\/script>/)?.[1]) } catch { return null } })(),
+    app: /<script type="module"[^>]*src="\/assets\//.test(html),
+    // Isi halaman hasil render (hub, daftar, detail) & alamat yang dirender (atribut data-ssr di <html>).
+    ssr: decode(html.match(/<html lang="[^"]*" data-ssr="([^"]*)">/)?.[1]) ?? null,
+    body: html.match(/<div id="root">([\s\S]*)<\/div>\s*<\/body>/)?.[1] ?? null,
   }
 }
 
@@ -90,6 +126,7 @@ const HEAD_PROBE = `(() => {
     ogLocale: content('meta[property="og:locale"]'), ogUrl: content('meta[property="og:url"]'), ogTitle: content('meta[property="og:title"]'),
     ogDescription: content('meta[property="og:description"]'), ogImage: content('meta[property="og:image"]'), robots: content('meta[name="robots"]'),
     alternates: [...document.head.querySelectorAll('link[rel="alternate"][hreflang]')].map((link) => [link.getAttribute('hreflang'), link.getAttribute('href')]),
+    jsonLd: JSON.parse(document.getElementById('structured-data')?.textContent || 'null'),
   }
 })()`
 
@@ -107,7 +144,124 @@ function headProblems(head, route, locale, [title, description]) {
   if (route !== '/') expect('og:description', head.ogDescription, description)
   expect('og:image', head.ogImage, `${SITE}/og-image.jpg`)
   expect('hreflang', JSON.stringify(head.alternates), JSON.stringify(alternatesOf(route)))
+  expect('JSON-LD', JSON.stringify(head.jsonLd), JSON.stringify(jsonLdOf(route, locale)))
+  // Pakai tanda hubung biasa di judul, tanpa tanda pisah panjang.
+  if (/[—–]/.test(head.title ?? '')) problems.push(`title bertanda pisah: "${head.title}"`)
   return problems
+}
+
+// Kotak semua elemen di #root untuk membandingkan tampilan sebelum & sesudah hydrate. Isi jam server (.server-time)
+// sengaja baru tampil setelah hydrate, jadi hanya kotak luarnya yang dibandingkan; notifikasi saran bahasa dimatikan.
+const LAYOUT_PROBE = `(() => {
+  const root = document.getElementById('root')
+  const boxes = []
+  for (const el of root.querySelectorAll('*')) {
+    if (el.closest('.server-time') && !el.matches('.server-time')) continue
+    const r = el.getBoundingClientRect()
+    boxes.push([el.tagName, el.getAttribute('class'), Math.round(r.left), Math.round(r.top + scrollY), Math.round(r.width), Math.round(r.height)].join('|'))
+  }
+  return {
+    boxes, ssr: document.documentElement.getAttribute('data-ssr'), csr: document.documentElement.hasAttribute('data-csr'),
+    hydrated: Object.keys(root).some((key) => key.startsWith('__reactContainer')), visible: getComputedStyle(root).visibility === 'visible',
+    h1: document.querySelector('h1')?.textContent ?? null, scrollY,
+    theme: { sun: getComputedStyle(document.querySelector('.theme-toggle__sun')).display !== 'none', moon: getComputedStyle(document.querySelector('.theme-toggle__moon')).display !== 'none', label: document.querySelector('.theme-toggle__sun').closest('button').getAttribute('aria-label') },
+  }
+})()`
+const QUIET = `try { localStorage.setItem('hdx-lang-hint-dismissed', '1') } catch {}`
+
+/**
+ * Hasil build di server statis lokal (aturan vercel.json): halaman tampil lengkap tanpa JavaScript (bundel aplikasi
+ * diblokir), lalu setelah hydrate tidak ada elemen yang bergeser atau berubah ukuran, tanpa error di console. Juga: tema
+ * gelap tanpa kedipan ikon, id useId server = browser (panel menu), posisi gulir sebelum hydrate tetap, alamat dengan
+ * query & alamat yang tidak ada dirender ulang di browser tanpa sempat menampilkan isi statis yang salah.
+ */
+async function hydrateSuite(width, check) {
+  const server = await startDistServer({ dist: fileURLToPath(new URL('dist', ROOT)), port: 4700 + Math.floor(Math.random() * 200), vercelConfig: fileURLToPath(new URL('vercel.json', ROOT)) })
+  const consoleLines = []
+  const load = async (route, { blockApp = false, setup = '' } = {}) => {
+    const tab = await openTab(PORT, width)
+    await tab.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }, { name: 'prefers-reduced-motion', value: 'reduce' }] })
+    await tab.send('Network.enable')
+    if (blockApp) await tab.send('Network.setBlockedURLs', { urls: ['*/assets/index-*.js'] })
+    await tab.send('Page.addScriptToEvaluateOnNewDocument', { source: `${QUIET}; try { localStorage.removeItem('hdx-theme') } catch {}; ${setup}` })
+    await tab.send('Page.navigate', { url: server.url + route })
+    await sleep(2500)
+    await tab.evaluate('document.fonts.ready.then(() => true)')
+    return tab
+  }
+  const finish = async (tab, route) => {
+    consoleLines.push(...tab.logs.filter((line) => !/\[Vercel Web Analytics\]|ERR_BLOCKED_BY_CLIENT/.test(line)).map((line) => `${route}: ${line}`))
+    await tab.close()
+  }
+  const compare = (before, after) => before.boxes.filter((box, index) => box !== after.boxes[index]).length + Math.abs(before.boxes.length - after.boxes.length)
+
+  try {
+    const pages = ['/wildlife', '/wildlife/fish', '/wildlife/birds/mallard', '/wildlife/animals/capybara', '/recipes/tiramisu', '/th/wildlife/fish/sea-bass', '/th/npcs/albert-jr', '/en/achievements/collector', '/en/crops/tomato', '/en/items', '/ingredients/egg']
+    const rows = []
+    for (const route of pages) {
+      let tab = await load(route, { blockApp: true })
+      const before = await tab.evaluate(LAYOUT_PROBE)
+      await tab.close()
+      tab = await load(route)
+      const after = await tab.evaluate(LAYOUT_PROBE)
+      await finish(tab, route)
+      const moved = compare(before, after)
+      rows.push({ ok: before.ssr === route && before.visible && before.h1 && before.boxes.length > 100 && after.hydrated && !after.csr && moved === 0, text: `${route} ${before.boxes.length} elemen, ${moved} berubah${after.hydrated ? '' : ', tidak di-hydrate'}` })
+    }
+    check(`Hydrate di hasil build (${pages.length} halaman: hub, daftar, detail tiap jenis, 3 bahasa): isi tampil tanpa JavaScript, lalu di-hydrate tanpa satu elemen pun bergeser atau berubah ukuran`,
+      rows.every((row) => row.ok), rows.filter((row) => !row.ok).map((row) => row.text).slice(0, 3).join(' | ') || rows[2].text)
+
+    // Tema gelap tersimpan: ikon matahari sudah benar sebelum hydrate (CSS dari data-theme), label menyusul setelahnya.
+    const dark = `localStorage.setItem('hdx-theme', 'dark')`
+    let tab = await load('/wildlife/birds/mallard', { blockApp: true, setup: dark })
+    const darkBefore = await tab.evaluate(LAYOUT_PROBE)
+    await tab.close()
+    tab = await load('/wildlife/birds/mallard', { setup: dark })
+    const darkAfter = await tab.evaluate(LAYOUT_PROBE)
+    await finish(tab, 'gelap')
+    check('Tema gelap: ikon tombol tema (matahari) sudah benar di HTML statis, tidak berganti saat hydrate; label menjadi "Ganti ke mode terang"; tidak ada yang bergeser',
+      darkBefore.theme.sun && !darkBefore.theme.moon && darkAfter.theme.sun && !darkAfter.theme.moon && darkAfter.theme.label === 'Ganti ke mode terang' && compare(darkBefore, darkAfter) === 0,
+      `${JSON.stringify(darkBefore.theme)} → ${JSON.stringify(darkAfter.theme)}`)
+
+    // useId: id dari HTML statis (aria-controls tombol menu) cocok dengan panel yang dirender browser setelah hydrate.
+    if (width >= 760) {
+      tab = await load('/wildlife/birds/mallard')
+      const ids = await tab.evaluate(`(async () => {
+        const button = document.querySelector('.site-nav .nav-menu__button')
+        button.click()
+        await new Promise((resolve) => setTimeout(resolve, 300))
+        const target = document.getElementById(button.getAttribute('aria-controls'))
+        return { controls: button.getAttribute('aria-controls'), found: Boolean(target), links: target?.querySelectorAll('a').length ?? 0 }
+      })()`)
+      await finish(tab, 'menu')
+      check('Setelah hydrate, id useId dari HTML statis cocok dengan render browser (aria-controls tombol menu Wildlife menunjuk panel yang dibuka)', ids.found && ids.links > 0, JSON.stringify(ids))
+    }
+
+    // Menggulir sebelum hydrate: posisi tetap setelah aplikasi dimuat.
+    tab = await load('/wildlife/fish', { blockApp: true })
+    await tab.evaluate('window.scrollTo(0, 1500)')
+    await tab.send('Network.setBlockedURLs', { urls: [] })
+    await tab.evaluate(`(() => { const script = document.createElement('script'); script.type = 'module'; script.src = document.querySelector('script[type="module"][src]').src + '?muat'; document.head.append(script) })()`)
+    await sleep(2500)
+    const scrolled = await tab.evaluate(LAYOUT_PROBE)
+    await finish(tab, 'gulir')
+    check('Pengunjung yang sudah menggulir sebelum hydrate tidak dilempar ke atas (posisi 1500px tetap)', scrolled.hydrated && Math.abs(scrolled.scrollY - 1500) <= 1, `scrollY ${scrolled.scrollY}, hydrate ${scrolled.hydrated}`)
+
+    // Alamat dengan query (filter di URL) dan alamat yang tidak ada: dirender ulang di browser.
+    tab = await load('/wildlife/fish?q=bass')
+    const query = await tab.evaluate(`({ csr: document.documentElement.hasAttribute('data-csr'), visible: getComputedStyle(document.getElementById('root')).visibility, cards: [...document.querySelectorAll('a.entry-card')].map((card) => card.getAttribute('href')).sort().join() })`)
+    await finish(tab, 'query')
+    tab = await load('/wildlife/fish/tidak-ada')
+    const missing = await tab.evaluate(`({ h1: document.querySelector('h1')?.textContent, visible: getComputedStyle(document.getElementById('root')).visibility })`)
+    await finish(tab, 'tidak ada')
+    check('Alamat dengan query (/wildlife/fish?q=bass) dirender ulang di browser dengan filternya; alamat yang tidak ada menampilkan "Ikan tidak ditemukan"',
+      !query.csr && query.visible === 'visible' && query.cards === '/wildlife/fish/largemouth-bass,/wildlife/fish/sea-bass' && missing.h1 === 'Ikan tidak ditemukan' && missing.visible === 'visible',
+      `${query.cards} · ${missing.h1}`)
+
+    check('Console bersih di hasil build (tanpa error hydration)', consoleLines.length === 0, consoleLines.slice(0, 3).join(' | '))
+  } finally {
+    await server.close()
+  }
 }
 
 async function runSuite(width) {
@@ -134,7 +288,7 @@ async function runSuite(width) {
       const found = headProblems(await evaluate(HEAD_PROBE), route, locale, EXPECTED[route][locale.id])
       if (found.length) problems.push(`${route} → ${found.join('; ')}`)
     }
-    check(`Browser, bahasa ${locale.id}: judul, deskripsi, canonical, og:title/description/url/locale, og:image, dan hreflang (id, th, en, x-default → en) benar di ${routes.length} halaman`,
+    check(`Browser, bahasa ${locale.id}: judul "<nama> - Heartopia Wiki …", deskripsi, canonical, og:title/description/url/locale, og:image, hreflang (id, th, en, x-default → en), dan JSON-LD (WebSite + BreadcrumbList) benar di ${routes.length} halaman`,
       problems.length === 0, problems.slice(0, 2).join(' | ') || EXPECTED['/wildlife/fish/sea-bass'][locale.id][1])
   }
 
@@ -161,7 +315,7 @@ async function runSuite(width) {
   await sleep(900)
   const backHome = await evaluate(HEAD_PROBE)
   check('Halaman tidak ditemukan: judul & deskripsi "tidak ditemukan" dalam bahasanya dan noindex; kembali ke halaman yang ada, noindex dilepas',
-    missing.title === 'Fish not found | Hatowiki' && missing.robots === 'noindex' && missing.canonical === `${SITE}/en/wildlife/fish/nope` && unknown.title === 'ไม่พบหน้านี้ | Hatowiki' && unknown.robots === 'noindex' && backHome.robots === null && backHome.title === EXPECTED['/'].th[0],
+    missing.title === 'Fish not found - Heartopia Wiki | Hatowiki' && missing.robots === 'noindex' && missing.canonical === `${SITE}/en/wildlife/fish/nope` && unknown.title === 'ไม่พบหน้านี้ - Heartopia Wiki ภาษาไทย' && unknown.robots === 'noindex' && backHome.robots === null && backHome.title === EXPECTED['/'].th[0],
     `${missing.title} [${missing.robots}] · ${unknown.title} [${unknown.robots}] · ${backHome.title} [${backHome.robots}]`)
 
   // ================= 2. Seluruh situs: unik, ≤ 160 karakter, berbeda per bahasa =================
@@ -199,7 +353,7 @@ async function runSuite(width) {
     site.tooLong.length === 0 && site.shortest >= 40 && site.sameAcrossLanguages.length === 0, [...site.tooLong, ...site.sameAcrossLanguages].slice(0, 4).join(' '))
   const specific = site.sample
   check('Deskripsi spesifik dari data: serangga (level, lokasi, waktu, harga), hewan (lokasi, cuaca & makanan favorit), tanaman (benih, waktu tumbuh, harga), bahan alam (lokasi, nilai jual)',
-    /serangga level 7.*Lokasi: Spirit-Oak Pine Forest.*Waktu muncul: Dawn, Day, Dusk.*Harga jual: 225–1\.800 koin/.test(specific['/wildlife/bugs/blue-morpho'][0]) &&
+    /serangga level 7.*Lokasi: Spirit-Oak Pine Forest.*Jadwal muncul: Dawn, Day, Dusk.*Harga jual: 225–1\.800 koin/.test(specific['/wildlife/bugs/blue-morpho'][0]) &&
       /Location: Crater Lake, Ruins\. Favorite weather: Rainbow, Rainy\. Favorite food: Tomato, Grape, Raspberry\./.test(specific['/wildlife/animals/capybara'][2]) &&
       /Harga benih: 10 koin\. Waktu tumbuh: 15 menit\. Harga jual: 30–70 koin\./.test(specific['/crops/tomato'][0]) &&
       /สถานที่: Residential Area · มูลค่าขาย: 28 เหรียญ/.test(specific['/collectibles/apple'][1]),
@@ -225,18 +379,53 @@ async function runSuite(width) {
         if (found.length) staticProblems.push(`${locale.id}${route} → ${found.join('; ')}`)
       }
     }
-    check(`HTML statis (dibaca tanpa JavaScript): lang, judul, deskripsi, canonical, Open Graph, dan hreflang benar di ${routes.length} contoh halaman × 3 bahasa; aplikasi tetap dimuat`,
+    check(`HTML statis (dibaca tanpa JavaScript): lang, judul, deskripsi, canonical, Open Graph, hreflang, dan JSON-LD benar di ${routes.length} contoh halaman × 3 bahasa; aplikasi tetap dimuat`,
       staticProblems.length === 0, staticProblems.slice(0, 2).join(' | '))
 
-    // Semua berkas statis sama dengan yang dipasang aplikasi di browser (tidak basi).
+    // Isi halaman di HTML statis: nama (H1) + keterangan "… di Heartopia", deskripsi, dan data (mis. lokasi) sudah ada
+    // tanpa JavaScript; daftar berisi semua kartu; beranda tetap tanpa isi (dirender di browser).
+    const contentProblems = []
+    for (const locale of LOCALES) {
+      const at = (route) => readHead(readFileSync(fileOf(locale.prefix + (route === '/' ? (locale.prefix ? '' : '/') : route)), 'utf8'))
+      const path = (route) => locale.prefix + route
+      const home = at('/')
+      if (home.ssr !== null || home.body !== '') contentProblems.push(`${locale.id}/: beranda berisi isi statis`)
+      const list = at('/wildlife/fish')
+      const cards = (list.body?.match(/<a class="entry-card"/g) ?? []).length
+      if (list.ssr !== path('/wildlife/fish') || cards !== 124 || !list.body.includes(`href="${path('/wildlife/fish/sea-bass')}"`)) contentProblems.push(`${locale.id}/wildlife/fish: data-ssr ${list.ssr}, ${cards} kartu`)
+      for (const [route, context] of Object.entries(CONTEXT)) {
+        const page = at(route)
+        const name = TRAILS[route].at(-1)[0]
+        const h1 = `<h1 id="entry-name" class="entry-detail__name">${name}</h1><p class="entry-detail__context">${context[locale.id]}</p>`
+        const description = page.body?.match(/<p class="entry-detail__description">([^<]+)<\/p>/)?.[1]
+        if (page.ssr !== path(route) || !page.body.includes(h1) || !description || (page.body.match(/<h1[ >]/g) ?? []).length !== 1) contentProblems.push(`${locale.id}${route}: data-ssr ${page.ssr}, H1 ${page.body?.includes(h1)}, deskripsi ${Boolean(description)}`)
+      }
+      if (!at('/wildlife/fish/sea-bass').body.includes('All Seas &amp; Ocean')) contentProblems.push(`${locale.id}/wildlife/fish/sea-bass: lokasi tidak ada`)
+    }
+    check('HTML statis berisi isi halaman: H1 nama entri + keterangan "… di Heartopia" (Ikan di Heartopia / ปลาใน Heartopia / A fish in Heartopia), deskripsi, lokasi; daftar Fish 124 kartu; beranda tanpa isi statis',
+      contentProblems.length === 0, contentProblems.slice(0, 3).join(' | '))
+
+    // Semua berkas statis sama dengan yang dipasang aplikasi di browser (tidak basi), dan isi & JSON-LD-nya lengkap.
     const stale = []
+    const incomplete = []
     for (const locale of LOCALES) {
       for (const [route, [title, description]] of Object.entries(site.all[locale.id])) {
-        const head = readHead(readFileSync(fileOf(locale.prefix + (route === '/' ? (locale.prefix ? '' : '/') : route)), 'utf8'))
+        const pagePath = locale.prefix + (route === '/' ? (locale.prefix ? '' : '/') : route)
+        const head = readHead(readFileSync(fileOf(pagePath), 'utf8'))
         if (head.title !== title || head.description !== description || head.lang !== locale.id || head.canonical !== urlOf(route, locale)) stale.push(`${locale.id}${route}`)
+        // Beranda & Checklist dirender di browser; halaman lain berisi isi statis dengan satu H1.
+        const prerendered = route !== '/' && route !== '/checklist'
+        const graph = head.jsonLd?.['@graph'] ?? []
+        const crumbs = graph.find((item) => item['@type'] === 'BreadcrumbList')?.itemListElement ?? []
+        const ok = (prerendered ? head.ssr === (pagePath === '/' ? '/' : pagePath) && (head.body.match(/<h1[ >]/g) ?? []).length === 1 : head.ssr === null && head.body === '') &&
+          graph[0]?.['@type'] === 'WebSite' && graph[0].alternateName === SITE_ALT_NAME[locale.id] &&
+          (route === '/' ? crumbs.length === 0 : crumbs[0]?.item === urlOf('/', locale) && crumbs.at(-1)?.item === urlOf(route, locale))
+        if (!ok) incomplete.push(`${locale.id}${route}`)
       }
     }
     check(`Semua ${site.routes * 3} HTML statis sama dengan meta yang dipasang aplikasi (judul, deskripsi, lang, canonical)`, stale.length === 0, `${stale.length} berbeda: ${stale.slice(0, 3).join(' ')}`)
+    check(`Semua HTML statis: hub, daftar & detail berisi isi halaman (data-ssr, satu H1), beranda & Checklist tanpa isi; JSON-LD WebSite + BreadcrumbList Beranda → halaman itu`,
+      incomplete.length === 0, `${incomplete.length} bermasalah: ${incomplete.slice(0, 4).join(' ')}`)
 
     const sitemap = readFileSync(`${DIST}sitemap.xml`, 'utf8')
     const entries = [...sitemap.matchAll(/<url>\s*<loc>([^<]*)<\/loc>([\s\S]*?)<\/url>/g)].map((match) => ({ loc: match[1], links: [...match[2].matchAll(/<xhtml:link rel="alternate" hreflang="([^"]*)" href="([^"]*)"/g)].map((link) => [link[1], link[2]]) }))
@@ -265,11 +454,14 @@ async function runSuite(width) {
       '/wildlife/fish?waktu=Day': servedHead('/wildlife/fish'),
     }
     check('Vercel: rewrite tidak menimpa HTML statis; alamat yang tidak ada di daftar halaman jatuh ke index.html versi bahasanya',
-      cases['/th/wildlife/fish/sea-bass'].by === 'statis' && cases['/th/wildlife/fish/sea-bass'].title === 'Sea Bass | Hatowiki' && cases['/th/wildlife/fish/sea-bass'].lang === 'th' &&
+      cases['/th/wildlife/fish/sea-bass'].by === 'statis' && cases['/th/wildlife/fish/sea-bass'].title === EXPECTED['/wildlife/fish/sea-bass'].th[0] && cases['/th/wildlife/fish/sea-bass'].lang === 'th' &&
         cases['/en/recipes/tiramisu'].by === 'statis' && cases['/en/recipes/tiramisu'].lang === 'en' && cases['/wildlife/fish?waktu=Day'].by === 'statis' &&
         cases['/th/wildlife/fish/nope'].by === 'rewrite /th/index.html' && cases['/th/wildlife/fish/nope'].lang === 'th' && cases['/th/wildlife/fish/nope'].title === EXPECTED['/'].th[0] &&
         cases['/en/nope'].by === 'rewrite /en/index.html' && cases['/en/nope'].lang === 'en' && cases['/nope'].by === 'rewrite /index.html' && cases['/nope'].lang === 'id',
       Object.entries(cases).map(([path, head]) => `${path}: ${head.by} (${head.lang})`).join(' · '))
+
+    // ================= 4. Hydrate (hasil build + bundel produksi) =================
+    await hydrateSuite(width, check)
   }
 
   const problems = tab.logs.filter((line) => !/\[vite\] connect|React DevTools|\[Vercel Web Analytics\]/.test(line))

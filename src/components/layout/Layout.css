@@ -224,6 +224,13 @@
   height: 19px;
 }
 
+/* Tombol tema: bulan di tema terang, matahari di tema gelap, dari atribut data-theme di <html> (sama di HTML statis
+   dan setelah hydrate) */
+:root[data-theme='dark'] .theme-toggle__moon,
+:root:not([data-theme='dark']) .theme-toggle__sun {
+  display: none;
+}
+
 .icon-button:hover {
   border-color: var(--color-border-strong);
   background: var(--color-surface-sunken);

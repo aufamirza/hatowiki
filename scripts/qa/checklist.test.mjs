@@ -171,7 +171,7 @@ async function runSuite(width) {
     check('Ketuk Checklist di drawer membuka /checklist dan menutup drawer', after.path === '/checklist' && !after.drawer && after.h1 === 'Checklist', JSON.stringify(after))
   }
   const langs = []
-  for (const [route, h1, title] of [['/th/checklist', 'เช็กลิสต์', 'เช็กลิสต์ | Hatowiki'], ['/en/checklist', 'Checklist', 'Checklist | Hatowiki'], ['/checklist', 'Checklist', 'Checklist | Hatowiki']]) {
+  for (const [route, h1, title] of [['/th/checklist', 'เช็กลิสต์', 'เช็กลิสต์ - Heartopia Wiki ภาษาไทย'], ['/en/checklist', 'Checklist', 'Checklist - Heartopia Wiki | Hatowiki'], ['/checklist', 'Checklist', 'Checklist - Heartopia Wiki Indonesia']]) {
     await go(route, 2000)
     const state = await evaluate(`(async () => {
       const lang = document.documentElement.lang

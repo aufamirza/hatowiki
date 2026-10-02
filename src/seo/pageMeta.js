@@ -1,4 +1,4 @@
-import { CATALOGS } from '../components/layout/catalogs'
+import { CATALOGS, WILDLIFE_CATALOGS } from '../components/layout/catalogs'
 import { PERIODS } from '../data/gameTime'
 import { getItem } from '../data/items'
 import { recipesUsingItem } from '../data/itemUsage'
@@ -10,8 +10,9 @@ import idMessages from '../i18n/messages/id.json'
 import { formatGrowthTime } from '../pages/goods/goodsKinds'
 
 /**
- * Judul, deskripsi, dan alamat tiap halaman untuk meta tag (SEO & pratinjau tautan), per bahasa. Satu sumber untuk dua
- * pemakai:
+ * Judul, deskripsi, alamat, dan data terstruktur (JSON-LD) tiap halaman untuk meta tag (SEO & pratinjau tautan), per
+ * bahasa. Judul berformat "<nama> - Heartopia Wiki Indonesia" / "... - Heartopia Wiki ภาษาไทย" / "... - Heartopia Wiki |
+ * Hatowiki" (messages meta.titlePage). Satu sumber untuk dua pemakai:
  * - browser: Layout memasangnya ke <head> setiap kali pindah halaman (src/seo/applyPageMeta.js);
  * - build: scripts/build-seo.mjs menulis satu HTML statis per halaman & bahasa (salinan index.html dengan meta tag yang
  *   sudah diisi, untuk crawler tanpa JavaScript seperti WhatsApp dan Discord) serta sitemap.xml.
@@ -228,11 +229,67 @@ function createI18n(localeId, messages) {
   return { t, formatNumber: (value) => number.format(value) }
 }
 
+// ---------- data terstruktur (JSON-LD) ----------
+
+// Jalur halaman untuk BreadcrumbList, sama dengan breadcrumb di halamannya: Beranda > (Wildlife >) katalog > entri.
+function breadcrumbTrail(page, t) {
+  const home = { name: t('common.home'), route: '/' }
+  const wildlife = { name: 'Wildlife', route: '/wildlife' }
+  switch (page.type) {
+    case 'hub':
+      return [home, wildlife]
+    case 'checklist':
+      return [home, { name: t('checklist.title'), route: '/checklist' }]
+    case 'list':
+    case 'detail': {
+      const { catalog } = page
+      return [
+        home,
+        ...(WILDLIFE_CATALOGS.includes(catalog) ? [wildlife] : []),
+        { name: catalog.name, route: catalog.href() },
+        ...(page.type === 'detail' ? [{ name: page.entry.name, route: catalog.href(page.entry) }] : []),
+      ]
+    }
+    default:
+      return null
+  }
+}
+
+/**
+ * JSON-LD halaman: WebSite (nama situs & nama lain per bahasa, alamat beranda bahasanya) di semua halaman, ditambah
+ * BreadcrumbList di halaman yang punya jalur. Tanpa SearchAction: pencarian global situs tidak bisa dibuka lewat URL
+ * (hanya pencarian per katalog, mis. /recipes?q=…).
+ */
+function structuredData(page, localeId, t) {
+  const home = pageUrl('/', localeId)
+  const graph = [
+    {
+      '@type': 'WebSite',
+      '@id': `${home}#website`,
+      name: 'Hatowiki',
+      alternateName: t('meta.siteAlternateName'),
+      url: home,
+      inLanguage: getLocale(localeId).hreflang,
+    },
+  ]
+  const trail = breadcrumbTrail(page, t)
+  if (trail) {
+    graph.push({
+      '@type': 'BreadcrumbList',
+      itemListElement: trail.map((step, index) => ({ '@type': 'ListItem', position: index + 1, name: step.name, item: pageUrl(step.route, localeId) })),
+    })
+  }
+  return { '@context': 'https://schema.org', '@graph': graph }
+}
+
+/** JSON-LD sebagai teks untuk <script type="application/ld+json">; "<" ditulis sebagai escape Unicode supaya teks data tidak bisa menutup tag. */
+export const serializeStructuredData = (data) => JSON.stringify(data).replace(/</g, '\\u003c')
+
 /**
  * Meta tag satu halaman. `messages` = teks antarmuka bahasa itu (src/i18n/messages/<bahasa>.json).
  * `found` false = alamat tidak dikenal atau entrinya tidak ada (judul & pesan "tidak ditemukan").
  * @returns {{ found: boolean, lang: string, title: string, description: string, ogDescription: string, ogLocale: string,
- *   ogImageAlt: string, url: string, alternates: { hreflang: string, href: string }[] }}
+ *   ogImageAlt: string, url: string, alternates: { hreflang: string, href: string }[], structuredData: object }}
  */
 export function getPageMeta(path, localeId, messages) {
   const locale = getLocale(localeId)
@@ -260,7 +317,7 @@ export function getPageMeta(path, localeId, messages) {
       description = t('checklist.metaDescription')
       break
     case 'list':
-      title = pageTitle(page.catalog.name)
+      title = pageTitle(t(`kinds.${page.catalog.slug}.listTitle`))
       description = t(`kinds.${page.catalog.slug}.metaList`, { count: formatNumber(page.catalog.entries.length) })
       break
     case 'detail':
@@ -286,5 +343,6 @@ export function getPageMeta(path, localeId, messages) {
     ogImageAlt: t('meta.ogImageAlt'),
     url: pageUrl(page.route, locale.id),
     alternates: alternateLinks(page.route),
+    structuredData: structuredData(page, locale.id, t),
   }
 }

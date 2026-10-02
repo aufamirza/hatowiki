@@ -3,8 +3,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { buildSeo, describeResult } from './scripts/build-seo.mjs'
 
-// Setelah bundel selesai ditulis: HTML statis per halaman & bahasa (meta tag untuk crawler tanpa JavaScript),
-// sitemap.xml, dan robots.txt. Lihat scripts/build-seo.mjs. Hanya saat `vite build`, tidak saat dev.
+// Setelah bundel selesai ditulis: HTML statis per halaman & bahasa (meta tag, JSON-LD, dan isi halaman hub/daftar/detail
+// untuk crawler tanpa JavaScript), sitemap.xml, dan robots.txt. Lihat scripts/build-seo.mjs. Hanya saat `vite build`.
 function seoPages() {
   let outDir
   return {

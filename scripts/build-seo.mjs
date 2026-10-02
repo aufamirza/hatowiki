@@ -4,8 +4,11 @@
  * `vite build` (plugin di vite.config.js); bisa juga dijalankan sendiri setelah build: `node scripts/build-seo.mjs`.
  *
  * WhatsApp, Discord, dan media sosial hanya membaca HTML mentah, jadi tiap halaman di tiap bahasa mendapat berkas HTML
- * sendiri: salinan dist/index.html yang judul, deskripsi, canonical, hreflang, Open Graph, dan atribut lang-nya sudah
- * diisi untuk halaman itu. Isi halamannya tetap dirender React seperti biasa (bukan SSR).
+ * sendiri: salinan dist/index.html yang judul, deskripsi, canonical, hreflang, Open Graph, data terstruktur (JSON-LD),
+ * dan atribut lang-nya sudah diisi untuk halaman itu. Hub Wildlife, halaman daftar, dan halaman detail juga berisi isi
+ * halamannya di <div id="root"> (render React di server, src/entry-server.jsx), supaya crawler langsung membaca nama,
+ * deskripsi, lokasi, jadwal, dan data lain; <html data-ssr="<alamat>"> menandainya, dan src/main.jsx melakukan hydrate.
+ * Beranda dan Checklist tetap tanpa isi (dirender di browser).
  *
  *   dist/wildlife/fish/sea-bass/index.html        versi Indonesia
  *   dist/th/wildlife/fish/sea-bass/index.html     versi Thai
@@ -38,10 +41,14 @@ function replaceOnce(html, pattern, replacement, label) {
 const setTagAttribute = (html, tag, selector, attribute, value) =>
   replaceOnce(html, new RegExp(`(<${tag} ${escapeRegExp(selector)} ${attribute}=")[^"]*(")`), (_, open, close) => open + escapeAttribute(value) + close, `${tag} ${selector}`)
 
-/** index.html dengan meta tag satu halaman (hasil getPageMeta). */
-export function renderPage(template, meta) {
+/**
+ * index.html dengan meta tag satu halaman (hasil getPageMeta) dan, kalau ada, isi halamannya: `body` = HTML hasil
+ * render untuk #root, `path` = alamat halaman itu (dengan awalan bahasa) untuk atribut data-ssr.
+ */
+export function renderPage(template, meta, { body = null, path = null } = {}) {
   let html = template
-  html = replaceOnce(html, /<html lang="[^"]*">/, () => `<html lang="${escapeAttribute(meta.lang)}">`, 'html lang')
+  const ssr = body == null ? '' : ` data-ssr="${escapeAttribute(path)}"`
+  html = replaceOnce(html, /<html lang="[^"]*">/, () => `<html lang="${escapeAttribute(meta.lang)}"${ssr}>`, 'html lang')
   html = replaceOnce(html, /<title>[^<]*<\/title>/, () => `<title>${escapeText(meta.title)}</title>`, 'title')
   html = setTagAttribute(html, 'meta', 'name="description"', 'content', meta.description)
   html = setTagAttribute(html, 'link', 'rel="canonical"', 'href', meta.url)
@@ -54,6 +61,13 @@ export function renderPage(template, meta) {
   html = setTagAttribute(html, 'meta', 'name="twitter:title"', 'content', meta.title)
   html = setTagAttribute(html, 'meta', 'name="twitter:description"', 'content', meta.ogDescription)
   html = setTagAttribute(html, 'meta', 'name="twitter:image:alt"', 'content', meta.ogImageAlt)
+  html = replaceOnce(
+    html,
+    /<script type="application\/ld\+json" id="structured-data">[^<]*<\/script>/,
+    () => `<script type="application/ld+json" id="structured-data">${meta.structuredDataJson}</script>`,
+    'script structured-data',
+  )
+  if (body != null) html = replaceOnce(html, /<div id="root"><\/div>/, () => `<div id="root">${body}</div>`, 'div root')
   return html
 }
 
@@ -77,12 +91,12 @@ export async function buildSeo({ outDir = path.join(ROOT, 'dist') } = {}) {
   const template = await readFile(templateFile, 'utf8')
 
   return withAppModules(async (load) => {
-    const [{ SITE_URL, MAX_DESCRIPTION, alternateLinks, getPageMeta, listRoutes, pageUrl }, { LOCALES, localizePath }] = await Promise.all([
-      load('/src/seo/pageMeta.js'),
-      load('/src/i18n/locales.js'),
-    ])
+    const started = Date.now()
+    const [{ SITE_URL, MAX_DESCRIPTION, alternateLinks, getPageMeta, listRoutes, pageUrl, serializeStructuredData }, { LOCALES, localizePath }, { renderPage: renderBody, shouldPrerender }] =
+      await Promise.all([load('/src/seo/pageMeta.js'), load('/src/i18n/locales.js'), load('/src/entry-server.jsx')])
     const routes = listRoutes()
     const pages = {}
+    const prerendered = {}
     let longest = 0
 
     for (const locale of LOCALES) {
@@ -99,9 +113,12 @@ export async function buildSeo({ outDir = path.join(ROOT, 'dist') } = {}) {
           seen.set(key, route)
         }
         longest = Math.max(longest, meta.description.length)
-        const file = path.join(outDir, localizePath(route, locale.id), 'index.html')
+        const pagePath = localizePath(route, locale.id)
+        const body = shouldPrerender(route) ? await renderBody(route, locale.id) : null
+        if (body != null) prerendered[locale.id] = (prerendered[locale.id] ?? 0) + 1
+        const file = path.join(outDir, pagePath, 'index.html')
         await mkdir(path.dirname(file), { recursive: true })
-        await writeFile(file, renderPage(template, meta))
+        await writeFile(file, renderPage(template, { ...meta, structuredDataJson: serializeStructuredData(meta.structuredData) }, { body, path: pagePath }))
       }
       pages[locale.id] = routes.length
     }
@@ -110,13 +127,13 @@ export async function buildSeo({ outDir = path.join(ROOT, 'dist') } = {}) {
     await writeFile(path.join(outDir, 'sitemap.xml'), renderSitemap(groups))
     await writeFile(path.join(outDir, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\n`)
 
-    return { routes: routes.length, pages, sitemapUrls: routes.length * LOCALES.length, longest }
+    return { routes: routes.length, pages, prerendered, sitemapUrls: routes.length * LOCALES.length, longest, seconds: (Date.now() - started) / 1000 }
   })
 }
 
 export function describeResult(result) {
-  const perLocale = Object.entries(result.pages).map(([locale, count]) => `${locale} ${count}`).join(', ')
-  return `halaman statis: ${perLocale} (deskripsi terpanjang ${result.longest} karakter) · sitemap.xml: ${result.sitemapUrls} alamat · robots.txt`
+  const perLocale = Object.entries(result.pages).map(([locale, count]) => `${locale} ${count} (${result.prerendered[locale] ?? 0} dengan isi)`).join(', ')
+  return `halaman statis: ${perLocale}, deskripsi terpanjang ${result.longest} karakter, ${result.seconds.toFixed(1)} detik · sitemap.xml: ${result.sitemapUrls} alamat · robots.txt`
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

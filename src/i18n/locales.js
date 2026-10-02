@@ -1,7 +1,7 @@
 /**
  * Bahasa situs. Indonesia (bawaan) di alamat tanpa awalan, Thai di bawah /th, Inggris di bawah /en; slug halaman sama
  * untuk semuanya. Tidak ada awalan /id: alamat /id/... diarahkan ke versi tanpa awalan (vercel.json dan route di
- * App.jsx). Kunci penyimpanan dan daftar awalan juga dipakai skrip di index.html (pengalihan, lang & font sebelum React
+ * src/routes.jsx). Kunci penyimpanan dan daftar awalan juga dipakai skrip di index.html (pengalihan, lang & font sebelum React
  * jalan) dan skrip build halaman statis (scripts/build-seo.mjs).
  */
 export const LOCALES = [

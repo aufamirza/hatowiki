@@ -1,7 +1,8 @@
 {
   "meta": {
-    "titleDefault": "Hatowiki | วิกิชุมชน Heartopia",
-    "titlePage": "{title} | Hatowiki",
+    "titleDefault": "Hatowiki - Heartopia Wiki ภาษาไทย",
+    "titlePage": "{title} - Heartopia Wiki ภาษาไทย",
+    "siteAlternateName": "Heartopia Wiki ภาษาไทย",
     "description": "วิกิชุมชน Heartopia ภาษาไทย: ปลา แมลง นก สัตว์ สูตรอาหาร พืชผล วัตถุดิบธรรมชาติ และวัตถุดิบทำอาหาร พร้อมช่วงเวลาที่ปรากฏ สภาพอากาศ สถานที่ และราคา",
     "ogDescription": "ปลา แมลง นก สัตว์ สูตรอาหาร พืชผล วัตถุดิบธรรมชาติ และวัตถุดิบทำอาหารใน Heartopia เป็นภาษาไทย: ช่วงเวลาที่ปรากฏ สภาพอากาศ สถานที่ ส่วนผสม และราคา",
     "ogImageAlt": "Hatowiki: ทิวทัศน์ยามกลางวันของ Heartopia มีเนินเขา ทะเล ปลา แมลง และนก"
@@ -75,6 +76,8 @@
   "kinds": {
     "fish": {
       "label": "ปลา",
+      "listTitle": "รายชื่อปลา",
+      "inHeartopia": "ปลาใน Heartopia",
       "noun": "ปลา",
       "unit": "ชนิด",
       "count": "ปลา {count} ชนิด",
@@ -89,6 +92,8 @@
     },
     "bugs": {
       "label": "แมลง",
+      "listTitle": "รายชื่อแมลง",
+      "inHeartopia": "แมลงใน Heartopia",
       "noun": "แมลง",
       "unit": "ชนิด",
       "count": "แมลง {count} ชนิด",
@@ -103,6 +108,8 @@
     },
     "birds": {
       "label": "นก",
+      "listTitle": "รายชื่อนก",
+      "inHeartopia": "นกใน Heartopia",
       "noun": "นก",
       "unit": "ชนิด",
       "count": "นก {count} ชนิด",
@@ -118,6 +125,8 @@
     },
     "animals": {
       "label": "สัตว์",
+      "listTitle": "รายชื่อสัตว์ป่า",
+      "inHeartopia": "สัตว์ป่าใน Heartopia",
       "noun": "สัตว์",
       "unit": "ชนิด",
       "count": "สัตว์ {count} ชนิด",
@@ -131,6 +140,8 @@
     },
     "recipes": {
       "label": "สูตรอาหาร",
+      "listTitle": "รายการสูตรอาหาร",
+      "inHeartopia": "สูตรอาหารใน Heartopia",
       "noun": "สูตรอาหาร",
       "unit": "สูตร",
       "count": "สูตรอาหาร {count} สูตร",
@@ -146,6 +157,8 @@
     },
     "crops": {
       "label": "พืชผล",
+      "listTitle": "รายการพืชผล",
+      "inHeartopia": "พืชผลใน Heartopia",
       "noun": "พืชผล",
       "unit": "ชนิด",
       "count": "พืชผล {count} ชนิด",
@@ -160,6 +173,8 @@
     },
     "collectibles": {
       "label": "วัตถุดิบธรรมชาติ",
+      "listTitle": "รายการวัตถุดิบธรรมชาติ",
+      "inHeartopia": "วัตถุดิบธรรมชาติใน Heartopia",
       "noun": "วัตถุดิบธรรมชาติ",
       "unit": "ชนิด",
       "count": "วัตถุดิบธรรมชาติ {count} ชนิด",
@@ -173,6 +188,8 @@
     },
     "ingredients": {
       "label": "วัตถุดิบทำอาหาร",
+      "listTitle": "รายการวัตถุดิบทำอาหาร",
+      "inHeartopia": "วัตถุดิบทำอาหารใน Heartopia",
       "noun": "วัตถุดิบทำอาหาร",
       "unit": "ชนิด",
       "count": "วัตถุดิบทำอาหาร {count} ชนิด",
@@ -186,6 +203,8 @@
     },
     "items": {
       "label": "ไอเทม",
+      "listTitle": "รายการไอเทม",
+      "inHeartopia": "ไอเทมใน Heartopia",
       "noun": "ไอเทม",
       "unit": "ชนิด",
       "count": "ไอเทม {count} ชนิด",
@@ -200,6 +219,8 @@
     },
     "npcs": {
       "label": "ชาวเมือง",
+      "listTitle": "รายชื่อ NPC",
+      "inHeartopia": "NPC ใน Heartopia",
       "noun": "NPC",
       "unit": "คน",
       "count": "NPC {count} คน",
@@ -215,6 +236,8 @@
     },
     "achievements": {
       "label": "ความสำเร็จ",
+      "listTitle": "รายการความสำเร็จ",
+      "inHeartopia": "ความสำเร็จใน Heartopia",
       "noun": "ความสำเร็จ",
       "unit": "รายการ",
       "count": "ความสำเร็จ {count} รายการ",

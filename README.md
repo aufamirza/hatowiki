@@ -36,8 +36,10 @@ Uji lain yang ikut `npm run test:ui`:
   filter & pencarian, Target Sekarang: level, cuaca, server, periode berikutnya, event yang sedang berjalan & lokasi
   khusus, reset dengan konfirmasi, Cadangkan &
   Pulihkan termasuk berkas yang salah, tidak ada request selain GET, area ketuk ponsel, tiga bahasa); bawaan lebar 390 & 1280.
-- `scripts/qa/seo.test.mjs`: meta tag per halaman & bahasa di browser, lalu HTML statis, `sitemap.xml`, `robots.txt`, dan
-  rewrite `vercel.json` di `dist/` (jalankan `npm run build` dulu).
+- `scripts/qa/seo.test.mjs`: meta tag & JSON-LD per halaman & bahasa di browser, lalu HTML statis (meta, JSON-LD, isi
+  halaman), `sitemap.xml`, `robots.txt`, dan rewrite `vercel.json` di `dist/`, serta hydrate hasil build di server statis
+  lokal yang meniru `vercel.json` (`scripts/qa/dist-server.mjs`): tidak ada elemen yang bergeser, tema gelap, useId,
+  posisi gulir, alamat dengan query, console (jalankan `npm run build` dulu).
 
 ```bash
 npm run dev        # di terminal lain
@@ -175,7 +177,11 @@ scripts/
 ├── translations/             Terjemahan & review per kategori (<kind>.id|th|en.json, review-*.md, english-corrections.json)
 └── qa/                       Uji UI (Chrome headless)
 src/
-├── App.jsx                   Definisi route
+├── main.jsx                  Masuk aplikasi di browser: hydrate HTML statis atau render dari awal (lihat SEO)
+├── App.jsx                   Akar aplikasi (router + Vercel Analytics), sama di browser & saat build
+├── routes.jsx                Definisi route (dipakai router browser & router statis)
+├── entry-server.jsx          Render isi halaman ke HTML saat build (hub, daftar, detail)
+├── hooks/                    useNow (jam), useHydrated (false sampai hydrate selesai), useReplayAnimation
 ├── styles/tokens.css         Design token: warna (light & dark, termasuk --level-1…14 badge level), font, radius, spacing, bayangan
 ├── styles/base.css           Reset, tipografi, utilitas (.container, .btn, dll)
 ├── data/
@@ -210,7 +216,7 @@ src/
 │       └── zoneViewBox.js    Potongan peta untuk beberapa zona sekaligus
 ├── i18n/                     Bahasa: locales.js (id, th, en), I18nProvider (useI18n), LocaleLink, format.js (teks & bentuk
 │                             jamak), suggestLocale.js (aturan saran bahasa), messages/<bahasa>.json (teks antarmuka)
-├── seo/                      pageMeta.js (judul, deskripsi & alamat tiap halaman per bahasa), applyPageMeta.js (pasang ke <head>)
+├── seo/                      pageMeta.js (judul, deskripsi, alamat & JSON-LD tiap halaman per bahasa), applyPageMeta.js (pasang ke <head>)
 ├── components/
 │   ├── catalog/              CatalogCard (kartu generik: gambar, badge kategori & level, baris info)
 │   ├── wildlife/             EntryCard, EntryImage, LocationMap (zona atau pin), MarketValue, dll (dipakai semua kategori)
@@ -356,18 +362,38 @@ Aturan yang dijaga:
 
 ## SEO
 
-- `src/seo/pageMeta.js` adalah satu-satunya sumber judul, deskripsi, dan alamat tiap halaman per bahasa. Deskripsi dibuat
-  dari data dalam bahasa halamannya, paling panjang 160 karakter: mis. ikan = nama, level, lokasi, waktu muncul, cuaca,
-  dan rentang harga jual; resep = level, energi, bahan utama, dan harga jual. Kalimat pembuka selalu ada, keterangan
+- `src/seo/pageMeta.js` adalah satu-satunya sumber judul, deskripsi, alamat, dan data terstruktur tiap halaman per
+  bahasa. Judul: "Mallard - Heartopia Wiki Indonesia", "Mallard - Heartopia Wiki ภาษาไทย", "Mallard - Heartopia Wiki |
+  Hatowiki" (`meta.titlePage`); halaman daftar memakai `kinds.<slug>.listTitle` ("Daftar Burung", "รายชื่อนก", "Bird
+  List"); beranda "Hatowiki - Heartopia Wiki Indonesia" / "… ภาษาไทย" / "Hatowiki - Heartopia Wiki". Tanda hubung biasa,
+  bukan tanda pisah panjang. Deskripsi dibuat dari data dalam bahasa halamannya dan selalu menyebut Heartopia, paling
+  panjang 160 karakter: mis. ikan = nama, level, lokasi, jadwal muncul, cuaca, dan rentang harga jual; resep = level,
+  energi, bahan utama, dan harga jual. Kalimat pembuka selalu ada, keterangan
   lain ditambahkan menurut prioritas selama masih muat. Teksnya di `src/i18n/messages` (`seo.*`, `kinds.<slug>.meta*`).
-- Di browser, `Layout` memasang judul, meta description, canonical, Open Graph/Twitter, dan `hreflang` (id, th, en, serta
-  `x-default` → versi Inggris) setiap kali pindah halaman atau bahasa (`src/seo/applyPageMeta.js`). Halaman yang tidak ada
-  diberi `noindex`.
+- JSON-LD (`<script type="application/ld+json" id="structured-data">`): `WebSite` (name "Hatowiki", alternateName
+  "Heartopia Wiki Indonesia" / "Heartopia Wiki ภาษาไทย" / "Heartopia Wiki", url beranda bahasanya) di semua halaman, dan
+  `BreadcrumbList` sesuai jalur halaman (Beranda > Wildlife > Birds > Mallard; Beranda > Recipes > Tiramisu). Tanpa
+  `SearchAction`, karena pencarian global tidak bisa dibuka lewat URL (hanya pencarian per katalog, `?q=`).
+- Halaman detail menampilkan keterangan singkat di bawah nama (H1), mis. "Burung di Heartopia" / "นกใน Heartopia" / "A bird
+  in Heartopia" (`src/components/InHeartopia.jsx`, `kinds.<slug>.inHeartopia`).
+- Di browser, `Layout` memasang judul, meta description, canonical, Open Graph/Twitter, `hreflang` (id, th, en, serta
+  `x-default` → versi Inggris), dan JSON-LD setiap kali pindah halaman atau bahasa (`src/seo/applyPageMeta.js`). Halaman
+  yang tidak ada diberi `noindex`.
 - Saat `vite build`, plugin di `vite.config.js` menjalankan `scripts/build-seo.mjs`: untuk tiap halaman di tiap bahasa
-  ditulis salinan `index.html` dengan meta tag dan atribut `lang` yang sudah diisi (`dist/wildlife/fish/sea-bass/index.html`,
-  `dist/th/...`, `dist/en/...`), untuk crawler tanpa JavaScript (WhatsApp, Discord, media sosial). Isi halaman tetap
-  dirender React; ini bukan SSR. Skrip yang sama menulis `sitemap.xml` (semua halaman × 3 bahasa dengan `hreflang`) dan
+  ditulis salinan `index.html` dengan meta tag, JSON-LD, dan atribut `lang` yang sudah diisi
+  (`dist/wildlife/fish/sea-bass/index.html`, `dist/th/...`, `dist/en/...`), untuk crawler tanpa JavaScript (WhatsApp,
+  Discord, media sosial). Skrip yang sama menulis `sitemap.xml` (semua halaman × 3 bahasa dengan `hreflang`) dan
   `robots.txt`. Build berhenti kalau ada judul/deskripsi yang sama di satu bahasa atau deskripsi lebih dari 160 karakter.
+- Isi halaman di HTML statis: hub Wildlife, halaman daftar, dan halaman detail dirender React saat build
+  (`src/entry-server.jsx`: router statis + `renderToString`, sekitar 10 detik untuk ketiga bahasa), jadi nama, deskripsi,
+  lokasi, jadwal, dan data lain terbaca tanpa JavaScript. `<html data-ssr="<alamat>">` menandai halaman itu, dan
+  `src/main.jsx` melakukan hydrate dengan pohon komponen yang sama (`App` + `routes.jsx`). Bagian yang bergantung pada
+  browser memakai `useHydrated`: jam server (`ServerTime`, `data-pending` = tempatnya ada tapi baru terlihat setelah
+  hydrate) dan label tombol tema (ikonnya dipilih CSS dari `data-theme`). Router dibuat dengan `hydrationData` supaya
+  posisi gulir tidak direset saat hydrate. Kalau alamat yang dibuka berbeda dari `data-ssr` (rewrite ke index.html lain)
+  atau punya query (filter daftar di URL), skrip di `index.html` memberi `data-csr`: isi statis disembunyikan dan aplikasi
+  dirender dari awal. Beranda dan Checklist tidak punya isi statis (jam, localStorage, dan ukuran layar menentukan isinya)
+  dan tetap dirender di browser.
 - Dua entri yang namanya sama di katalog berbeda (Egg: resep & bahan masak) diberi nama kategori di judulnya, dalam
   bahasa halamannya: "Egg (Resep)" dan "Egg (Bahan Masak)", "Egg (สูตรอาหาร)" dan "Egg (วัตถุดิบทำอาหาร)", "Egg (Recipes)" dan
   "Egg (Ingredients)".

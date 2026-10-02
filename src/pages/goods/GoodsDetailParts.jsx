@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { ArrowLeft, ExternalLink, Store } from 'lucide-react'
 import { categoryToneStyle } from '../../components/catalog/categoryTone'
+import InHeartopia from '../../components/InHeartopia'
 import { sellersOf, splitNpcMentions } from '../../data/npcSales'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Link } from '../../i18n/LocaleLink'
@@ -21,6 +22,7 @@ export function IdentityPanel({ kind, entry }) {
       <h1 id="entry-name" className="entry-detail__name">
         {entry.name}
       </h1>
+      <InHeartopia kindSlug={kind.slug} />
       {entry.category && (
         <p className="category-tag" style={categoryToneStyle(entry.category)}>
           <span className="visually-hidden">{t('common.categoryPrefix')}</span>

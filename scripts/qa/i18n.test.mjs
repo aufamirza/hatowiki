@@ -40,9 +40,9 @@ const PORT = 9950 + Math.floor(Math.random() * 40)
 const ROOT = new URL('../../', import.meta.url)
 
 // Teks yang diharapkan, ditulis ulang di sini supaya uji tidak memakai kode aplikasi untuk memeriksa dirinya sendiri.
-const TH_TITLE = 'Hatowiki | วิกิชุมชน Heartopia'
-const ID_TITLE = 'Hatowiki | Wiki Komunitas Heartopia'
-const EN_TITLE = 'Hatowiki | Heartopia Community Wiki'
+const TH_TITLE = 'Hatowiki - Heartopia Wiki ภาษาไทย'
+const ID_TITLE = 'Hatowiki - Heartopia Wiki Indonesia'
+const EN_TITLE = 'Hatowiki - Heartopia Wiki'
 const SUGGEST_TH = {
   title: 'สวัสดี! 👋',
   text: 'Hatowiki มีเวอร์ชันภาษาไทยด้วยนะ อยากเปลี่ยนเป็นภาษาไทยไหม?',
@@ -239,7 +239,7 @@ async function runSuite(width) {
   const enNotFound = enPages.find((page) => page.route === '/nope')
   const enFishNotFound = enPages.find((page) => page.route === '/wildlife/fish/nope')
   check('/en: halaman 404 umum & detail tidak ditemukan berbahasa Inggris; judul tab memakai nama entri/katalog',
-    enNotFound.h1 === 'Page not found' && enFishNotFound.h1 === 'Fish not found' && enFishNotFound.title === 'Fish not found | Hatowiki' && enPages.find((page) => page.route === '/wildlife/fish').title === 'Fish | Hatowiki' && enPages.find((page) => page.route === '/wildlife/fish/sea-bass').title === 'Sea Bass | Hatowiki',
+    enNotFound.h1 === 'Page not found' && enFishNotFound.h1 === 'Fish not found' && enFishNotFound.title === 'Fish not found - Heartopia Wiki | Hatowiki' && enPages.find((page) => page.route === '/wildlife/fish').title === 'Fish List - Heartopia Wiki | Hatowiki' && enPages.find((page) => page.route === '/wildlife/fish/sea-bass').title === 'Sea Bass - Heartopia Wiki | Hatowiki',
     `${enNotFound.h1} · ${enFishNotFound.h1}`)
   const enList = enPages.find((page) => page.route === '/wildlife/bugs').text
   const enRecipes = enPages.find((page) => page.route === '/recipes').text
@@ -409,9 +409,9 @@ async function runSuite(width) {
   check('/th: angka memakai angka Arab (tanpa angka Thai)', pages.every((page) => !THAI_DIGITS.test(page.text)))
   const notFound = pages.find((page) => page.route === '/nope')
   const fishNotFound = pages.find((page) => page.route === '/wildlife/fish/nope')
-  check('/th: halaman 404 umum & detail tidak ditemukan berbahasa Thai', notFound.h1 === 'ไม่พบหน้านี้' && fishNotFound.h1 === 'ไม่พบปลานี้' && fishNotFound.title === 'ไม่พบปลานี้ | Hatowiki', `${notFound.h1} · ${fishNotFound.h1}`)
+  check('/th: halaman 404 umum & detail tidak ditemukan berbahasa Thai', notFound.h1 === 'ไม่พบหน้านี้' && fishNotFound.h1 === 'ไม่พบปลานี้' && fishNotFound.title === 'ไม่พบปลานี้ - Heartopia Wiki ภาษาไทย', `${notFound.h1} · ${fishNotFound.h1}`)
   const listTitle = pages.find((page) => page.route === '/wildlife/fish').title
-  check('/th: judul tab halaman memakai nama entri/katalog (Inggris) + Hatowiki', listTitle === 'Fish | Hatowiki' && pages.find((page) => page.route === '/wildlife/fish/sea-bass').title === 'Sea Bass | Hatowiki', listTitle)
+  check('/th: judul tab halaman memakai nama entri (Inggris) atau judul daftar Thai + Heartopia Wiki ภาษาไทย', listTitle === 'รายชื่อปลา - Heartopia Wiki ภาษาไทย' && pages.find((page) => page.route === '/wildlife/fish/sea-bass').title === 'Sea Bass - Heartopia Wiki ภาษาไทย', listTitle)
 
   // Kunci teks antarmuka sama di kedua bahasa; deskripsi Thai lengkap & sesuai aturan sembunyi.
   const coverage = await evaluate(`(async () => {

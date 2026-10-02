@@ -6,10 +6,11 @@
   <meta name="description" content="Wiki komunitas Heartopia berbahasa Indonesia: ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak, dengan jadwal, lokasi, dan harga." />
   <meta name="theme-color" content="#f5f7fc" />
   <meta name="application-name" content="Hatowiki" />
-  <title>Hatowiki | Wiki Komunitas Heartopia</title>
-  <!-- Judul, deskripsi, canonical, hreflang, Open Graph, dan atribut lang diisi per halaman & bahasa dari
-       src/seo/pageMeta.js: saat build oleh scripts/build-seo.mjs (satu salinan berkas ini per halaman), dan di
-       browser oleh Layout setiap kali pindah halaman. Berkas sumbernya berisi versi beranda Indonesia. -->
+  <title>Hatowiki - Heartopia Wiki Indonesia</title>
+  <!-- Judul, deskripsi, canonical, hreflang, Open Graph, data terstruktur (JSON-LD), dan atribut lang diisi per
+       halaman & bahasa dari src/seo/pageMeta.js: saat build oleh scripts/build-seo.mjs (satu salinan berkas ini per
+       halaman, beserta isi halamannya di #root untuk hub, daftar, dan detail), dan di browser oleh Layout setiap kali
+       pindah halaman. Berkas sumbernya berisi versi beranda Indonesia. -->
   <link rel="canonical" href="https://www.hatowiki.site/" />
   <link rel="alternate" hreflang="id" href="https://www.hatowiki.site/" />
   <link rel="alternate" hreflang="th" href="https://www.hatowiki.site/th" />
@@ -19,7 +20,7 @@
   <meta property="og:site_name" content="Hatowiki" />
   <meta property="og:locale" content="id_ID" />
   <meta property="og:url" content="https://www.hatowiki.site/" />
-  <meta property="og:title" content="Hatowiki | Wiki Komunitas Heartopia" />
+  <meta property="og:title" content="Hatowiki - Heartopia Wiki Indonesia" />
   <meta property="og:description" content="Ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak Heartopia dalam bahasa Indonesia: jadwal muncul, cuaca, lokasi, bahan, dan harga." />
   <meta property="og:image" content="https://www.hatowiki.site/og-image.jpg" />
   <meta property="og:image:type" content="image/jpeg" />
@@ -27,14 +28,20 @@
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Hatowiki: pemandangan siang Heartopia dengan bukit, laut, ikan, serangga, dan burung" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Hatowiki | Wiki Komunitas Heartopia" />
+  <meta name="twitter:title" content="Hatowiki - Heartopia Wiki Indonesia" />
   <meta name="twitter:description" content="Ikan, serangga, burung, hewan, resep, tanaman, collectibles, dan bahan masak Heartopia dalam bahasa Indonesia: jadwal muncul, cuaca, lokasi, bahan, dan harga." />
   <meta name="twitter:image" content="https://www.hatowiki.site/og-image.jpg" />
   <meta name="twitter:image:alt" content="Hatowiki: pemandangan siang Heartopia dengan bukit, laut, ikan, serangga, dan burung" />
+  <script type="application/ld+json" id="structured-data">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://www.hatowiki.site/#website","name":"Hatowiki","alternateName":"Heartopia Wiki Indonesia","url":"https://www.hatowiki.site/","inLanguage":"id"}]}</script>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,500..700,100&family=Plus+Jakarta+Sans:wght@400..700&display=swap" />
+  <style>
+    /* Isi statis yang tidak di-hydrate (lihat skrip di bawah & src/main.jsx) disembunyikan sampai aplikasi selesai
+       dirender, supaya tidak sempat tampil lalu berganti. */
+    html[data-csr] #root { visibility: hidden; }
+  </style>
   <script>
     // Pasang tema sebelum render supaya tidak berkedip: pilihan tersimpan dari tombol tema, kalau belum pernah memilih
     // selalu light (tidak mengikuti pengaturan sistem).
@@ -53,6 +60,7 @@
       var chosen
       try { chosen = localStorage.getItem('hdx-lang') } catch (e) {}
       if (!prefix && (chosen === 'th' || chosen === 'en')) {
+        document.documentElement.setAttribute('data-csr', '')
         // Awalan /id tidak dipakai: /id/x → /th/x.
         if (path === '/id' || path.indexOf('/id/') === 0) path = path.slice(3) || '/'
         location.replace('/' + chosen + (path === '/' ? '' : path) + location.search + location.hash)
@@ -66,6 +74,16 @@
       font.rel = 'stylesheet'
       font.href = 'https://fonts.googleapis.com/css2?family=Anuphan:wght@400..700&display=swap'
       document.head.appendChild(font)
+    })();
+    // Isi halaman di HTML statis (atribut data-ssr = alamat yang dirender, scripts/build-seo.mjs) hanya dipakai ulang
+    // (hydrate) kalau alamat yang dibuka sama persis dan tanpa query (filter daftar di URL). Kalau tidak, data-csr:
+    // isinya disembunyikan dan aplikasi merender ulang dari awal (src/main.jsx).
+    (function () {
+      var root = document.documentElement
+      var rendered = root.getAttribute('data-ssr')
+      if (rendered === null) return
+      var path = location.pathname.replace(/\/+$/, '') || '/'
+      if (path !== rendered || location.search) root.setAttribute('data-csr', '')
     })()
   </script>
 </head>

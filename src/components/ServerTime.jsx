@@ -1,5 +1,6 @@
 import { Moon, Sun, Sunrise, Sunset } from 'lucide-react'
 import { SERVERS, formatClock, formatUtcOffset, getPeriod, getServerTime } from '../data/gameTime'
+import { useHydrated } from '../hooks/useHydrated'
 import { useNow } from '../hooks/useNow'
 import './ServerTime.css'
 
@@ -7,9 +8,11 @@ import './ServerTime.css'
 export const PERIOD_ICONS = { Dawn: Sunrise, Day: Sun, Dusk: Sunset, Night: Moon }
 
 // Jam live untuk semua server Heartopia beserta periode waktunya: baris-baris yang ukurannya menyesuaikan lebar wadah
-// (container query), dipakai di halaman detail wildlife. Beranda memakai pita siklus hari (DayCycle).
+// (container query), dipakai di halaman detail wildlife. Beranda memakai pita siklus hari (DayCycle). Di HTML statis
+// jamnya belum diketahui: barisnya tetap ada (ukuran kotak tidak berubah) tapi baru terlihat setelah hydrate.
 function ServerTime() {
   const now = useNow()
+  const hydrated = useHydrated()
   const servers = SERVERS.map((server) => {
     const { hours, minutes } = getServerTime(now, server.utcOffset)
     const period = getPeriod(hours)
@@ -17,7 +20,7 @@ function ServerTime() {
   })
 
   return (
-    <div className="server-time">
+    <div className="server-time" data-pending={hydrated ? undefined : ''}>
       <ul className="server-time__list">
         {servers.map(({ server, period, clock, PeriodIcon }) => (
           <li key={server.id} className="server-row">

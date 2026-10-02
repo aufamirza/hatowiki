@@ -128,6 +128,14 @@
   line-height: 1.02;
 }
 
+/* Keterangan di bawah nama, mis. "Burung di Heartopia" (InHeartopia.jsx): teks kecil redup, rapat ke nama */
+.entry-detail__context {
+  margin-top: calc(var(--space-2) * -1);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
 /* Warna per kategori dari token --category-<kunci> (categoryTone.js), sama dengan badge kategori di kartu */
 .category-tag {
   display: inline-flex;

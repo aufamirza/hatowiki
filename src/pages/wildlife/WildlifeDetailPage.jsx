@@ -10,6 +10,7 @@ import MarketValue from '../../components/wildlife/MarketValue'
 import ShadowIndicator from '../../components/wildlife/ShadowIndicator'
 import { levelToneStyle } from '../../components/wildlife/levelTone'
 import { categoryToneStyle } from '../../components/catalog/categoryTone'
+import InHeartopia from '../../components/InHeartopia'
 import { PERIODS, formatPeriodRange } from '../../data/gameTime'
 import { WEATHERS } from '../../data/wildlife/attributes'
 import { getEntryLocations } from '../../data/wildlife/entryLocations'
@@ -77,6 +78,7 @@ function WildlifeDetailPage({ kindSlug }) {
             <h1 id="entry-name" className="entry-detail__name">
               {entry.name}
             </h1>
+            <InHeartopia kindSlug={kind.slug} />
             {entry.category && (
               <p className="category-tag" style={categoryToneStyle(entry.category)}>
                 <span className="visually-hidden">{t('common.categoryPrefix')}</span>

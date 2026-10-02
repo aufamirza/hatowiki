@@ -8,6 +8,7 @@ import { formatEnergy } from '../../components/recipes/starValues'
 import EntryImage from '../../components/wildlife/EntryImage'
 import MarketValue from '../../components/wildlife/MarketValue'
 import { levelToneStyle } from '../../components/wildlife/levelTone'
+import InHeartopia from '../../components/InHeartopia'
 import { RECIPE_CATEGORIES } from '../../data/recipes/categories'
 import { getRecipeBySlug } from '../../data/recipes/recipes'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -66,6 +67,7 @@ function RecipeDetailPage() {
           <h1 id="entry-name" className="entry-detail__name">
             {recipe.name}
           </h1>
+          <InHeartopia kindSlug={RECIPE_KIND.slug} />
           {recipe.category && (
             <p className="category-tag" style={categoryToneStyle(recipe.category)}>
               <span className="visually-hidden">{t('common.categoryPrefix')}</span>

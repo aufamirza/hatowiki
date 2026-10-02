@@ -4,6 +4,7 @@ import { Award, Eye, EyeOff, LockKeyhole, Target, Trophy } from 'lucide-react'
 import Breadcrumbs from '../../components/Breadcrumbs'
 import { categoryToneStyle } from '../../components/catalog/categoryTone'
 import EntryImage from '../../components/wildlife/EntryImage'
+import InHeartopia from '../../components/InHeartopia'
 import { getAchievementBySlug } from '../../data/achievements/achievements'
 import { useI18n } from '../../i18n/I18nProvider'
 import NotFoundPage from '../NotFoundPage'
@@ -92,6 +93,7 @@ function AchievementDetailPage() {
           <h1 id="entry-name" className="entry-detail__name">
             {entry.name}
           </h1>
+          <InHeartopia kindSlug={ACHIEVEMENT_KIND.slug} />
           <div className="achievement-tags">
             {entry.category && (
               <p className="category-tag" style={categoryToneStyle(entry.category)}>

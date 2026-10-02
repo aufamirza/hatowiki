@@ -104,6 +104,12 @@ button:disabled {
   border: 0;
 }
 
+/* Bagian yang bergantung pada browser (mis. jam server) di HTML statis & render hydrate: tempatnya tetap ada, isinya
+   baru terlihat setelah hydrate (src/hooks/useHydrated.js). */
+[data-pending] {
+  visibility: hidden;
+}
+
 .eyebrow {
   font-size: var(--text-xs);
   font-weight: 700;

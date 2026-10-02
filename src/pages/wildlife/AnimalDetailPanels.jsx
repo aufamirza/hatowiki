@@ -5,6 +5,7 @@ import ItemList from '../../components/items/ItemList'
 import AvailabilityChips from '../../components/wildlife/AvailabilityChips'
 import EntryImage from '../../components/wildlife/EntryImage'
 import LocationMap from '../../components/wildlife/LocationMap'
+import InHeartopia from '../../components/InHeartopia'
 import { WEATHERS } from '../../data/wildlife/attributes'
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -28,6 +29,7 @@ function AnimalDetailPanels({ kind, entry, category, locations }) {
             <h1 id="entry-name" className="entry-detail__name">
               {entry.name}
             </h1>
+            <InHeartopia kindSlug={kind.slug} />
             {entry.category && (
               <p className="category-tag" style={categoryToneStyle(entry.category)}>
                 <span className="visually-hidden">{t('common.categoryPrefix')}</span>
