@@ -101,6 +101,48 @@
       "en": "Don't mistake it for a bad dye job... Only a bold fashion sense suits its name.",
       "id": "Jangan kira ini hasil pewarnaan yang gagal... Hanya selera busana yang berani yang cocok dengan namanya.",
       "th": "อย่าเข้าใจผิดว่าเป็นงานย้อมสีพัง ๆ นะ... ต้องมีรสนิยมแฟชั่นที่กล้าเท่านั้นถึงจะคู่ควรกับชื่อนี้"
+    },
+    "blue-sea-angel": {
+      "name": "Blue Sea Angel",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "green-sea-angel": {
+      "name": "Green Sea Angel",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "golden-cuttlefish": {
+      "name": "Golden Cuttlefish",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "purple-sea-angel": {
+      "name": "Purple Sea Angel",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "pharaoh-cuttlefish": {
+      "name": "Pharaoh Cuttlefish",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "spineless-cuttlefish": {
+      "name": "Spineless Cuttlefish",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
     }
   },
   "bugs": {
@@ -181,6 +223,41 @@
       "id": "",
       "th": ""
     },
+    "pumpkin-dung-beetle": {
+      "name": "Pumpkin Dung Beetle",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "strawberry-dung-beetle": {
+      "name": "Strawberry Dung Beetle",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "mandarin-dung-beetle": {
+      "name": "Mandarin Dung Beetle",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "shiitake-dung-beetle": {
+      "name": "Shiitake Dung Beetle",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "truffle-dung-beetle": {
+      "name": "Truffle Dung Beetle",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
     "colorful-brick-large-red-damselfly": {
       "name": "Colorful Brick Large Red Damselfly",
       "reason": "deskripsi di sumber sama persis dengan Pink Brick Large Red Damselfly dan menyebut balok merah muda (\"Pink bricks\"), hampir pasti salah salin di heartodex; disembunyikan sampai sumber diperbaiki",
@@ -204,13 +281,6 @@
       "id": "",
       "th": ""
     },
-    "chestnut-cheeked-starling": {
-      "name": "Chestnut-Cheeked Starling",
-      "reason": "deskripsi tidak ditemukan di sumber",
-      "en": "",
-      "id": "",
-      "th": ""
-    },
     "blue-headed-quail-dove": {
       "name": "Blue-Headed Quail-Dove",
       "reason": "deskripsi tidak ditemukan di sumber",
@@ -220,6 +290,13 @@
     },
     "white-peafowl": {
       "name": "White Peafowl",
+      "reason": "deskripsi tidak ditemukan di sumber",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "chestnut-cheeked-starling": {
+      "name": "Chestnut-Cheeked Starling",
       "reason": "deskripsi tidak ditemukan di sumber",
       "en": "",
       "id": "",
@@ -287,6 +364,83 @@
       "en": "",
       "id": "",
       "th": ""
+    },
+    "longtoothed-fruit-bat": {
+      "name": "Long‑Toothed Fruit Bat",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "northern-white-faced-owl": {
+      "name": "Northern White-Faced Owl",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "palau-scops-owl": {
+      "name": "Palau Scops Owl",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "eastern-screech-owl": {
+      "name": "Eastern Screech Owl",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "pumpkin-raven": {
+      "name": "Pumpkin Raven",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "strawberry-raven": {
+      "name": "Strawberry Raven",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "mandarin-raven": {
+      "name": "Mandarin Raven",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "apple-raven": {
+      "name": "Apple Raven",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "truffle-raven": {
+      "name": "Truffle Raven",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "honduran-white-bat": {
+      "name": "Honduran White Bat",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "tanzanian-woolly-bat": {
+      "name": "Tanzanian Woolly Bat",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
     }
   },
   "animals": {},
@@ -294,6 +448,139 @@
     "mandarin-milkshake": {
       "name": "Mandarin Milkshake",
       "reason": "deskripsi di sumber sama persis dengan Apple Milkshake dan menyebut apel, hampir pasti salah salin di heartodex; disembunyikan sampai sumber diperbaiki",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "cape-gooseberry-apple-hot-cocoa": {
+      "name": "Cape Gooseberry & Apple Hot Cocoa",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "cape-gooseberry-blueberry-hot-cocoa": {
+      "name": "Cape Gooseberry & Blueberry Hot Cocoa",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "cape-gooseberry-grape-hot-cocoa": {
+      "name": "Cape Gooseberry & Grape Hot Cocoa",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "cape-gooseberry-mandarin-hot-cocoa": {
+      "name": "Cape Gooseberry & Mandarin Hot Cocoa",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "cape-gooseberry-pineapple-hot-cocoa": {
+      "name": "Cape Gooseberry & Pineapple Hot Cocoa",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "cape-gooseberry-raspberry-hot-cocoa": {
+      "name": "Cape Gooseberry & Raspberry Hot Cocoa",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "cape-gooseberry-strawberry-hot-cocoa": {
+      "name": "Cape Gooseberry & Strawberry Hot Cocoa",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "cape-gooseberry-hot-cocoa": {
+      "name": "Cape Gooseberry Hot Cocoa",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "creamy-pumpkin-carrot-soup": {
+      "name": "Creamy Pumpkin Carrot Soup",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "creamy-pumpkin-corn-soup": {
+      "name": "Creamy Pumpkin Corn Soup",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "creamy-pumpkin-eggplant-soup": {
+      "name": "Creamy Pumpkin Eggplant Soup",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "creamy-pumpkin-mushroom-soup": {
+      "name": "Creamy Pumpkin Mushroom Soup",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "creamy-pumpkin-potato-soup": {
+      "name": "Creamy Pumpkin Potato Soup",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "creamy-pumpkin-tomato-soup": {
+      "name": "Creamy Pumpkin Tomato Soup",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "gloomwood-meal": {
+      "name": "Gloomwood Meal",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "tom-yum-cuttlefish-noodles": {
+      "name": "Tom Yum Cuttlefish Noodles",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "tom-yum-golden-cuttlefish-noodles": {
+      "name": "Tom Yum Golden Cuttlefish Noodles",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "tom-yum-pharaoh-cuttlefish-noodles": {
+      "name": "Tom Yum Pharaoh Cuttlefish Noodles",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "tom-yum-spineless-cuttlefish-noodles": {
+      "name": "Tom Yum Spineless Cuttlefish Noodles",
+      "reason": "terjemahan Indonesia belum ada",
       "en": "",
       "id": "",
       "th": ""
@@ -321,16 +608,53 @@
       "id": "",
       "th": ""
     },
+    "pumpkin": {
+      "name": "Pumpkin",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
     "avocado": {
       "name": "Avocado",
       "reason": "deskripsi tidak ada di sumber (blok About kosong)",
       "en": "",
       "id": "",
       "th": ""
+    },
+    "cape-gooseberry": {
+      "name": "Cape Gooseberry",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
     }
   },
-  "collectibles": {},
-  "ingredients": {},
+  "collectibles": {
+    "honey-mushroom": {
+      "name": "Honey Mushroom",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    }
+  },
+  "ingredients": {
+    "cinnamon-cocoa-powder": {
+      "name": "Cinnamon Cocoa Powder",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    },
+    "tom-yum-paste": {
+      "name": "Tom Yum Paste",
+      "reason": "terjemahan Indonesia belum ada",
+      "en": "",
+      "id": "",
+      "th": ""
+    }
+  },
   "items": {
     "inflatable-insect-attractor": {
       "name": "Inflatable Insect Attractor",

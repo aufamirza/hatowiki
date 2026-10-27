@@ -5,7 +5,8 @@ heartodex (`descriptionOriginal`). Yang diubah hanya salah ketik yang jelas bera
 file data tetap apa adanya. Daftar pembetulannya ada di `scripts/translations/english-corrections.json`.
 
 - Pembetulan: 11 di 8 entri (y→g: 7, kapital: 3, OCR: 1).
-- Tidak ada teks di sumber (14 entri): Baikal Teal, Inca Tern, Chestnut-Cheeked Starling, Blue-Headed Quail-Dove, White Peafowl, Snowy Owl, Red-Browed Finch, Atlantic Puffin, Blue-Footed Booby, Whooper Swan, Black Swan, Black Peafowl, Black Stork, Spectacled Owl.
+- Tidak ditampilkan karena disembunyikan di versi Indonesia (salah salin di sumber): Long‑Toothed Fruit Bat (`longtoothed-fruit-bat`), Northern White-Faced Owl (`northern-white-faced-owl`), Palau Scops Owl (`palau-scops-owl`), Eastern Screech Owl (`eastern-screech-owl`), Pumpkin Raven (`pumpkin-raven`), Strawberry Raven (`strawberry-raven`), Mandarin Raven (`mandarin-raven`), Apple Raven (`apple-raven`), Truffle Raven (`truffle-raven`), Honduran White Bat (`honduran-white-bat`), Tanzanian Woolly Bat (`tanzanian-woolly-bat`). Di versi Inggris juga tampil "No description available yet.".
+- Tidak ada teks di sumber (14 entri): Baikal Teal, Inca Tern, Blue-Headed Quail-Dove, White Peafowl, Chestnut-Cheeked Starling, Snowy Owl, Red-Browed Finch, Atlantic Puffin, Blue-Footed Booby, Whooper Swan, Black Swan, Black Peafowl, Black Stork, Spectacled Owl.
 - Entri lain memakai teks sumber tanpa perubahan, jadi tidak dicantumkan di tabel.
 
 ## Pembetulan salah ketik

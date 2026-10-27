@@ -22,9 +22,15 @@
 export const BASE_GAME = 'Base Game'
 export const BASE_GAME_EMOJI = '🎮'
 
-// Tanggal mulai dari halaman tiap event di Heartodex ("Start Date"), diperiksa 2026-09-28.
+// Tanggal mulai dari halaman tiap event di Heartodex ("Start Date"), diperiksa 2026-10-27.
 /** @type {GameEvent[]} */
 export const EVENTS = [
+  {
+    name: 'Night of Divination',
+    emoji: '🎃',
+    startDate: '2026-10-10',
+    source: 'https://www.heartodex.com/en/events/night-of-divination',
+  },
   {
     name: 'Autumn Moon Treasury',
     emoji: '🍂',

@@ -5,6 +5,7 @@ heartodex (`descriptionOriginal`). Yang diubah hanya salah ketik yang jelas bera
 file data tetap apa adanya. Daftar pembetulannya ada di `scripts/translations/english-corrections.json`.
 
 - Pembetulan: 1 di 1 entri (kapital: 1).
+- Tidak ditampilkan karena disembunyikan di versi Indonesia (salah salin di sumber): Cinnamon Cocoa Powder (`cinnamon-cocoa-powder`), Tom Yum Paste (`tom-yum-paste`). Di versi Inggris juga tampil "No description available yet.".
 - Entri lain memakai teks sumber tanpa perubahan, jadi tidak dicantumkan di tabel.
 
 ## Pembetulan salah ketik

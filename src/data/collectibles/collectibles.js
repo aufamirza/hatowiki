@@ -598,6 +598,23 @@ export const collectibles = [
     source: 'https://www.heartodex.com/en/collectibles/black-truffle',
   },
   {
+    slug: 'honey-mushroom',
+    name: 'Honey Mushroom',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'A softly glowing honey-gold cap that\'ll latch onto just about anything.',
+    sellValue: 16,
+    energy: 5,
+    locations: [
+      { name: 'Fishing Village Square', zone: 'fishing-village-square' },
+    ],
+    image: '/images/collectibles/honey-mushroom.webp',
+    imageSize: [400, 400],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/collectibles/honey-mushroom',
+  },
+  {
     slug: 'glasswort',
     name: 'Glasswort',
     category: 'Call of Whales',

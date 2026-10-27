@@ -5,5 +5,6 @@ heartodex (`descriptionOriginal`). Yang diubah hanya salah ketik yang jelas bera
 file data tetap apa adanya. Daftar pembetulannya ada di `scripts/translations/english-corrections.json`.
 
 - Pembetulan: 0 di 0 entri.
+- Tidak ditampilkan karena disembunyikan di versi Indonesia (salah salin di sumber): Pumpkin (`pumpkin`), Cape Gooseberry (`cape-gooseberry`). Di versi Inggris juga tampil "No description available yet.".
 - Tidak ada teks di sumber (2 entri): Paddy, Avocado.
 - Entri lain memakai teks sumber tanpa perubahan, jadi tidak dicantumkan di tabel.

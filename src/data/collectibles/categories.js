@@ -8,4 +8,5 @@ export const COLLECTIBLE_CATEGORIES = {
   'Meteor Shower': { emoji: '🌠' },
   'Call of Whales': { emoji: '🐳' },
   'Dreamlight Cinematics': { emoji: '🎬' },
+  'Night of Divination': { emoji: '🎃' },
 }

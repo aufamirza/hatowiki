@@ -5,6 +5,7 @@ heartodex (`descriptionOriginal`). Yang diubah hanya salah ketik yang jelas bera
 file data tetap apa adanya. Daftar pembetulannya ada di `scripts/translations/english-corrections.json`.
 
 - Pembetulan: 23 di 19 entri (y→g: 11, OCR: 5, kapital: 7).
+- Tidak ditampilkan karena disembunyikan di versi Indonesia (salah salin di sumber): Blue Sea Angel (`blue-sea-angel`), Green Sea Angel (`green-sea-angel`), Golden Cuttlefish (`golden-cuttlefish`), Purple Sea Angel (`purple-sea-angel`), Pharaoh Cuttlefish (`pharaoh-cuttlefish`), Spineless Cuttlefish (`spineless-cuttlefish`). Di versi Inggris juga tampil "No description available yet.".
 - Tidak ada teks di sumber (13 entri): Asian Arowana, Blackspot Sergeant, Lionhead, Whale Shark, Mahi-Mahi, Moon Jelly, Angelfish, Pink Betta, Green Sea Turtle, White-Faced Surgeonfish, Lionfish, Blue-and-Yellow Wrasse, Azure Demoiselle.
 - Entri lain memakai teks sumber tanpa perubahan, jadi tidak dicantumkan di tabel.
 

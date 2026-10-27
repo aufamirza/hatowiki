@@ -5,7 +5,7 @@ heartodex (`descriptionOriginal`). Yang diubah hanya salah ketik yang jelas bera
 file data tetap apa adanya. Daftar pembetulannya ada di `scripts/translations/english-corrections.json`.
 
 - Pembetulan: 15 di 15 entri (y→g: 4, kapital: 4, apostrof: 5, OCR: 2).
-- Tidak ditampilkan karena disembunyikan di versi Indonesia (salah salin di sumber): Colorful Brick Large Red Damselfly (`colorful-brick-large-red-damselfly`). Di versi Inggris juga tampil "No description available yet.".
+- Tidak ditampilkan karena disembunyikan di versi Indonesia (salah salin di sumber): Pumpkin Dung Beetle (`pumpkin-dung-beetle`), Strawberry Dung Beetle (`strawberry-dung-beetle`), Mandarin Dung Beetle (`mandarin-dung-beetle`), Shiitake Dung Beetle (`shiitake-dung-beetle`), Truffle Dung Beetle (`truffle-dung-beetle`), Colorful Brick Large Red Damselfly (`colorful-brick-large-red-damselfly`). Di versi Inggris juga tampil "No description available yet.".
 - Tidak ada teks di sumber (11 entri): Atlas Beetle, Queen Alexandra's Birdwing, Greater Asian Lady Beetle, Goliath Beetle, Red Milkweed Locust, Flamer Skimmer, Purple Spotted Swallowtail, Scarce Morpho, Green Metalwing, Green Snail, Glasswing Butterfly.
 - Entri lain memakai teks sumber tanpa perubahan, jadi tidak dicantumkan di tabel.
 

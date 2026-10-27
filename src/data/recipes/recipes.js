@@ -1737,6 +1737,371 @@ export const recipes = [
     source: 'https://www.heartodex.com/en/recipes/crayfish-avocado-cup',
   },
   {
+    slug: 'cape-gooseberry-apple-hot-cocoa',
+    name: 'Cape Gooseberry & Apple Hot Cocoa',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'cape-gooseberry-apple-hot-cocoa',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Apple-kissed hot cocoa, like a little taste of autumn from the farm.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [260, 390, 520, 1040, 2080],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'crops/cape-gooseberry', quantity: 1 }, { item: 'ingredients/milk', quantity: 1 }, { item: 'ingredients/cinnamon-cocoa-powder', quantity: 1 }, { item: 'collectibles/apple', quantity: 1 }] },
+    ],
+    image: '/images/recipes/cape-gooseberry-apple-hot-cocoa.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/cape-gooseberry-apple-hot-cocoa',
+  },
+  {
+    slug: 'cape-gooseberry-blueberry-hot-cocoa',
+    name: 'Cape Gooseberry & Blueberry Hot Cocoa',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'cape-gooseberry-blueberry-hot-cocoa',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'They say blue kills your appetite. Let\'s hope this hot cocoa proves them wrong.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [240, 360, 480, 960, 1920],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'ingredients/cinnamon-cocoa-powder', quantity: 1 }, { item: 'ingredients/milk', quantity: 1 }, { item: 'crops/cape-gooseberry', quantity: 1 }, { item: 'collectibles/blueberry', quantity: 1 }] },
+    ],
+    image: '/images/recipes/cape-gooseberry-blueberry-hot-cocoa.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/cape-gooseberry-blueberry-hot-cocoa',
+  },
+  {
+    slug: 'cape-gooseberry-grape-hot-cocoa',
+    name: 'Cape Gooseberry & Grape Hot Cocoa',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'cape-gooseberry-grape-hot-cocoa',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Before that first sip of hot cocoa, who\'s really counting the grapes at the bottom?',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [690, 1035, 1380, 2760, 5520],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'ingredients/milk', quantity: 1 }, { item: 'crops/grape', quantity: 1 }, { item: 'crops/cape-gooseberry', quantity: 1 }, { item: 'ingredients/cinnamon-cocoa-powder', quantity: 1 }] },
+    ],
+    image: '/images/recipes/cape-gooseberry-grape-hot-cocoa.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/cape-gooseberry-grape-hot-cocoa',
+  },
+  {
+    slug: 'cape-gooseberry-mandarin-hot-cocoa',
+    name: 'Cape Gooseberry & Mandarin Hot Cocoa',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'cape-gooseberry-mandarin-hot-cocoa',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Orange-kissed hot cocoa. On Grimkin Night, one cup is all it takes to feel the holiday spirit.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [260, 390, 520, 1040, 2080],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'crops/cape-gooseberry', quantity: 1 }, { item: 'ingredients/cinnamon-cocoa-powder', quantity: 1 }, { item: 'ingredients/milk', quantity: 1 }, { item: 'collectibles/mandarin', quantity: 1 }] },
+    ],
+    image: '/images/recipes/cape-gooseberry-mandarin-hot-cocoa.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/cape-gooseberry-mandarin-hot-cocoa',
+  },
+  {
+    slug: 'cape-gooseberry-pineapple-hot-cocoa',
+    name: 'Cape Gooseberry & Pineapple Hot Cocoa',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'cape-gooseberry-pineapple-hot-cocoa',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Pineapple-kissed hot cocoa. No matter how cold it is outside, it\'s pure summer in your cup.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [260, 390, 520, 1040, 2080],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'ingredients/milk', quantity: 1 }, { item: 'crops/pineapple', quantity: 1 }, { item: 'crops/cape-gooseberry', quantity: 1 }, { item: 'ingredients/cinnamon-cocoa-powder', quantity: 1 }] },
+    ],
+    image: '/images/recipes/cape-gooseberry-pineapple-hot-cocoa.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/cape-gooseberry-pineapple-hot-cocoa',
+  },
+  {
+    slug: 'cape-gooseberry-raspberry-hot-cocoa',
+    name: 'Cape Gooseberry & Raspberry Hot Cocoa',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'cape-gooseberry-raspberry-hot-cocoa',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Raspberries don\'t need any fancy tricks. Just let them soak in the hot cocoa and work their charm.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [260, 390, 520, 1040, 2080],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'crops/cape-gooseberry', quantity: 1 }, { item: 'ingredients/cinnamon-cocoa-powder', quantity: 1 }, { item: 'collectibles/raspberry', quantity: 1 }, { item: 'ingredients/milk', quantity: 1 }] },
+    ],
+    image: '/images/recipes/cape-gooseberry-raspberry-hot-cocoa.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/cape-gooseberry-raspberry-hot-cocoa',
+  },
+  {
+    slug: 'cape-gooseberry-strawberry-hot-cocoa',
+    name: 'Cape Gooseberry & Strawberry Hot Cocoa',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'cape-gooseberry-strawberry-hot-cocoa',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Strawberry-kissed hot cocoa, with a surprisingly boozy, fruity twist.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [580, 870, 1160, 2320, 4640],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'ingredients/milk', quantity: 1 }, { item: 'crops/cape-gooseberry', quantity: 1 }, { item: 'ingredients/cinnamon-cocoa-powder', quantity: 1 }, { item: 'crops/strawberry', quantity: 1 }] },
+    ],
+    image: '/images/recipes/cape-gooseberry-strawberry-hot-cocoa.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/cape-gooseberry-strawberry-hot-cocoa',
+  },
+  {
+    slug: 'cape-gooseberry-hot-cocoa',
+    name: 'Cape Gooseberry Hot Cocoa',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'cape-gooseberry-hot-cocoa',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Does skipping hot cocoa on a freezing night mean you\'ve grown up? Or does it just mean it\'s not cold enough yet?',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [240, 360, 480, 960, 1920],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'crops/cape-gooseberry', quantity: 1 }, { item: 'ingredients/milk', quantity: 1 }, { item: 'ingredients/cinnamon-cocoa-powder', quantity: 1 }] },
+      { type: 'choose', count: 1, options: ['collectibles/blueberry', 'collectibles/mandarin', 'crops/grape', 'collectibles/raspberry', 'crops/cape-gooseberry', 'collectibles/apple', 'crops/pineapple', 'crops/strawberry'] },
+    ],
+    image: '/images/recipes/cape-gooseberry-hot-cocoa.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/cape-gooseberry-hot-cocoa',
+  },
+  {
+    slug: 'creamy-pumpkin-carrot-soup',
+    name: 'Creamy Pumpkin Carrot Soup',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'soup',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'A carrot passes by the pumpkin soup and decides to jump in.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [370, 555, 740, 1480, 2960],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'crops/pumpkin', quantity: 1 }, { item: 'crops/carrot', quantity: 1 }, { item: 'ingredients/milk', quantity: 1 }, { item: 'collectibles/honey-mushroom', quantity: 1 }] },
+    ],
+    image: '/images/recipes/creamy-pumpkin-carrot-soup.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/creamy-pumpkin-carrot-soup',
+  },
+  {
+    slug: 'creamy-pumpkin-corn-soup',
+    name: 'Creamy Pumpkin Corn Soup',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'soup',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Golden corn kernels crowd into the pumpkin soup, all nodding in agreement—this one\'s a winner!',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [730, 1095, 1460, 2920, 5840],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'collectibles/honey-mushroom', quantity: 1 }, { item: 'ingredients/milk', quantity: 1 }, { item: 'crops/pumpkin', quantity: 1 }, { item: 'crops/corn', quantity: 1 }] },
+    ],
+    image: '/images/recipes/creamy-pumpkin-corn-soup.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/creamy-pumpkin-corn-soup',
+  },
+  {
+    slug: 'creamy-pumpkin-eggplant-soup',
+    name: 'Creamy Pumpkin Eggplant Soup',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'soup',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Eggplant can\'t go in soup? This dish begs to differ. Prejudice never tasted this good.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [620, 930, 1240, 2480, 4960],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'ingredients/milk', quantity: 1 }, { item: 'crops/pumpkin', quantity: 1 }, { item: 'collectibles/honey-mushroom', quantity: 1 }, { item: 'crops/eggplant', quantity: 1 }] },
+    ],
+    image: '/images/recipes/creamy-pumpkin-eggplant-soup.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/creamy-pumpkin-eggplant-soup',
+  },
+  {
+    slug: 'creamy-pumpkin-mushroom-soup',
+    name: 'Creamy Pumpkin Mushroom Soup',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'soup',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Silky, rich mushroom soup served right inside a pumpkin. Rumor has it someone loved it so much they ate the bowl too.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [240, 360, 480, 960, 1920],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'crops/pumpkin', quantity: 1 }, { item: 'collectibles/honey-mushroom', quantity: 1 }, { item: 'ingredients/milk', quantity: 1 }] },
+    ],
+    image: '/images/recipes/creamy-pumpkin-mushroom-soup.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/creamy-pumpkin-mushroom-soup',
+  },
+  {
+    slug: 'creamy-pumpkin-potato-soup',
+    name: 'Creamy Pumpkin Potato Soup',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'soup',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Hearty, creamy potato soup. One bowl in, and you\'ll be round as a pumpkin yourself.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [300, 450, 600, 1200, 2400],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'crops/potatoes', quantity: 1 }, { item: 'crops/pumpkin', quantity: 1 }, { item: 'collectibles/honey-mushroom', quantity: 1 }, { item: 'ingredients/milk', quantity: 1 }] },
+    ],
+    image: '/images/recipes/creamy-pumpkin-potato-soup.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/creamy-pumpkin-potato-soup',
+  },
+  {
+    slug: 'creamy-pumpkin-tomato-soup',
+    name: 'Creamy Pumpkin Tomato Soup',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'soup',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'One look at it, and you can tell the tomato stole the show.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [240, 360, 480, 960, 1920],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'crops/pumpkin', quantity: 1 }, { item: 'crops/tomato', quantity: 1 }, { item: 'collectibles/honey-mushroom', quantity: 1 }, { item: 'ingredients/milk', quantity: 1 }] },
+    ],
+    image: '/images/recipes/creamy-pumpkin-tomato-soup.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/creamy-pumpkin-tomato-soup',
+  },
+  {
+    slug: 'gloomwood-meal',
+    name: 'Gloomwood Meal',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'gloomwood-meal',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Deep in a little forest aglow with ghostly light, an owl brings over a curious feast. Dig in—before the Grimkin sniff it out!',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [1060, 1590, 2120, 4240, 8480],
+    ingredients: [
+      { type: 'choose', count: 1, options: ['recipes/creamy-pumpkin-potato-soup', 'recipes/creamy-pumpkin-tomato-soup', 'recipes/creamy-pumpkin-carrot-soup', 'recipes/creamy-pumpkin-mushroom-soup', 'recipes/creamy-pumpkin-corn-soup', 'recipes/creamy-pumpkin-eggplant-soup'] },
+      { type: 'choose', count: 1, options: ['recipes/cape-gooseberry-blueberry-hot-cocoa', 'recipes/cape-gooseberry-hot-cocoa', 'recipes/cape-gooseberry-raspberry-hot-cocoa', 'recipes/cape-gooseberry-strawberry-hot-cocoa', 'recipes/cape-gooseberry-pineapple-hot-cocoa', 'recipes/cape-gooseberry-apple-hot-cocoa', 'recipes/cape-gooseberry-mandarin-hot-cocoa', 'recipes/cape-gooseberry-grape-hot-cocoa'] },
+      { type: 'choose', count: 1, options: ['recipes/tom-yum-pharaoh-cuttlefish-noodles', 'recipes/tom-yum-cuttlefish-noodles', 'recipes/tom-yum-golden-cuttlefish-noodles', 'recipes/tom-yum-spineless-cuttlefish-noodles'] },
+    ],
+    image: '/images/recipes/gloomwood-meal.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/gloomwood-meal',
+  },
+  {
+    slug: 'tom-yum-cuttlefish-noodles',
+    name: 'Tom Yum Cuttlefish Noodles',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'tom-yum-cuttlefish-noodles',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'The ink turns the noodles black. The flavor, thankfully, is anything but.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [290, 435, 580, 1160, 2320],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'crops/pumpkin', quantity: 1 }, { item: 'ingredients/tom-yum-paste', quantity: 1 }] },
+      { type: 'choose', count: 1, options: ['fish/pharaoh-cuttlefish', 'fish/spineless-cuttlefish', 'fish/golden-cuttlefish'] },
+    ],
+    image: '/images/recipes/tom-yum-cuttlefish-noodles.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/tom-yum-cuttlefish-noodles',
+  },
+  {
+    slug: 'tom-yum-golden-cuttlefish-noodles',
+    name: 'Tom Yum Golden Cuttlefish Noodles',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'tom-yum-golden-cuttlefish-noodles',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Sweet, silky pumpkin soup meets tender, chewy cuttlefish rings. Every bite is rich, tangy, and just the right amount of heat.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [290, 435, 580, 1160, 2320],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'ingredients/tom-yum-paste', quantity: 1 }, { item: 'fish/golden-cuttlefish', quantity: 1 }, { item: 'crops/pumpkin', quantity: 1 }] },
+    ],
+    image: '/images/recipes/tom-yum-golden-cuttlefish-noodles.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/tom-yum-golden-cuttlefish-noodles',
+  },
+  {
+    slug: 'tom-yum-pharaoh-cuttlefish-noodles',
+    name: 'Tom Yum Pharaoh Cuttlefish Noodles',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'tom-yum-pharaoh-cuttlefish-noodles',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Looks terrifying. Tastes amazing. Seriously appetizing.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [290, 435, 580, 1160, 2320],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'fish/pharaoh-cuttlefish', quantity: 1 }, { item: 'crops/pumpkin', quantity: 1 }, { item: 'ingredients/tom-yum-paste', quantity: 1 }] },
+    ],
+    image: '/images/recipes/tom-yum-pharaoh-cuttlefish-noodles.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/tom-yum-pharaoh-cuttlefish-noodles',
+  },
+  {
+    slug: 'tom-yum-spineless-cuttlefish-noodles',
+    name: 'Tom Yum Spineless Cuttlefish Noodles',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    family: 'tom-yum-spineless-cuttlefish-noodles',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'The broth shimmers gold. One sip, and you\'ll swear you\'re drinking liquid sunshine.',
+    level: 1,
+    energy: null, // TODO: energi tidak ada di sumber: 1★ "---", 2★ "---", 3★ "---", 4★ "---", 5★ "---"
+    buffs: null, // TODO: buff tidak dicantumkan di sumber (blok "Energy & Buffs" hanya berisi energi per bintang)
+    marketValue: [290, 435, 580, 1160, 2320],
+    ingredients: [
+      { type: 'fixed', items: [{ item: 'fish/spineless-cuttlefish', quantity: 1 }, { item: 'crops/pumpkin', quantity: 1 }, { item: 'ingredients/tom-yum-paste', quantity: 1 }] },
+    ],
+    image: '/images/recipes/tom-yum-spineless-cuttlefish-noodles.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/recipes/tom-yum-spineless-cuttlefish-noodles',
+  },
+  {
     slug: 'chocolate-mooncake',
     name: 'Chocolate Mooncake',
     category: 'Autumn Moon Treasury',

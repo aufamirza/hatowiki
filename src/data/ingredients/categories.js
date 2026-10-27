@@ -13,4 +13,5 @@ export const INGREDIENT_CATEGORIES = {
   'Dreamlight Cinematics': { emoji: '🎬' },
   'Modular Streets': { emoji: '🧩' },
   'Winter frost season': { emoji: '⛄' },
+  'Night of Divination': { emoji: '🎃' },
 }

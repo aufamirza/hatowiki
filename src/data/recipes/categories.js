@@ -18,4 +18,5 @@ export const RECIPE_CATEGORIES = {
   'Rainbow Verse': { emoji: '🌈' },
   'SANRIO CHARACTERS': { emoji: '🫧' },
   'Winter frost season': { emoji: '⛄' },
+  'Night of Divination': { emoji: '🎃' },
 }

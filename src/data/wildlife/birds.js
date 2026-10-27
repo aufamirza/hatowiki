@@ -1300,25 +1300,6 @@ export const birds = [
     source: 'https://www.heartodex.com/en/birds/inca-tern',
   },
   {
-    slug: 'chestnut-cheeked-starling',
-    name: 'Chestnut-Cheeked Starling',
-    category: 'Common',
-    section: 'Base Game',
-    description: null, // TODO: terjemahan Indonesia belum ada
-    descriptionOriginal: null, // TODO: deskripsi tidak ditemukan di sumber
-    level: 11,
-    marketValue: [30, 120, 240, 480, 720],
-    schedule: ['Day', 'Dawn', 'Dusk', 'Night'],
-    weather: ['Rainbow', 'Sunny', 'Rainy'],
-    locations: [
-      { name: 'Windmill Flower Field', zone: 'windmill-flower-field' },
-    ],
-    image: '/images/birds/chestnut-cheeked-starling.webp',
-    imageSize: [400, 415],
-    locationImage: '/images/maps/heartopia-map.webp',
-    source: 'https://www.heartodex.com/en/birds/chestnut-cheeked-starling',
-  },
-  {
     slug: 'blue-headed-quail-dove',
     name: 'Blue-Headed Quail-Dove',
     category: 'Common',
@@ -1355,6 +1336,25 @@ export const birds = [
     imageSize: [400, 435],
     locationImage: '/images/maps/heartopia-map.webp',
     source: 'https://www.heartodex.com/en/birds/white-peafowl',
+  },
+  {
+    slug: 'chestnut-cheeked-starling',
+    name: 'Chestnut-Cheeked Starling',
+    category: 'Common',
+    section: 'Base Game',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: null, // TODO: deskripsi tidak ditemukan di sumber
+    level: 11,
+    marketValue: [30, 120, 240, 480, 720],
+    schedule: ['Day', 'Dawn', 'Dusk', 'Night'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Windmill Flower Field', zone: 'windmill-flower-field' },
+    ],
+    image: '/images/birds/chestnut-cheeked-starling.webp',
+    imageSize: [400, 415],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/birds/chestnut-cheeked-starling',
   },
   {
     slug: 'snowy-owl',
@@ -1526,6 +1526,215 @@ export const birds = [
     imageSize: [400, 483],
     locationImage: '/images/maps/heartopia-map.webp',
     source: 'https://www.heartodex.com/en/birds/spectacled-owl',
+  },
+  {
+    slug: 'longtoothed-fruit-bat',
+    name: 'Long‑Toothed Fruit Bat',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'A tiny "flying fox" that hangs upside down, with a huge wingspan and a mouth full of sharp teeth. But it\'s really just a harmless fruit eater. It sleeps in pitch-black caves all day and only comes out to perch at night.',
+    level: 1,
+    marketValue: null, // TODO: harga jual tidak ada di sumber (blok Market Value kosong)
+    schedule: ['Dusk', 'Night'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Forest Island', zone: 'forest-island' },
+    ],
+    image: '/images/birds/longtoothed-fruit-bat.webp',
+    imageSize: [400, 400],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/birds/longtoothed-fruit-bat',
+  },
+  {
+    slug: 'northern-white-faced-owl',
+    name: 'Northern White-Faced Owl',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'A master of disguise who adapts on the fly, shifting its size and posture to match its opponent\'s strength. It vanishes to unknown places at night, only returning to the trees by day.',
+    level: 1,
+    marketValue: null, // TODO: harga jual tidak ada di sumber (blok Market Value kosong)
+    schedule: ['Day', 'Dawn'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Forest Island', zone: 'forest-island' },
+    ],
+    image: '/images/birds/northern-white-faced-owl.webp',
+    imageSize: [400, 400],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/birds/northern-white-faced-owl',
+  },
+  {
+    slug: 'palau-scops-owl',
+    name: 'Palau Scops Owl',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'A warm little island dweller that loves duets. You\'ll usually hear it before you ever see it. It vanishes to unknown places at night, only returning to the trees by day.',
+    level: 1,
+    marketValue: null, // TODO: harga jual tidak ada di sumber (blok Market Value kosong)
+    schedule: ['Day', 'Dawn'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Forest Island', zone: 'forest-island' },
+    ],
+    image: '/images/birds/palau-scops-owl.webp',
+    imageSize: [400, 400],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/birds/palau-scops-owl',
+  },
+  {
+    slug: 'eastern-screech-owl',
+    name: 'Eastern Screech Owl',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Reddish-brown feathers and fine speckles make the perfect disguise—just another piece of tree bark. It vanishes to unknown places at night, only returning to the trees by day.',
+    level: 1,
+    marketValue: null, // TODO: harga jual tidak ada di sumber (blok Market Value kosong)
+    schedule: ['Day', 'Dawn'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Forest Island', zone: 'forest-island' },
+    ],
+    image: '/images/birds/eastern-screech-owl.webp',
+    imageSize: [400, 400],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/birds/eastern-screech-owl',
+  },
+  {
+    slug: 'pumpkin-raven',
+    name: 'Pumpkin Raven',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Pumpkin‑orange feathers fit the Grimkin Night vibe perfectly. If it just stands still long enough, it might pass as a scarecrow.',
+    level: 1,
+    marketValue: null, // TODO: harga jual tidak ada di sumber (blok Market Value kosong)
+    schedule: ['Day', 'Dawn', 'Dusk', 'Night'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Ruins', zone: 'ruins' },
+    ],
+    image: '/images/birds/pumpkin-raven.webp',
+    imageSize: [400, 400],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/birds/pumpkin-raven',
+  },
+  {
+    slug: 'strawberry-raven',
+    name: 'Strawberry Raven',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Almost no bird of prey wears pink, but the strawberry raven adores it.',
+    level: 1,
+    marketValue: null, // TODO: harga jual tidak ada di sumber (blok Market Value kosong)
+    schedule: ['Day', 'Dawn', 'Dusk', 'Night'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Crater Lake', zone: 'crater-lake' },
+    ],
+    image: '/images/birds/strawberry-raven.webp',
+    imageSize: [400, 400],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/birds/strawberry-raven',
+  },
+  {
+    slug: 'mandarin-raven',
+    name: 'Mandarin Raven',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'This raven is so bright orange it practically glows. Hiding in the shadows? Not happening—this outfit is all style, no stealth.',
+    level: 1,
+    marketValue: null, // TODO: harga jual tidak ada di sumber (blok Market Value kosong)
+    schedule: ['Day', 'Dawn', 'Dusk', 'Night'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Onsen', zone: 'onsen' },
+    ],
+    image: '/images/birds/mandarin-raven.webp',
+    imageSize: [400, 400],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/birds/mandarin-raven',
+  },
+  {
+    slug: 'apple-raven',
+    name: 'Apple Raven',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'That big apple in its beak... don\'t tell me it stole it from another bird again.',
+    level: 1,
+    marketValue: null, // TODO: harga jual tidak ada di sumber (blok Market Value kosong)
+    schedule: ['Day', 'Dawn', 'Dusk', 'Night'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Stone Cliff', zone: 'stone-cliff' },
+    ],
+    image: '/images/birds/apple-raven.webp',
+    imageSize: [400, 400],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/birds/apple-raven',
+  },
+  {
+    slug: 'truffle-raven',
+    name: 'Truffle Raven',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'This truffle raven has a long‑standing partnership with wild beasts—it calls them over with a single caw, lets them do the digging, and then reaps the rewards.',
+    level: 1,
+    marketValue: null, // TODO: harga jual tidak ada di sumber (blok Market Value kosong)
+    schedule: ['Day', 'Dawn', 'Dusk', 'Night'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Raven\'s Hoard Event', zone: null }, // TODO: zona peta tidak ada di sumber (tampil placeholder)
+    ],
+    image: '/images/birds/truffle-raven.webp',
+    imageSize: [400, 400],
+    locationImage: null,
+    source: 'https://www.heartodex.com/en/birds/truffle-raven',
+  },
+  {
+    slug: 'honduran-white-bat',
+    name: 'Honduran White Bat',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Snow‑white and bright yellow—this one looks like a plush toy come to life. It sleeps in pitch-black caves all day and only comes out to perch at night.',
+    level: 1,
+    marketValue: null, // TODO: harga jual tidak ada di sumber (blok Market Value kosong)
+    schedule: ['Dusk', 'Night'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Forest Island', zone: 'forest-island' },
+    ],
+    image: '/images/birds/honduran-white-bat.webp',
+    imageSize: [400, 400],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/birds/honduran-white-bat',
+  },
+  {
+    slug: 'tanzanian-woolly-bat',
+    name: 'Tanzanian Woolly Bat',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'A tuft of bright orange fluff dangling from a bare branch—less a bird, more a little sunset. It sleeps in pitch-black caves all day and only comes out to perch at night.',
+    level: 1,
+    marketValue: null, // TODO: harga jual tidak ada di sumber (blok Market Value kosong)
+    schedule: ['Dusk', 'Night'],
+    weather: ['Rainbow', 'Sunny', 'Rainy'],
+    locations: [
+      { name: 'Forest Island', zone: 'forest-island' },
+    ],
+    image: '/images/birds/tanzanian-woolly-bat.webp',
+    imageSize: [400, 400],
+    locationImage: '/images/maps/heartopia-map.webp',
+    source: 'https://www.heartodex.com/en/birds/tanzanian-woolly-bat',
   },
   {
     slug: 'blue-hoopoe',

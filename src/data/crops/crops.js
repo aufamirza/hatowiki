@@ -55,6 +55,23 @@ export const crops = [
     source: 'https://www.heartodex.com/en/crops/paddy',
   },
   {
+    slug: 'pumpkin',
+    name: 'Pumpkin',
+    category: 'Common',
+    section: 'Base Game',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'After countless experiments, Blanc finally transplanted this crop to town.',
+    level: 1,
+    seedPrice: 10,
+    growthTime: 900,
+    starValues: [
+      { label: 'Market Value', values: [30, 40, 50, 60, 90] },
+    ],
+    image: '/images/crops/pumpkin.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/crops/pumpkin',
+  },
+  {
     slug: 'potatoes',
     name: 'Potatoes',
     category: 'Common',
@@ -274,6 +291,24 @@ export const crops = [
     image: '/images/crops/avocado.webp',
     imageSize: [400, 339],
     source: 'https://www.heartodex.com/en/crops/avocado',
+  },
+  {
+    slug: 'cape-gooseberry',
+    name: 'Cape Gooseberry',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'From afar, the ripe fruit looks just like little lanterns, but don\'t be fooled. They\'re not from any lantern plant.',
+    level: 1,
+    seedPrice: 10,
+    growthTime: 900,
+    starValues: [
+      { label: 'Market Value', values: [30, 40, 50, 60, 90] },
+      { label: 'Event Tokens', values: [5, 6, 7, 8, 10] },
+    ],
+    image: '/images/crops/cape-gooseberry.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/crops/cape-gooseberry',
   },
   {
     slug: 'prickly-pear',

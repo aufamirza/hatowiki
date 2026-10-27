@@ -10,4 +10,5 @@ export const CROP_CATEGORIES = {
   'Dreamlight Cinematics': { emoji: '🎬' },
   'Modular Streets': { emoji: '🧩' },
   'Winter frost season': { emoji: '⛄' },
+  'Night of Divination': { emoji: '🎃' },
 }

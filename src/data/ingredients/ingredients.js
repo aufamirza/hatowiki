@@ -320,6 +320,36 @@ export const ingredients = [
     source: 'https://www.heartodex.com/en/ingredients/tea-leaves',
   },
   {
+    slug: 'cinnamon-cocoa-powder',
+    name: 'Cinnamon Cocoa Powder',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Rich, slightly bitter cocoa with bold, sweet‑spicy cinnamon—a scent straight out of another era.',
+    buyPrice: 50,
+    sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
+    origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: null, // TODO: tempat membeli/mendapatkan belum diisi (cari di About, Fandom, atau situs panduan; tulis sumbernya)
+    image: '/images/ingredients/cinnamon-cocoa-powder.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/ingredients/cinnamon-cocoa-powder',
+  },
+  {
+    slug: 'tom-yum-paste',
+    name: 'Tom Yum Paste',
+    category: 'Night of Divination',
+    section: 'Night of Divination',
+    description: null, // TODO: terjemahan Indonesia belum ada
+    descriptionOriginal: 'Sour, spicy, and savory all packed into one little jar. Just one scoop, and even a kitchen newbie turns into a chef.',
+    buyPrice: 50,
+    sellPrice: null, // TODO: harga jual (Sell Price) tidak ada di sumber
+    origin: null, // TODO: info asal (Origin) tidak ada di sumber
+    obtainedFrom: null, // TODO: tempat membeli/mendapatkan belum diisi (cari di About, Fandom, atau situs panduan; tulis sumbernya)
+    image: '/images/ingredients/tom-yum-paste.webp',
+    imageSize: [400, 400],
+    source: 'https://www.heartodex.com/en/ingredients/tom-yum-paste',
+  },
+  {
     slug: 'osmanthus-jam',
     name: 'Osmanthus Jam',
     category: 'Autumn Moon Treasury',

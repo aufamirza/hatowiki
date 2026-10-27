@@ -34,6 +34,7 @@ export const FISH_CATEGORIES = {
   'Modular Streets': { emoji: '🧩' },
   'Winter frost season': { emoji: '⛄' },
   'Echo of Ancients': { emoji: '🦖' },
+  'Night of Divination': { emoji: '🎃' },
 }
 
 // Kategori serangga beserta ikonnya persis seperti di Heartodex (semua bagian, termasuk event).
@@ -45,6 +46,7 @@ export const BUG_CATEGORIES = {
   'Modular Streets': { emoji: '🧩' },
   'Winter frost season': { emoji: '⛄' },
   'Echo of Ancients': { emoji: '🦖' },
+  'Night of Divination': { emoji: '🎃' },
 }
 
 // Kategori burung beserta ikonnya persis seperti di Heartodex (semua bagian, termasuk event).
@@ -56,6 +58,7 @@ export const BIRD_CATEGORIES = {
   'Modular Streets': { emoji: '🧩' },
   'Winter frost season': { emoji: '⛄' },
   'Echo of Ancients': { emoji: '🦖' },
+  'Night of Divination': { emoji: '🎃' },
 }
 
 // Kategori hewan liar beserta ikonnya persis seperti di Heartodex, dari seluruh 11 hewan di
